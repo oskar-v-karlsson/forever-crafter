@@ -1,0 +1,269 @@
+# ForeverCrafter: DB2 create-item recipes left out of Data/Recipes.lua
+# Reason: absent from every Wowhead Forever profession list (likely unobtainable),
+# or Wowhead learnedat 9999. A recipe the player knows still comes in at runtime
+# through C_TradeSkillUI. Columns: spellID, skillLine, name
+# db2 build 1.60.1.70888, Wowhead lists fetched 2026-11-11
+2671	164	Rough Bronze Bracers
+7636	197	Green Woolen Robe
+8366	164	Ironforge Chain
+8368	164	Ironforge Gauntlets
+8778	197	Boots of Darkness
+9942	164	Mithril Plate Gloves
+10550	165	Nightscape Cloak
+11447	171	Draught of Water Walking
+12062	197	Stormcloth Pants
+12063	197	Stormcloth Gloves
+12068	197	Stormcloth Vest
+12083	197	Stormcloth Headband
+12087	197	Stormcloth Shoulders
+12090	197	Stormcloth Boots
+12719	202	Explosive Arrow
+12720	202	Goblin "Boom" Box
+12722	202	Goblin Radio
+12900	202	Mobile Alarm
+12904	202	Gnomish Ham Radio
+16960	164	Thorium Greatsword
+16965	164	Bleakwood Hew
+16967	164	Inlaid Thorium Hammer
+16980	164	Rune Edge
+16986	164	Blood Talon
+16987	164	Darkspear
+17579	171	Greater Holy Protection Potion
+19106	165	Onyxia Scale Breastplate
+22430	171	Refined Scale of Onyxia
+30021	129	Crystal Infused Bandage
+426607	171	Elixir of Coalesced Regret
+427061	164	Mantle of the Second War
+428424	197	Phoenix Bindings
+429351	197	Extraplanar Spidersilk Boots
+429354	165	Void-Touched Leather Gloves
+429869	165	Void-Touched Leather Gauntlets
+430397	164	Blackfathom Sharpening Stone
+430409	333	Blackfathom Mana Oil
+431362	202	Soul Vessel
+435819	165	Faintly Glowing Leather
+435841	197	Invoker's Cord
+435848	197	Invoker's Mantle
+435904	165	Glowing Gneuro-Linked Cowl
+435949	165	Glowing Hyperconductive Scale Coif
+435951	165	Gneuro-Conductive Channeler's Hood
+435953	165	Rad-Resistant Scale Hood
+439085	197	Crimson Silk Robe
+439086	197	Black Mageweave Vest
+439088	197	Black Mageweave Leggings
+439091	197	Earthen Silk Belt
+439093	197	Crimson Silk Shoulders
+439094	197	Long Silken Cloak
+439097	197	Boots of the Enchanter
+439098	197	Crimson Silk Belt
+439100	197	Earthen Vest
+439102	197	Enchanter's Cowl
+439105	165	Big Voodoo Mask
+439108	165	Big Voodoo Robe
+439110	165	Guardian Leather Bracers
+439112	165	Guardian Belt
+439114	165	Guardian Pants
+439116	165	Turtle Scale Breastplate
+439118	165	Turtle Scale Gloves
+439120	164	Golden Scale Gauntlets
+439122	164	Golden Scale Boots
+439124	164	Golden Scale Cuirass
+439126	164	Golden Scale Coif
+439128	164	Moonsteel Broadsword
+439130	164	Golden Scale Shoulders
+439132	164	Golden Scale Leggings
+439134	333	Greater Mystic Wand
+439156	333	Sigil of Innovation
+439960	171	Lesser Arcane Elixir
+446183	165	Paranoia Mantle
+446185	165	Shrieking Spaulders
+446186	165	Cacophonous Chain Shoulderguards
+446189	165	Shoulderpads of Obsession
+446190	165	Wailing Chain Mantle
+446192	165	Membrane of Dark Neurosis
+451706	165	Screaming Chain Pauldrons
+460460	164	Sulfuron Hammer
+461645	165	Honed Blue Dragonscale Shoulders
+461647	164	Skyrider's Masterwork Stormhammer
+461649	165	Living Green Dragonscale Leggings
+461651	164	Fiery Plate Gauntlets of the Hidden Technique
+461653	165	Brilliant Chromatic Cloak
+461655	165	Hardened Black Dragonscale Breastplate
+461657	165	Hardened Black Dragonscale Leggings
+461659	165	Hardened Black Dragonscale Shoulders
+461661	165	Masterwork Volcanic Breastplate
+461663	165	Masterwork Volcanic Shoulders
+461665	165	Masterwork Volcanic Leggings
+461667	164	Tempered Dark Iron Plate
+461669	164	Refined Arcanite Champion
+461671	164	Stronger-hold Gauntlets
+461673	165	Honed Blue Dragonscale Breastplate
+461675	164	Refined Arcanite Reaper
+461677	165	Living Green Dragonscale Gauntlets
+461690	165	Mastercrafted Shifting Cloak
+461692	165	Synthetic Gordok Ogre Suit
+461692	197	Synthetic Gordok Ogre Suit
+461706	165	Swift Flight Vambraces
+461708	197	Incandescent Mooncloth Robe
+461710	202	Fiery Core Sharpshooter Rifle
+461712	164	Refined Hammer of the Titans
+461714	164	Desecration
+461716	164	Deadly Heartseeker
+461718	164	Tranquility
+461720	165	Living Green Dragonscale Breastplate
+461722	165	Devilcore Gauntlets
+461724	165	Devilcore Leggings
+461727	197	Leather-Reinforced Runecloth Bag
+461730	164	Hardened Frostguard
+461733	164	Finely-Enchanted Battlehammer
+461735	164	Invincible Mail
+461737	164	Tempest Gauntlets
+461739	164	Warcrest of the Great Chief
+461743	164	Sageblade of the Archmagus
+461747	197	Incandescent Mooncloth Vest
+461750	197	Incandescent Mooncloth Circlet
+461752	197	Incandescent Mooncloth Leggings
+461754	165	Girdle of Arcane Insight
+462227	165	Honed Blue Dragonscale Leggings
+462282	197	Embroidered Belt of the Archmage
+463866	333	Sigil of Flowing Waters
+463869	333	Conductive Shield Coating
+463972	197	Bottomless Bag
+470349	129	Dense Runecloth Bandage
+470359	185	Darkclaw Bisque
+470370	185	Smoked Redgill
+471400	333	Magnificent Trollshine
+1213481	164	Razorspike Headcage
+1213484	164	Razorspike Shoulderplate
+1213490	164	Razorspike Battleplate
+1213492	164	Obsidian Reaver
+1213492	164	Obsidian Reaver
+1213498	164	Obsidian Champion
+1213500	164	Obsidian Destroyer
+1213502	164	Obsidian Stormhammer
+1213504	164	Obsidian Sageblade
+1213506	164	Obsidian Defender
+1213513	165	Glowing Chitin Armor Kit
+1213519	165	Sharpened Chitin Armor Kit
+1213521	165	Razorbramble Cowl
+1213523	165	Razorbramble Shoulderpads
+1213525	165	Razorbramble Leathers
+1213527	197	Vampiric Cowl
+1213530	197	Vampiric Shawl
+1213532	197	Vampiric Robe
+1213534	197	Qiraji Silk Scarf
+1213536	197	Qiraji Silk Cape
+1213538	197	Qiraji Silk Cloak
+1213540	197	Qiraji Silk Drape
+1213544	171	Flask of Unyielding Sorrow
+1213546	171	Flask of Ancient Knowledge
+1213548	171	Flask of the Old Gods
+1213552	171	Flask of Madness
+1213559	171	Elixir of the Honey Badger
+1213563	171	Elixir of the Mage-Lord
+1213565	171	Elixir of the Ironside
+1213571	171	Elixir of Alacrity
+1213573	202	Arcane Megabomb
+1213576	202	The Fumigator
+1213578	202	Obsidian Bomb
+1213586	202	G00 DV-1B3 Generator
+1213588	202	Tuned Force Reactive Disk
+1213593	333	Speedstone
+1213595	333	Tear of the Dreamer
+1213598	333	Lodestone of Retaliation
+1213600	333	Enchanted Stopwatch
+1213603	333	Ruby-Encrusted Broach
+1213607	333	Scroll: Wrath of the Swarm
+1213610	333	Enchanted Repellent
+1213628	333	Enchanted Prayer Tome
+1213633	333	Enchanted Totem
+1213635	333	Enchanted Mushroom
+1213638	186	Smelt Obsidian-Infused Thorium Bar
+1213643	164	Obsidian Grinding Stone
+1213646	202	Obsidian Blasting Powder
+1213709	164	Ironvine Belt
+1213711	164	Ironvine Gloves
+1213715	164	Ironvine Breastplate
+1213717	165	Sandstalker Bracers
+1213720	165	Sandstalker Gauntlets
+1213723	165	Sandstalker Breastplate
+1213726	165	Spitfire Bracers
+1213728	165	Spitfire Gauntlets
+1213731	165	Spitfire Breastplate
+1213734	165	Bramblewood Belt
+1213736	165	Bramblewood Boots
+1213738	165	Bramblewood Helm
+1213740	197	Sylvan Shoulders
+1213742	197	Sylvan Crown
+1213744	197	Sylvan Vest
+1213746	164	Heavy Obsidian Belt
+1213748	164	Light Obsidian Belt
+1213751	165	Dreamscale Breastplate
+1214137	164	Obsidian Heartseeker
+1214145	202	Obsidian Shotgun
+1214173	197	Bolt of Qiraji Silk
+1214257	164	Black Grasp of the Destroyer
+1214270	164	Jagged Obsidian Shield
+1214274	164	Obsidian Mail Tunic
+1214303	165	Dreamscale Kilt
+1214306	197	Dreamscale Bracers
+1214307	197	Dreamscale Mitts
+1214309	164	Dreamscale Visor
+1215507	164	Thick Obsidian Breastplate
+1216005	333	Libram of Righteousness
+1216007	333	Libram of the Exorcist
+1216010	333	Libram of Sanctity
+1216014	333	Totem of Pyroclastic Thunder
+1216016	333	Totem of Thunderous Strikes
+1216018	333	Totem of Flowing Magma
+1216020	333	Idol of Sidereal Wrath
+1216022	333	Idol of Feline Ferocity
+1216024	333	Idol of Ursin Power
+1217207	202	Obsidian Scope
+1221012	202	Creepy Censor Sensors
+1223760	197	Glacial Vest
+1223762	197	Glacial Cloak
+1223764	197	Glacial Gloves
+1223766	197	Glacial Wrists
+1223768	197	Frosty Vest
+1223770	197	Frosty Gloves
+1223772	197	Frosty Wrists
+1223774	165	Icy Scale Breastplate
+1223776	165	Icy Scale Gauntlets
+1223778	165	Icy Scale Bracers
+1223780	165	Polar Tunic
+1223782	165	Polar Gloves
+1223784	165	Polar Bracers
+1223787	164	Icebane Breastplate
+1223789	164	Icebane Gauntlets
+1223791	164	Icebane Bracers
+1224607	197	Scarlet Augur's Hood
+1224608	197	Scarlet Augur's Mantle
+1224610	197	Scarlet Augur's Cuffs
+1224611	197	Scarlet Augur's Mitts
+1224612	197	Scarlet Augur's Strap
+1224613	197	Scarlet Augur's Leggings
+1224614	197	Scarlet Augur's Soles
+1224615	165	Scarlet Infiltrator's Bandana
+1224616	165	Scarlet Infiltrator's Shoulderpads
+1224617	165	Scarlet Infiltrator's Vest
+1224618	165	Scarlet Infiltrator's Bracers
+1224619	165	Scarlet Infiltrator's Gloves
+1224620	165	Scarlet Infiltrator's Belt
+1224621	165	Scarlet Infiltrator's Trousers
+1224622	165	Scarlet Infiltrator's Shoes
+1224623	165	Scarlet Huntsman's Coif
+1224624	165	Scarlet Huntsman's Pauldrons
+1224625	165	Scarlet Huntsman's Chain
+1224626	165	Scarlet Huntsman's Wristguards
+1224627	165	Scarlet Huntsman's Handguards
+1224628	165	Scarlet Huntsman's Clasp
+1224629	165	Scarlet Huntsman's Legguards
+1224630	165	Scarlet Huntsman's Boots
+1224631	164	Scarlet Soldier's Helmet
+1224632	164	Scarlet Soldier's Spaulders
+1224633	164	Scarlet Soldier's Chestplate
+1224635	164	Scarlet Soldier's Protectors
+1226689	165	Scarlet Quiver
+1226690	165	Scarlet Ammo Pouch
+1255241	185	Cleansing Stew (learnedat 9999)

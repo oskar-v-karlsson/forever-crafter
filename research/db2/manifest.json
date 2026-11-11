@@ -1,0 +1,146 @@
+{
+  "build": "1.60.1.70888",
+  "fetched": "2026-11-12",
+  "product": "wowf",
+  "tables": {
+    "Item": {
+      "columns": [
+        "ID",
+        "ClassID",
+        "SubclassID"
+      ],
+      "full_rows": 32008,
+      "full_sha256": "037ac6248ce1fceaad391fb0ec717cdb7ae1e8999e8c976c11b086a05deb5c57",
+      "snapshot_rows": 4723,
+      "snapshot_sha256": "60c3fe6916a8c26381f004f1b8e386b6f271c7f1f79c965b7aca9879f29fc7ce",
+      "url": "https://wago.tools/db2/Item/csv?build=1.60.1.70888"
+    },
+    "ItemEffect": {
+      "columns": [
+        "ID",
+        "SpellID",
+        "TriggerType"
+      ],
+      "full_rows": 12693,
+      "full_sha256": "d7b8b53248beb9e1bdbacdcf3106ff5edacadb36548a48ff4777074caba67ff3",
+      "snapshot_rows": 4080,
+      "snapshot_sha256": "6e163fefd2d1900ec6238e9f32926072bac7ed83d2eb2f965651accd00e9d68b",
+      "url": "https://wago.tools/db2/ItemEffect/csv?build=1.60.1.70888"
+    },
+    "ItemSparse": {
+      "columns": [
+        "ID",
+        "Display_lang",
+        "OverallQualityID",
+        "SellPrice",
+        "BuyPrice",
+        "VendorStackCount",
+        "Stackable",
+        "RequiredSkill",
+        "RequiredSkillRank",
+        "Bonding"
+      ],
+      "full_rows": 19325,
+      "full_sha256": "ced52fc6e5ca345805cfe3c015c05426c138aebd23ff1ad8a26cff5f1fe08be9",
+      "snapshot_rows": 4180,
+      "snapshot_sha256": "551ae17c6f5fa2aa9ddb18ba37e382f0df8a138b61fd2f38fdd65be539b0fe01",
+      "url": "https://wago.tools/db2/ItemSparse/csv?build=1.60.1.70888"
+    },
+    "ItemXItemEffect": {
+      "columns": [
+        "ID",
+        "ItemEffectID",
+        "ItemID"
+      ],
+      "full_rows": 12679,
+      "full_sha256": "15dc36eec90ca5768e00469cb8065aedf82efcf205ca03281daf6aac69ca1885",
+      "snapshot_rows": 4080,
+      "snapshot_sha256": "659d5bcf78c970b87bee1b7163629fccdb50d301c61ac3898f368967cfe934a5",
+      "url": "https://wago.tools/db2/ItemXItemEffect/csv?build=1.60.1.70888"
+    },
+    "SkillLine": {
+      "columns": [
+        "ID",
+        "DisplayName_lang",
+        "ParentSkillLineID",
+        "CategoryID"
+      ],
+      "full_rows": 154,
+      "full_sha256": "f3867d43ab42d1f5278e6e5028d0151bc06e4ef8e5cbd790a20df6ee57aa654d",
+      "snapshot_rows": 18,
+      "snapshot_sha256": "f0825281201334fdb9b9802fddae7b4a0c7b68eaf3d847e6bac61aa2cdd2f14e",
+      "url": "https://wago.tools/db2/SkillLine/csv?build=1.60.1.70888"
+    },
+    "SkillLineAbility": {
+      "columns": [
+        "ID",
+        "SkillLine",
+        "Spell",
+        "MinSkillLineRank",
+        "AcquireMethod",
+        "TrivialSkillLineRankLow",
+        "TrivialSkillLineRankHigh",
+        "NumSkillUps"
+      ],
+      "full_rows": 7853,
+      "full_sha256": "13ef58a08253125e3e9dca642a39bc480187987e90cfbe5c8be30e1ab3c8be0a",
+      "snapshot_rows": 2623,
+      "snapshot_sha256": "a8c642e86c46411012b9ae21fd86b3973ccfd9bf8cf37ed612064c5a11f1ffdc",
+      "url": "https://wago.tools/db2/SkillLineAbility/csv?build=1.60.1.70888"
+    },
+    "SpellEffect": {
+      "columns": [
+        "ID",
+        "SpellID",
+        "DifficultyID",
+        "EffectIndex",
+        "Effect",
+        "EffectItemType",
+        "EffectBasePointsF"
+      ],
+      "full_rows": 43508,
+      "full_sha256": "da2fb074eedb51bd1246ef53666044c0b757bdb67340c3969b712caa8481ac2b",
+      "snapshot_rows": 2300,
+      "snapshot_sha256": "d43dac2e4c3357b19960d8a774d1c142d21d66bb6d6b6f32612d22a385e70f4e",
+      "url": "https://wago.tools/db2/SpellEffect/csv?build=1.60.1.70888"
+    },
+    "SpellName": {
+      "columns": [
+        "ID",
+        "Name_lang"
+      ],
+      "full_rows": 32482,
+      "full_sha256": "4358b3d1a2a859284b2f46cf614e6a1f85320be342acc1c4b68b625f30cf47a5",
+      "snapshot_rows": 2580,
+      "snapshot_sha256": "93ed4c0d09007fdb86f2a00f6e376b36927c569a0b50cb32821c7d30840f97d2",
+      "url": "https://wago.tools/db2/SpellName/csv?build=1.60.1.70888"
+    },
+    "SpellReagents": {
+      "columns": [
+        "ID",
+        "SpellID",
+        "Reagent_0",
+        "Reagent_1",
+        "Reagent_2",
+        "Reagent_3",
+        "Reagent_4",
+        "Reagent_5",
+        "Reagent_6",
+        "Reagent_7",
+        "ReagentCount_0",
+        "ReagentCount_1",
+        "ReagentCount_2",
+        "ReagentCount_3",
+        "ReagentCount_4",
+        "ReagentCount_5",
+        "ReagentCount_6",
+        "ReagentCount_7"
+      ],
+      "full_rows": 3319,
+      "full_sha256": "f37423f667c09a6aaada6f05bed12e6d307fe15b3596944e132492f7f1dc9cc8",
+      "snapshot_rows": 2484,
+      "snapshot_sha256": "eebea1ba6b6c4940ab7750dd550a0b4d889db8e8c7dc9fd38b2ab2178ba72986",
+      "url": "https://wago.tools/db2/SpellReagents/csv?build=1.60.1.70888"
+    }
+  }
+}

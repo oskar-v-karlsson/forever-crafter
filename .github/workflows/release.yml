@@ -1,0 +1,61 @@
+# Every push to main: run the offline checks, build the addon zip and publish it as a GitHub Release
+# tagged v<TOC version>-<short commit>, e.g. v0.2.0-5f1a87c. The newest release is marked Latest.
+name: Release
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # lupa bundles a real Lua 5.1 (lupa.lua51), which make check uses to run the addon in a fake client.
+      - name: Install lupa
+        run: python -m pip install lupa
+
+      - name: Check
+        run: make check PYTHON=python
+
+      - name: Build zip
+        run: make zip PYTHON=python
+
+      - name: Create release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          version=$(sed -n 's/^## Version: *//p' ForeverCrafter/ForeverCrafter.toc | tr -d '\r')
+          short=$(git rev-parse --short=7 "$GITHUB_SHA")
+          tag="v${version}-${short}"
+          if gh release view "$tag" > /dev/null 2>&1; then
+            echo "Release $tag already exists (re-run): nothing to do."
+            exit 0
+          fi
+          asset="dist/ForeverCrafter-${tag}.zip"
+          cp "dist/ForeverCrafter-v${version}.zip" "$asset"
+
+          # Release notes: the commit messages of this push (newest last).
+          jq -r '[.commits[]?.message] | if length == 0 then empty else .[] end | . + "\n"' \
+            "$GITHUB_EVENT_PATH" > notes.md
+          if [ ! -s notes.md ]; then
+            git log -1 --format='%B' "$GITHUB_SHA" > notes.md
+          fi
+
+          gh release create "$tag" "$asset" \
+            --target "$GITHUB_SHA" \
+            --title "ForeverCrafter $tag" \
+            --notes-file notes.md \
+            --latest
