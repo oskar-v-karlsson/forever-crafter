@@ -99,6 +99,9 @@ local DEFAULTS = {
     profession = 0,        -- skill line ID, 0 = all
     minProfit = 0,         -- copper
     minListings = 1,       -- the result must have at least this many AH listings to count as AH-sellable
+    -- Hide results sold on the AH whose output sells fewer than this many per day in the region (TSM); 0 = off.
+    -- Vendor sales are never hidden; an output with no TSM data counts as below.
+    minSoldPerDay = 1,
     sort = "profit",
     sortDesc = true,
     mode = "char",         -- results window: "char" (this character) or "whatIf"

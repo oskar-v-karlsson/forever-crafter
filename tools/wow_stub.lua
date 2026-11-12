@@ -22,6 +22,8 @@ STUB = {
   items = {},       -- itemID → { name, quality, sell } (C_Item.GetItemInfo; nil = not cached)
   badEvents = {},   -- event → true: RegisterEvent throws, like the client does for unknown events
   faction = "Alliance",
+  regionName = "EU", -- GetCurrentRegionName()
+  region = 3,       -- GetCurrentRegion()
 }
 
 -- Frames ------------------------------------------------------------------------------------------
@@ -153,6 +155,8 @@ function GetRealmName() return "Test" end
 function UnitFactionGroup() return STUB.faction end
 function GetCursorPosition() return 0, 0 end
 function GetBuildInfo() return "1.60.1", "70888", "Nov 4 2026", 16001 end
+function GetCurrentRegionName() return STUB.regionName end
+function GetCurrentRegion() return STUB.region end
 
 C_AddOns = {}
 function C_AddOns.GetAddOnMetadata(_, field) return STUB.meta[field] end
