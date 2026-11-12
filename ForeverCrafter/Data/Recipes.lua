@@ -6,26 +6,27 @@ local _, ns = ...
 
 ns.DATA_BUILD = "1.60.1.70888"
 
--- skillLine = { name, parent } (parent 0 = the profession itself)
+-- skillLine = { name, parent, cat } (parent 0 = the profession itself; cat = SkillLine.CategoryID:
+--   11 profession, 9 secondary skill)
 ns.SkillLines = {
-  [129]={name="First Aid",parent=0,src="db2",verified="2026-11-12"},
-  [164]={name="Blacksmithing",parent=0,src="db2",verified="2026-11-12"},
-  [165]={name="Leatherworking",parent=0,src="db2",verified="2026-11-12"},
-  [171]={name="Alchemy",parent=0,src="db2",verified="2026-11-12"},
-  [185]={name="Cooking",parent=0,src="db2",verified="2026-11-12"},
-  [186]={name="Mining",parent=0,src="db2",verified="2026-11-12"},
-  [197]={name="Tailoring",parent=0,src="db2",verified="2026-11-12"},
-  [202]={name="Engineering",parent=0,src="db2",verified="2026-11-12"},
-  [333]={name="Enchanting",parent=0,src="db2",verified="2026-11-12"},
-  [2937]={name="Alchemy",parent=171,src="db2",verified="2026-11-12"},
-  [2938]={name="Blacksmithing",parent=164,src="db2",verified="2026-11-12"},
-  [2939]={name="Cooking",parent=185,src="db2",verified="2026-11-12"},
-  [2940]={name="Enchanting",parent=333,src="db2",verified="2026-11-12"},
-  [2941]={name="Engineering",parent=202,src="db2",verified="2026-11-12"},
-  [2942]={name="First Aid",parent=129,src="db2",verified="2026-11-12"},
-  [2945]={name="Leatherworking",parent=165,src="db2",verified="2026-11-12"},
-  [2946]={name="Mining",parent=186,src="db2",verified="2026-11-12"},
-  [2948]={name="Tailoring",parent=197,src="db2",verified="2026-11-12"},
+  [129]={name="First Aid",parent=0,cat=9,src="db2",verified="2026-11-12"},
+  [164]={name="Blacksmithing",parent=0,cat=11,src="db2",verified="2026-11-12"},
+  [165]={name="Leatherworking",parent=0,cat=11,src="db2",verified="2026-11-12"},
+  [171]={name="Alchemy",parent=0,cat=11,src="db2",verified="2026-11-12"},
+  [185]={name="Cooking",parent=0,cat=9,src="db2",verified="2026-11-12"},
+  [186]={name="Mining",parent=0,cat=11,src="db2",verified="2026-11-12"},
+  [197]={name="Tailoring",parent=0,cat=11,src="db2",verified="2026-11-12"},
+  [202]={name="Engineering",parent=0,cat=11,src="db2",verified="2026-11-12"},
+  [333]={name="Enchanting",parent=0,cat=11,src="db2",verified="2026-11-12"},
+  [2937]={name="Alchemy",parent=171,cat=11,src="db2",verified="2026-11-12"},
+  [2938]={name="Blacksmithing",parent=164,cat=11,src="db2",verified="2026-11-12"},
+  [2939]={name="Cooking",parent=185,cat=9,src="db2",verified="2026-11-12"},
+  [2940]={name="Enchanting",parent=333,cat=11,src="db2",verified="2026-11-12"},
+  [2941]={name="Engineering",parent=202,cat=11,src="db2",verified="2026-11-12"},
+  [2942]={name="First Aid",parent=129,cat=9,src="db2",verified="2026-11-12"},
+  [2945]={name="Leatherworking",parent=165,cat=11,src="db2",verified="2026-11-12"},
+  [2946]={name="Mining",parent=186,cat=11,src="db2",verified="2026-11-12"},
+  [2948]={name="Tailoring",parent=197,cat=11,src="db2",verified="2026-11-12"},
 }
 
 -- [spellID] = { name, skill = skill line, learn = rank needed to learn,
