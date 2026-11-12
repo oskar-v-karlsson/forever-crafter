@@ -872,6 +872,58 @@ def hidden_text(h):
                      for reg, (n, nodata, low, total) in h.items())
 
 
+def check_sales_tsm_empty():
+    """TSM installed but with no region data (Desktop App never run): full My character and what-if runs must stay
+    cheap (the scale detection is tried once per run, never per item) and use the snapshot; once TSM has data, the
+    next run uses it."""
+    lua, ns, stub = new_runtime()
+    login(lua, stub, skills={line: 300 for line in (171, 164, 333, 202, 165, 197, 185, 129, 186)},
+          known=list(ns.Recipes.keys()))
+    listings = []
+    for i in ns.Items.keys():
+        price = 100 + (i * 7919) % 50000
+        listings += [(i, 5, price * 5), (i, 1, price + 10)]
+    set_auctions(lua, stub, listings)
+    scan(lua, stub)
+    lua.execute("""
+      TSM_STUB = { calls = 0, live = {} }
+      TSM_API = { GetCustomPriceValue = function(key, s)
+        TSM_STUB.calls = TSM_STUB.calls + 1
+        local e = TSM_STUB.live[tonumber(s:match("^i:(%d+)$"))]
+        if not e then return nil end
+        return key == "DBRegionSoldPerDay" and e[1] or e[2]
+      end }
+    """)
+    tsm = lua.globals().TSM_STUB
+    eu = ns.SalesData.regions.eu
+    for region in ("EU", "KR"):
+        stub.regionName = region
+        ns.Sales.Reset()
+        tsm.calls = 0
+        res, _ = ns.Planner.Run()
+        res = list(res.values())
+        wres, _ = ns.Planner.Run(ltable(lua, {"whatIf": WI_DEFAULT}))
+        wres = list(wres.values())
+        expect(tsm.calls < 5000, f"TSM with no data ({region}): {tsm.calls} TSM_API calls in a full run and a what-if run")
+        srcs = {r.sales.src for r in res + wres if r.sales is not None}
+        expect(srcs == ({"snapshot"} if region == "EU" else set()),
+               f"TSM with no data ({region}): sales sources {srcs}")
+    # TSM gets its data later: the next run picks it up.
+    stub.regionName = "EU"
+    ns.Sales.Reset()
+    ns.Planner.Run()
+    for i, v in eu["items"].items():
+        tsm.live[i] = lua.table_from([v[1] * 2, v[2]])
+    tsm.calls = 0
+    res, _ = ns.Planner.Run()
+    live = [r for r in res.values() if r.sales is not None]
+    expect(live and all(r.sales.src == "tsm" for r in live), "the run after TSM loads its data must use it")
+    expect(tsm.calls < 10000, f"{tsm.calls} TSM_API calls in a run with TSM data")
+    errs = list(ns.errors.values())
+    expect(not errs, f"errors with TSM and no data: {errs[:3]}")
+    return tsm.calls
+
+
 def check_sales():
     """TSM sold per day: the bundled snapshot by region, the TSM addon's live values and their scale, the filter."""
     lua, ns, stub = new_runtime()
@@ -938,6 +990,9 @@ def check_sales():
     expect(a and a.src == "snapshot", "TSM loaded without values must fall back to the snapshot")
     feed(1000, 100)
     b = S.Get(item)
+    expect(b and b.src == "snapshot", "a failed scale detection must not be retried before the next run")
+    S.NewRun()
+    b = S.Get(item)
     expect(b and b.src == "tsm" and abs(b.perDay - eu["items"][item][1] * 1.1) < 1e-6
            and abs(b.rate - min(eu["items"][item][2] * 1.1, 1)) < 1e-6,
            f"TSM live x1000/x100 not read back (got {b and (b.src, b.perDay, b.rate)}): an item read before TSM had "
@@ -977,6 +1032,7 @@ def check_sales():
     lua.execute("TSM_API = nil")
     stub.regionName = "EU"
     S.Reset()
+    check_sales_tsm_empty()
 
     # Texts and the filter rule.
     expect([S.Format(x) for x in (None, 0.25, 3.44, 12.6)] == ["—", "0.25", "3.4", "13"], "Sales.Format")

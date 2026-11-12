@@ -465,6 +465,7 @@ end
 -- Evaluates every recipe. opts nil: this character (known recipes, plus unlearned ones its skill allows). opts
 -- { whatIf = settings }: a what-if character (see runWhatIf). → results (sorted by profit), stats
 function PL.Run(opts)
+  if ns.Sales then ns.Sales.NewRun() end
   if opts and opts.whatIf then return runWhatIf(opts.whatIf) end
   local results, stats = {}, { noPrice = 0, noValue = 0, evaluated = 0, hidden = 0 }
   if not ns.char then return results, stats end
@@ -504,6 +505,7 @@ end
 -- progress(i, n) after each set; done(results, stats) at the end. Starting a new run cancels the one before.
 local runToken = 0
 function PL.RunAsync(opts, progress, done)
+  if ns.Sales then ns.Sales.NewRun() end
   runToken = runToken + 1
   local token = runToken
   local co = coroutine.create(function()

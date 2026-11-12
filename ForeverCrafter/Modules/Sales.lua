@@ -8,12 +8,19 @@ ns.Sales = S
 local KEYS = { perDay = "DBRegionSoldPerDay", rate = "DBRegionSaleRate" }
 local SCALES = { 1, 100, 1000 }
 local PROBES = 25
+local RATE_PROBES = 200   -- recipe outputs probed for the scale when the region has no snapshot
 local REGION_BY_NUMBER = { [1] = "US", [3] = "EU" }   -- GetCurrentRegion(); assumed, see SOURCES.md
 
-local cache, region, regionName, scale
+local cache, region, regionName, scale, scaleTried
 
 function S.Reset()
-  cache, region, regionName, scale = {}, nil, nil, nil
+  cache, region, regionName, scale, scaleTried = {}, nil, nil, nil, false
+end
+
+-- Called when the planner starts a run: a scale detection that found no TSM values may be tried once more (TSM loads
+-- its data after login). Never per item: each try probes the TSM addon up to a few hundred times.
+function S.NewRun()
+  scaleTried = false
 end
 S.Reset()
 ns.Listen("RESET", S.Reset)
@@ -91,13 +98,17 @@ local function detectScale()
       return out
     end
   end
-  -- No snapshot to compare with: the largest sale rate of the recipe outputs (raw values are 0-1).
-  local maxRate, n = 0, 0
+  -- No snapshot to compare with: the largest sale rate of some recipe outputs (raw values are 0-1).
+  local maxRate, n, probed = 0, 0, 0
   for _, r in pairs(ns.Recipes) do
-    local v = r.out and raw(KEYS.rate, r.out[1])
-    if v then
-      n = n + 1
-      if v > maxRate then maxRate = v end
+    if r.out then
+      local v = raw(KEYS.rate, r.out[1])
+      if v then
+        n = n + 1
+        if v > maxRate then maxRate = v end
+      end
+      probed = probed + 1
+      if probed >= RATE_PROBES or n >= PROBES then break end
     end
   end
   if n < 3 then return nil end
@@ -107,7 +118,10 @@ end
 
 local function liveScale()
   if not liveAPI() then return nil end
-  if not scale then scale = detectScale() end
+  if not scale and not scaleTried then
+    scaleTried = true
+    scale = detectScale()
+  end
   return scale
 end
 
