@@ -50,6 +50,7 @@ Prices are only as fresh as your last scan, and other players buy and post all t
 | `/crafter status` | Your professions and skill, snapshot age, the AH cut in use |
 | `/crafter cut <pct>` | Set the AH cut in percent; blank goes back to the measured or assumed cut |
 | `/crafter minimap` | Show or hide the minimap button |
+| `/crafter dump` | Save the open profession window's full recipe list (learned and unlearned), reagents, outputs, the game's "how to learn" text and item info, for the data in this addon (see below); `/crafter dump clear` removes it |
 | `/crafter reset` | Forget prices, merchant data and this character's recipe data |
 | `/crafter debug` | Toggle debug output (also prints any API the client lacks) |
 
@@ -64,10 +65,12 @@ These cannot be tested outside the game. Please go through them once and report 
 3. [ ] `/crafter scan` at the AH finishes with "snapshot done: N listings, M items used by recipes" in chat. Note how long it took, and what the game says if you scan again right away (the throttle).
 4. [ ] Cloth, herbs and ore (commodities) have prices after a scan (e.g. Linen Cloth in a Tailoring chain).
 5. [ ] A price in the window matches the AH for one item: the lowest buyout per item, not per stack.
-6. [ ] Open a reagent vendor (e.g. one selling Empty Vial or Coarse Thread): its price shows without `~` afterwards and matches the merchant.
+6. [ ] Open a reagent vendor (e.g. one selling Empty Vial or Coarse Thread): its price shows without `~` afterwards and matches the merchant. The shopping list names a vendor from Wowhead Forever (e.g. "vendor (NPC name, zone +N)"); check that one of them really sells it.
 7. [ ] After an AH sale, open the mailbox: `/crafter status` shows the measured cut (e.g. `AH cut 5.0% (from 1 sale invoice(s))`).
 8. [ ] The minimap button and the compartment entry show a coin icon.
 9. [ ] `/crafter debug` lists no missing APIs or events.
+10. [ ] If your trainer or a vendor teaches a recipe listed in [`research/open_sources.txt`](research/open_sources.txt) (recipes, reagents and vendors that Wowhead Forever has no source for), or you can learn one of the left-out recipes in [`research/excluded_recipes.txt`](research/excluded_recipes.txt), please report it.
+11. [ ] **Help the recipe data:** open each profession window and type `/crafter dump` (on each character, for each profession, both factions if you can). Then `/reload` or log out, and send `WTF\Account\<account>\SavedVariables\ForeverCrafter.lua` (the file also holds your character names, skills and saved prices; the import reads only its `dump` part and keeps the recipes, items, faction and date, nothing about your characters). The game's own list then decides which recipes exist, and its reagents and "how to learn" text come before Wowhead Forever.
 
 ## Development
 
@@ -75,13 +78,13 @@ These cannot be tested outside the game. Please go through them once and report 
   - **TOC and policy:** `## Interface: 16001`, the file list, and no Classic or Retail source links in the data, docs or tools;
   - **data:** every entry has a `src` from the [SOURCES.md](SOURCES.md) table and a `verified` date, every referenced item exists, `Data/*.lua` matches what the pinned `research/` snapshots generate (`tools/gen_data.py verify`), and the Wowhead Forever tooltip fact for recipe 3170;
   - **runtime:** loads the addon in a fake WoW client (`tools/wow_stub.lua`) with the real data, then logs in, reads a profession window, scans an AH, opens a merchant and the mailbox, and drives the window and every command. It checks the costs, values and chains against hand-computed numbers, cycles between recipes, the chain depth limit, thin markets, missing APIs, a full run over all 2038 recipes, and that the zip holds `ForeverCrafter/` at its top level.
-- `make data` regenerates `ForeverCrafter/Data/*.lua` from `research/` (offline, deterministic). To move to a new client build: change `BUILD` in `tools/gen_data.py`, run `python3 tools/gen_data.py fetch`, dump the Wowhead Forever lists again in a browser with `tools/wowhead_dump.js` and `python3 tools/gen_data.py wowhead <folder>`, then `make data`, `make crosscheck` and update SOURCES.md.
+- `make data` regenerates `ForeverCrafter/Data/*.lua` from `research/` (offline, deterministic). To move to a new client build: change `BUILD` in `tools/gen_data.py`, run `python3 tools/gen_data.py fetch`, dump the Wowhead Forever lists again in a browser with `tools/wowhead_dump.js` and `python3 tools/gen_data.py wowhead <folder>`, read the pages in `research/wowhead/page_targets.json` and the recipe item lists with `tools/wowhead_crawl.js` (`FCcrawl`, `FCsourcemore`) and trim them with `python3 tools/gen_data.py wowhead-pages <folder>` and `wowhead-sourcemore <file>`, fetch the item tooltips with `python3 tools/gen_data.py wowhead-tooltips`, merge players' `/crafter dump` files with `python3 tools/gen_data.py client-dump <ForeverCrafter.lua ...>` (into `research/client/dump.json`), then `make data`, `make crosscheck` and update SOURCES.md.
 - `make crosscheck` compares a sample of recipes with the Wowhead Forever tooltips (network) and writes `research/crosscheck_<date>.txt`.
 - `make zip` builds `dist/ForeverCrafter-v<version>.zip` (unzip straight into `AddOns`).
 - Layout of `ForeverCrafter/`:
   - `Core/`: init, events, slash commands, saved variables (`Init.lua`); money and item helpers (`Util.lua`);
   - `Data/`: generated recipes, items and vendor reagents, each with source and verified date;
-  - `Modules/`: professions and skill (`Professions.lua`), the AH snapshot (`Scanner.lua`), buy and sell prices, merchants, invoices and deposits (`Pricing.lua`), the chain solver (`Planner.lua`), the window (`UI.lua`), the minimap button (`Minimap.lua`).
+  - `Modules/`: professions and skill (`Professions.lua`), the AH snapshot (`Scanner.lua`), buy and sell prices, merchants, invoices and deposits (`Pricing.lua`), the chain solver (`Planner.lua`), the window (`UI.lua`), the minimap button (`Minimap.lua`), `/crafter dump` (`Dump.lua`).
 - The client is the 12.x API ("Camelot", `## Interface: 16001`). Use `C_*` namespaces and pcall-wrap anything that may not exist.
 
 ## Licence

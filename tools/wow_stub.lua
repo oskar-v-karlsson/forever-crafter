@@ -11,7 +11,7 @@ STUB = {
   meta = {},        -- ForeverCrafter's TOC metadata (C_AddOns.GetAddOnMetadata)
   skills = {},      -- skill line → { rank, max } (C_SkillInfo.GetSkillLineInfoByID)
   known = {},       -- spell ID → true (C_SpellBook.IsSpellKnown)
-  -- trade-skill window: { line, rank, max, recipes = { [spell] = { learned, difficulty, schematic } },
+  -- trade-skill window: { line, rank, max, recipes = { [spell] = { learned, difficulty, schematic, source } },
   --   showUnlearned = bool }; nil = closed
   ts = nil,
   auctions = {},    -- { {itemID, stack, buyout}, ... } (C_AuctionHouse replicate list)
@@ -197,6 +197,10 @@ function C_TradeSkillUI.GetRecipeSchematic(id)
   return { recipeID = id, name = s.name, outputItemID = s.out[1], quantityMin = s.out[2], quantityMax = s.out[3],
     reagentSlotSchematics = slots }
 end
+function C_TradeSkillUI.GetRecipeSourceText(id)
+  local r = STUB.ts and STUB.ts.recipes[id]
+  return r and r.source or nil
+end
 function C_TradeSkillUI.GetShowUnlearned() return STUB.ts and STUB.ts.showUnlearned or false end
 function C_TradeSkillUI.SetShowUnlearned(v)
   STUB.ts.showUnlearned = v
@@ -246,6 +250,29 @@ C_Item = {}
 function C_Item.GetItemInfo(id)
   local d = STUB.items[id]
   if not d then return nil end
-  return d.name, "|Hitem:" .. id .. "|h", d.quality or 1, 1, 1, "Trade Goods", "", 20, "", 134400, d.sell or 0
+  return d.name, "|Hitem:" .. id .. "|h", d.quality or 1, 1, 1, "Trade Goods", "", 20, "", 134400, d.sell or 0, 7, 5, 0
 end
 function C_Item.RequestLoadItemDataByID() end
+
+-- SavedVariables ----------------------------------------------------------------------------------
+-- The text the client writes for a saved global at logout: `name = { ["key"] = value, [1] = value, ... }`.
+local function ser(v, indent)
+  if type(v) == "string" then return string.format("%q", v) end
+  if type(v) ~= "table" then return tostring(v) end
+  local keys = {}
+  for k in pairs(v) do table.insert(keys, k) end
+  table.sort(keys, function(a, b)
+    if type(a) == type(b) then return a < b end
+    return type(a) == "number"
+  end)
+  local out = { "{" }
+  for _, k in ipairs(keys) do
+    local key = type(k) == "string" and string.format("[%q]", k) or "[" .. tostring(k) .. "]"
+    table.insert(out, indent .. "\t" .. key .. " = " .. ser(v[k], indent .. "\t") .. ",")
+  end
+  table.insert(out, indent .. "}")
+  return table.concat(out, "\n")
+end
+function STUB.savedVariables(name)
+  return "\n" .. name .. " = " .. ser(_G[name], "") .. "\n"
+end

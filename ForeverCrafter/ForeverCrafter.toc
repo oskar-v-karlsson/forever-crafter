@@ -16,6 +16,7 @@ Data\Recipes.lua
 Data\Items.lua
 Data\Vendor.lua
 Modules\Professions.lua
+Modules\Dump.lua
 Modules\Scanner.lua
 Modules\Pricing.lua
 Modules\Planner.lua

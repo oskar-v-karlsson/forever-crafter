@@ -114,6 +114,7 @@ local CHAR_DEFAULTS = {
   listed = {},      -- skill line → { time, complete, ids = { [spellID] = true } } from the trade-skill window
   schematics = {},  -- spell ID → { skill, name, out = {id, min, max}, reagents = {{id, n}} } from GetRecipeSchematic
   difficulty = {},  -- spell ID → TradeskillRelativeDifficulty (0 optimal .. 3 trivial)
+  sourceText = {},  -- spell ID → C_TradeSkillUI.GetRecipeSourceText of an unlearned recipe (the game's "how to learn")
 }
 
 local function fill(dst, src)
@@ -182,6 +183,7 @@ local function help()
   ns.Print("/crafter minimap      - show or hide the minimap button")
   ns.Print("/crafter status       - professions, snapshot age, AH cut")
   ns.Print("/crafter reset        - forget prices, merchant data and this character's recipe data")
+  ns.Print("/crafter dump         - save the open profession's recipes and item data for the addon's data files")
   ns.Print("/crafter debug        - toggle debug output")
 end
 

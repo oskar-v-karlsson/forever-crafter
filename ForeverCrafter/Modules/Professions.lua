@@ -82,7 +82,7 @@ function P.IsHidden(spell, line)
   return listed and listed.complete and not listed.ids[spell] or false
 end
 
-local function readSchematic(id, line)
+function P.ReadSchematic(id, line)
   local ok, s = ns.Call("C_TradeSkillUI.GetRecipeSchematic", id, false)
   if not ok or type(s) ~= "table" or not s.outputItemID then return nil end
   local reagents = {}
@@ -99,7 +99,7 @@ local function readSchematic(id, line)
   }
 end
 
-local function recipeIDs()
+function P.RecipeIDs()
   local ok, ids = ns.Call("C_TradeSkillUI.GetAllRecipeIDs")
   if ok and type(ids) == "table" and #ids > 0 then return ids end
   ok, ids = ns.Call("C_TradeSkillUI.GetFilteredRecipeIDs")
@@ -107,7 +107,7 @@ local function recipeIDs()
   return nil
 end
 
-local function currentLine(ids)
+function P.CurrentLine(ids)
   for _, fn in ipairs({ "C_TradeSkillUI.GetBaseProfessionInfo", "C_TradeSkillUI.GetChildProfessionInfo" }) do
     local ok, info = ns.Call(fn)
     if ok and type(info) == "table" then
@@ -129,17 +129,21 @@ end
 
 local triedUnlearned, restoreUnlearned = {}, false
 
+-- True when the trade-skill window shows someone else's recipes (a link or an NPC crafter).
+function P.IsForeign()
+  local ok, linked = ns.Call("C_TradeSkillUI.IsTradeSkillLinked")
+  if ok and linked then return true end
+  ok, linked = ns.Call("C_TradeSkillUI.IsNPCCrafting")
+  return ok and linked or false
+end
+
 -- Reads the open trade-skill window. → true when something was captured
 function P.Capture()
   local char = ns.char
-  if not char then return false end
-  local ok, linked = ns.Call("C_TradeSkillUI.IsTradeSkillLinked")
-  if ok and linked then return false end
-  ok, linked = ns.Call("C_TradeSkillUI.IsNPCCrafting")
-  if ok and linked then return false end
-  local ids = recipeIDs()
+  if not char or P.IsForeign() then return false end
+  local ids = P.RecipeIDs()
   if not ids or #ids == 0 then return false end
-  local line, info = currentLine(ids)
+  local line, info = P.CurrentLine(ids)
   if not line then return false end
   if info and info.skillLevel and info.skillLevel > 0 then
     char.skills[line] = { rank = info.skillLevel, max = info.maxSkillLevel or info.skillLevel, time = time(),
@@ -154,10 +158,12 @@ function P.Capture()
         learned = learned + 1
         char.known[id] = true
         if r.relativeDifficulty then char.difficulty[id] = r.relativeDifficulty end
-        local s = readSchematic(id, line)
+        local s = P.ReadSchematic(id, line)
         if s then char.schematics[id] = s end
       else
         sawUnlearned = true
+        local okT, text = ns.Call("C_TradeSkillUI.GetRecipeSourceText", id)
+        if okT and type(text) == "string" and text ~= "" then char.sourceText[id] = text end
       end
     end
   end

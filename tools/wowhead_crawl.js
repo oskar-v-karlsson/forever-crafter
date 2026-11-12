@@ -9,6 +9,9 @@
 //   python3 tools/gen_data.py wowhead-pages <folder>
 // to trim them into research/wowhead/pages_*.json. The crawl stops at the first page that is not a normal
 // Wowhead Forever page (e.g. a bot check); FCstate[kind].left holds the IDs still to read, so nothing is guessed.
+// Wowhead's bot check trips after roughly 60-70 pages in a few minutes: use conc 1 and pause 5000 or more, and when
+// it trips, solve it in the tab and run FCcrawl again with ids = FCstate[kind].left and first = the next batch number.
+// await FCsourcemore() downloads the recipe item lists with their sourcemore column, see below.
 (() => {
   const NPC = ['id', 'name', 'location', 'react', 'stock', 'cost', 'stack', 'minlevel', 'maxlevel', 'classification',
     'count', 'outof'];
@@ -138,6 +141,40 @@
     a.click();
     a.remove();
   }
+
+  // The recipe item lists with their sourcemore column (the NPC, quest or zone Wowhead names when an item has one
+  // source of a kind) and the zone names, as one download, wh_sourcemore.json, for
+  //   python3 tools/gen_data.py wowhead-sourcemore wh_sourcemore.json
+  window.FCsourcemore = async function (paths = ['9.1', '9.2', '9.3', '9.4', '9.5', '9.6', '9.7', '9.8']
+    .map(s => '/forever/items=' + s)) {
+    const get = async url => {
+      const r = await fetch(url, { credentials: 'same-origin' });
+      const t = await r.text();
+      const title = (t.match(/<title>([^<]*)/) || [])[1] || '';
+      if (r.status !== 200 || !/WoW Forever/.test(title)) throw new Error('blocked at ' + url + ': ' + r.status + ' ' + title);
+      return [t, title];
+    };
+    const lists = {};
+    for (const path of paths) {
+      const [t, title] = await get(path);
+      const i = t.indexOf('var listviewitems = ');
+      if (i < 0) throw new Error('no listviewitems on ' + path);
+      lists[path] = {
+        title, rows: parseArray(t, i + 'var listviewitems = '.length).map(r => ({
+          id: r.id, name: String(r.name).replace(/^[0-7](?=\D)/, ''), source: r.source, sourcemore: r.sourcemore,
+        })),
+      };
+      await new Promise(r => setTimeout(r, 4000));
+    }
+    const [zt] = await get('/forever/zones');
+    const z = zt.indexOf('id="data.page.listPage.listviews">');
+    const views = JSON.parse(zt.slice(z + 34, zt.indexOf('</script>', z)));
+    const zones = views.find(v => v.id === 'zones').data
+      .map(r => ({ id: r.id, name: r.name, category: r.category, territory: r.territory }));
+    const out = { fetched: new Date().toISOString(), lists, zones: { url: '/forever/zones', rows: zones } };
+    download('wh_sourcemore', out);
+    return Object.entries(lists).map(([k, v]) => k + ' ' + v.rows.length).join(', ') + ', zones ' + zones.length;
+  };
 
   window.FCcrawl = async function ({ kind, ids, batch = 100, conc = 3, pause = 250, first = 0 }) {
     const st = window.FCstate[kind] = { done: 0, total: ids.length, posted: first, error: null,

@@ -133,8 +133,12 @@ local function knownUsable(spell, r)
 end
 
 -- What learning an unlearned recipe takes. → { cost (copper or nil), text }
-function PL.Acquire(r)
+-- The game's own source text comes first: read from this character's profession window, else from a client dump in
+-- the data (learnText).
+function PL.Acquire(r, spell)
   local parts, cost = {}, nil
+  local game = spell and ns.char and ns.char.sourceText[spell] or r.learnText
+  if game then table.insert(parts, "Game: " .. Util.SourceText(game)) end
   local how = {}
   for _, c in ipairs(r.how or {}) do how[c] = true end
   if how[6] then
@@ -155,22 +159,28 @@ function PL.Acquire(r)
       table.insert(options, "vendor " .. Util.Money(seen.unit) .. (seen.npc and (" (" .. seen.npc .. ")") or ""))
       if not cost or seen.unit < cost then cost = seen.unit end
     elseif v then
-      table.insert(options, "vendor ~" .. Util.Money(v.price) .. (v.limited and " (limited)" or ""))
+      table.insert(options, "vendor ~" .. Util.Money(v.price) .. (v.limited and " (limited)" or "")
+        .. Util.VendorNPC(item))
       if not cost or v.price < cost then cost = v.price end
     elseif unit then
       table.insert(options, "vendor " .. label)
     end
     local d = ns.Items[item]
-    table.insert(parts, Util.ItemText(item) .. ": " ..
-      (#options > 0 and table.concat(options, ", ") or Util.Sources(d and d.how)))
+    local from = Util.FromText(item)
+    if #options == 0 then
+      table.insert(options, Util.Sources(d and d.how))
+    end
+    table.insert(parts, Util.ItemText(item) .. ": " .. table.concat(options, ", ") .. (from and (" - " .. from) or ""))
   end
-  if #parts == 0 then
+  if #parts == (game and 1 or 0) then
     local rest = {}
     for _, c in ipairs(r.how or {}) do
       if c ~= 6 then table.insert(rest, c) end
     end
     if #rest > 0 then
       table.insert(parts, Util.Sources(rest))
+    elseif game then
+      -- the game's text says it all
     elseif r.acquire == 1 then
       table.insert(parts, "no source on Wowhead Forever; game data marks it AcquireMethod 1 (may be learned "
         .. "automatically - check your trainer)")
@@ -240,7 +250,7 @@ function PL.Run()
                 h = h + 1 },
             }
             if learnable then
-              res.acquire = PL.Acquire(r)
+              res.acquire = PL.Acquire(r, spell)
               if res.acquire.cost and res.profit > 0 then
                 res.payback = math.ceil(res.acquire.cost / res.profit)
               end

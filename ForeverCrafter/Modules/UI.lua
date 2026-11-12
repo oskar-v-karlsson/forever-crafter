@@ -170,8 +170,8 @@ function UI.DetailText(r)
   table.insert(out, "")
   table.insert(out, "|cffffd100Shopping list:|r")
   for _, e in ipairs(ns.Planner.ShoppingList(r.tree)) do
-    table.insert(out, string.format("  %d x %s - %s%s  %s", e.qty, Util.ItemText(e.id), SRC_TEXT[e.src],
-      e.est and " ~" or "", Util.Money(e.cost)))
+    table.insert(out, string.format("  %d x %s - %s%s%s  %s", e.qty, Util.ItemText(e.id), SRC_TEXT[e.src],
+      e.src == "vendor" and Util.VendorNPC(e.id) or "", e.est and " ~" or "", Util.Money(e.cost)))
   end
   if r.est then
     table.insert(out, "")

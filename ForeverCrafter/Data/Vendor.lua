@@ -4,90 +4,91 @@
 -- See SOURCES.md. Licence: GPL-2.0-or-later.
 local _, ns = ...
 
--- Items Wowhead Forever lists with the source "Vendor" (wh_list) and a DB2
--- BuyPrice > 0. price = DB2 BuyPrice for VendorStackCount (vstack) items -- the
--- per-bundle reading is an ASSUMPTION until checked at a merchant (SOURCES.md).
--- limited = Wowhead also lists other sources (drop, gathered, ...), so the vendor
--- may be limited-stock or rare; the planner only uses it after an in-game merchant
--- capture. recipe = a recipe item. Which NPC sells it needs a browser/in-game check.
+-- Reagents and recipe items sold by NPCs. price = DB2 BuyPrice for VendorStackCount
+-- (vstack) items; the item's Wowhead Forever page (wh_item) lists the same stack size
+-- per NPC. src wh_item: from the "Sold by" list on that page: limited = no NPC has
+-- unlimited stock, npcs = up to 3 NPCs {name, zone, side} (unlimited stock first),
+-- nNpc = how many NPCs sell it. src wh_list (no page read): Wowhead lists the source
+-- "Vendor" and limited = it also lists other sources or quality > Common. The planner
+-- only uses limited vendors after an in-game merchant capture. recipe = recipe item.
 ns.Vendor = {
-  [159]={price=25,vstack=5,limited=true,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Refreshing Spring Water
-  [728]={price=200,vstack=1,limited=true,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Recipe: Westfall Stew
-  [765]={price=40,vstack=1,limited=true,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Silverleaf
-  [785]={price=80,vstack=1,limited=true,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Mageroyal
-  [929]={price=300,vstack=1,limited=true,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Healing Potion
-  [1179]={price=125,vstack=5,limited=true,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Ice Cold Milk
-  [1205]={price=500,vstack=5,limited=true,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Melon Juice
-  [1645]={price=2000,vstack=5,limited=true,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Moonberry Juice
-  [1708]={price=1000,vstack=5,limited=true,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Sweet Nectar
-  [2289]={price=350,vstack=1,limited=true,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Scroll of Strength II
-  [2319]={price=200,vstack=1,limited=true,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Medium Leather
-  [2320]={price=10,vstack=1,limited=false,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Coarse Thread
-  [2321]={price=100,vstack=1,limited=false,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Fine Thread
-  [2324]={price=25,vstack=1,limited=false,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Bleach
-  [2325]={price=1000,vstack=1,limited=false,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Black Dye
-  [2447]={price=40,vstack=1,limited=true,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Peacebloom
-  [2449]={price=80,vstack=1,limited=true,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Earthroot
-  [2453]={price=100,vstack=1,limited=true,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Bruiseweed
-  [2455]={price=40,vstack=1,limited=true,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Minor Mana Potion
-  [2594]={price=1500,vstack=1,limited=true,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Flagon of Dwarven Honeymead
-  [2596]={price=120,vstack=1,limited=true,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Skin of Dwarven Stout
-  [2604]={price=50,vstack=1,limited=false,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Red Dye
-  [2605]={price=100,vstack=1,limited=false,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Green Dye
-  [2678]={price=10,vstack=5,limited=false,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Mild Spices
-  [2686]={price=50,vstack=1,limited=false,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Thunder Ale
-  [2692]={price=40,vstack=1,limited=false,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Hot Spices
-  [2697]={price=400,vstack=1,limited=true,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Recipe: Goretusk Liver Pie
-  [2698]={price=400,vstack=1,limited=true,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Recipe: Cooked Crab Claw
-  [2699]={price=800,vstack=1,limited=true,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Recipe: Redridge Goulash
-  [2700]={price=400,vstack=1,limited=true,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Recipe: Succulent Pork Ribs
-  [2701]={price=1600,vstack=1,limited=true,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Recipe: Seasoned Wolf Kabob
-  [2723]={price=50,vstack=1,limited=true,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Bottle of Dalaran Noir
-  [2880]={price=100,vstack=1,limited=false,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Weak Flux
-  [2889]={price=240,vstack=1,limited=true,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Recipe: Beer Basted Boar Ribs
-  [2894]={price=50,vstack=1,limited=false,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Rhapsody Malt
-  [3013]={price=100,vstack=1,limited=true,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Scroll of Protection
-  [3355]={price=200,vstack=1,limited=true,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Wild Steelbloom
-  [3356]={price=120,vstack=1,limited=true,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Kingsblood
-  [3357]={price=300,vstack=1,limited=true,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Liferoot
-  [3358]={price=700,vstack=1,limited=true,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Khadgar's Whisker
-  [3371]={price=20,vstack=5,limited=false,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Empty Vial
-  [3372]={price=200,vstack=5,limited=false,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Leaded Vial
-  [3385]={price=120,vstack=1,limited=true,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Lesser Mana Potion
-  [3466]={price=2000,vstack=1,limited=false,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Strong Flux
-  [3678]={price=400,vstack=1,limited=true,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Recipe: Crocolisk Steak
-  [3679]={price=400,vstack=1,limited=true,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Recipe: Blood Sausage
-  [3680]={price=1600,vstack=1,limited=true,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Recipe: Murloc Fin Soup
-  [3681]={price=1600,vstack=1,limited=true,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Recipe: Crocolisk Gumbo
-  [3682]={price=1600,vstack=1,limited=true,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Recipe: Curiously Tasty Omelet
-  [3683]={price=1600,vstack=1,limited=true,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Recipe: Gooey Spider Cake
-  [3713]={price=160,vstack=1,limited=false,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Soothing Spices
-  [3734]={price=1600,vstack=1,limited=true,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Recipe: Big Bear Steak
-  [3735]={price=1800,vstack=1,limited=true,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Recipe: Hot Lion Chops
-  [3827]={price=480,vstack=1,limited=true,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Mana Potion
-  [3857]={price=500,vstack=1,limited=true,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Coal
-  [4234]={price=600,vstack=1,limited=true,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Heavy Leather
-  [4289]={price=50,vstack=1,limited=false,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Salt
-  [4291]={price=500,vstack=1,limited=false,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Silken Thread
-  [4304]={price=1200,vstack=1,limited=true,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Thick Leather
-  [4340]={price=350,vstack=1,limited=false,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Gray Dye
-  [4341]={price=500,vstack=1,limited=false,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Yellow Dye
-  [4342]={price=2500,vstack=1,limited=false,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Purple Dye
+  [159]={price=25,vstack=5,limited=false,recipe=false,npcs={{"Brog Hamfist","Elwynn Forest","Alliance"},{"Brother Danil","Elwynn Forest","Alliance"},{"Mabel Solaj","Duskwood","Alliance"}},nNpc=200,src="db2+wh_item",verified="2026-11-12"}, -- Refreshing Spring Water
+  [728]={price=200,vstack=1,limited=false,recipe=true,npcs={{"Kendor Kabonka","Stormwind City","Alliance"}},nNpc=1,src="db2+wh_item",verified="2026-11-12"}, -- Recipe: Westfall Stew
+  [765]={price=40,vstack=1,limited=true,recipe=false,npcs={{"Maria Lumere","Stormwind City","Alliance"},{"Hula'mahi","The Barrens","Horde"},{"Selina Weston","Tirisfal Glades","Horde"}},nNpc=3,src="db2+wh_item",verified="2026-11-12"}, -- Silverleaf
+  [785]={price=80,vstack=1,limited=true,recipe=false,npcs={{"Antonio Perelli","Westfall","Alliance"},{"Bernard Gump","Stormwind City","Alliance"},{"Maria Lumere","Stormwind City","Alliance"}},nNpc=9,src="db2+wh_item",verified="2026-11-12"}, -- Mageroyal
+  [929]={price=300,vstack=1,limited=true,recipe=false,npcs={{"Charys Yserian","Stormwind City","Alliance"},{"Dewin Shimmerdawn","Wetlands","Alliance"},{"Samor Festivus","Wetlands","Alliance"}},nNpc=12,src="db2+wh_item",verified="2026-11-12"}, -- Healing Potion
+  [1179]={price=125,vstack=5,limited=false,recipe=false,npcs={{"Mabel Solaj","Duskwood","Alliance"},{"Joshua Maclure","Elwynn Forest","Alliance"},{"Barkeep Hann","Duskwood","Alliance"}},nNpc=172,src="db2+wh_item",verified="2026-11-12"}, -- Ice Cold Milk
+  [1205]={price=500,vstack=5,limited=false,recipe=false,npcs={{"Mabel Solaj","Duskwood","Alliance"},{"Joshua Maclure","Elwynn Forest","Alliance"},{"Barkeep Hann","Duskwood","Alliance"}},nNpc=181,src="db2+wh_item",verified="2026-11-12"}, -- Melon Juice
+  [1645]={price=2000,vstack=5,limited=false,recipe=false,npcs={{"Joshua Maclure","Elwynn Forest","Alliance"},{"Barkeep Hann","Duskwood","Alliance"},{"Innkeeper Farley","Elwynn Forest","Alliance"}},nNpc=175,src="db2+wh_item",verified="2026-11-12"}, -- Moonberry Juice
+  [1708]={price=1000,vstack=5,limited=false,recipe=false,npcs={{"Joshua Maclure","Elwynn Forest","Alliance"},{"Barkeep Hann","Duskwood","Alliance"},{"Innkeeper Farley","Elwynn Forest","Alliance"}},nNpc=175,src="db2+wh_item",verified="2026-11-12"}, -- Sweet Nectar
+  [2289]={price=350,vstack=1,limited=true,recipe=false,npcs={{"Super-Seller 680","Desolace","both"},{"Professor Thaddeus Paleo","Mulgore","both"}},nNpc=2,src="db2+wh_item",verified="2026-11-12"}, -- Scroll of Strength II
+  [2319]={price=200,vstack=1,limited=true,recipe=false,npcs={{"Lhara","Elwynn Forest","both"}},nNpc=1,src="db2+wh_item",verified="2026-11-12"}, -- Medium Leather
+  [2320]={price=10,vstack=1,limited=false,recipe=false,npcs={{"Tharynn Bouden","Elwynn Forest","Alliance"},{"Amy Davenport","Redridge Mountains","Alliance"},{"Gina MacGregor","Westfall","Alliance"}},nNpc=125,src="db2+wh_item",verified="2026-11-12"}, -- Coarse Thread
+  [2321]={price=100,vstack=1,limited=false,recipe=false,npcs={{"Amy Davenport","Redridge Mountains","Alliance"},{"Gina MacGregor","Westfall","Alliance"},{"Gunder Thornbush","Duskwood","Alliance"}},nNpc=107,src="db2+wh_item",verified="2026-11-12"}, -- Fine Thread
+  [2324]={price=25,vstack=1,limited=false,recipe=false,npcs={{"Tharynn Bouden","Elwynn Forest","Alliance"},{"Amy Davenport","Redridge Mountains","Alliance"},{"Gina MacGregor","Westfall","Alliance"}},nNpc=75,src="db2+wh_item",verified="2026-11-12"}, -- Bleach
+  [2325]={price=1000,vstack=1,limited=false,recipe=false,npcs={{"Banalash","Swamp of Sorrows","Horde"},{"Nerrist","Stranglethorn Vale","Horde"},{"Edna Mullby","Stormwind City","Alliance"}},nNpc=88,src="db2+wh_item",verified="2026-11-12"}, -- Black Dye
+  [2447]={price=40,vstack=1,limited=true,recipe=false,npcs={{"Maria Lumere","Stormwind City","Alliance"},{"Hula'mahi","The Barrens","Horde"},{"Selina Weston","Tirisfal Glades","Horde"}},nNpc=3,src="db2+wh_item",verified="2026-11-12"}, -- Peacebloom
+  [2449]={price=80,vstack=1,limited=true,recipe=false,npcs={{"Antonio Perelli","Westfall","Alliance"},{"Bernard Gump","Stormwind City","Alliance"},{"Maria Lumere","Stormwind City","Alliance"}},nNpc=9,src="db2+wh_item",verified="2026-11-12"}, -- Earthroot
+  [2453]={price=100,vstack=1,limited=true,recipe=false,npcs={{"Antonio Perelli","Westfall","Alliance"},{"Bernard Gump","Stormwind City","Alliance"},{"Maria Lumere","Stormwind City","Alliance"}},nNpc=9,src="db2+wh_item",verified="2026-11-12"}, -- Bruiseweed
+  [2455]={price=40,vstack=1,limited=true,recipe=false,npcs={{"Dawn Brightstar","Elwynn Forest","Alliance"},{"Lizzarik","The Barrens","both"}},nNpc=2,src="db2+wh_item",verified="2026-11-12"}, -- Minor Mana Potion
+  [2594]={price=1500,vstack=1,limited=false,recipe=false,npcs={{"Joshua Maclure","Elwynn Forest","Alliance"},{"Roberto Pupellyverbos","Stormwind City","Alliance"},{"Barkeep Dobbins","Elwynn Forest","Alliance"}},nNpc=27,src="db2+wh_item",verified="2026-11-12"}, -- Flagon of Dwarven Honeymead
+  [2596]={price=120,vstack=1,limited=false,recipe=false,npcs={{"Joshua Maclure","Elwynn Forest","Alliance"},{"Roberto Pupellyverbos","Stormwind City","Alliance"},{"Barkeep Dobbins","Elwynn Forest","Alliance"}},nNpc=26,src="db2+wh_item",verified="2026-11-12"}, -- Skin of Dwarven Stout
+  [2604]={price=50,vstack=1,limited=false,recipe=false,npcs={{"Tharynn Bouden","Elwynn Forest","Alliance"},{"Gina MacGregor","Westfall","Alliance"},{"Banalash","Swamp of Sorrows","Horde"}},nNpc=103,src="db2+wh_item",verified="2026-11-12"}, -- Red Dye
+  [2605]={price=100,vstack=1,limited=false,recipe=false,npcs={{"Gina MacGregor","Westfall","Alliance"},{"Edna Mullby","Stormwind City","Alliance"},{"Alexandra Bolero","Stormwind City","Alliance"}},nNpc=73,src="db2+wh_item",verified="2026-11-12"}, -- Green Dye
+  [2678]={price=10,vstack=5,limited=false,recipe=false,npcs={{"Tharynn Bouden","Elwynn Forest","Alliance"},{"Amy Davenport","Redridge Mountains","Alliance"},{"Gina MacGregor","Westfall","Alliance"}},nNpc=84,src="db2+wh_item",verified="2026-11-12"}, -- Mild Spices
+  [2686]={price=50,vstack=1,limited=false,recipe=false,npcs={{"Innkeeper Belm","Dun Morogh","Alliance"},{"Yanni Stoutheart","Loch Modan","Alliance"},{"Innkeeper Thulfram","The Hinterlands","Alliance"}},nNpc=3,src="db2+wh_item",verified="2026-11-12"}, -- Thunder Ale
+  [2692]={price=40,vstack=1,limited=false,recipe=false,npcs={{"Amy Davenport","Redridge Mountains","Alliance"},{"Gina MacGregor","Westfall","Alliance"},{"Gunder Thornbush","Duskwood","Alliance"}},nNpc=74,src="db2+wh_item",verified="2026-11-12"}, -- Hot Spices
+  [2697]={price=400,vstack=1,limited=false,recipe=true,npcs={{"Kendor Kabonka","Stormwind City","Alliance"}},nNpc=1,src="db2+wh_item",verified="2026-11-12"}, -- Recipe: Goretusk Liver Pie
+  [2698]={price=400,vstack=1,limited=false,recipe=true,npcs={{"Kendor Kabonka","Stormwind City","Alliance"}},nNpc=1,src="db2+wh_item",verified="2026-11-12"}, -- Recipe: Cooked Crab Claw
+  [2699]={price=800,vstack=1,limited=false,recipe=true,npcs={{"Kendor Kabonka","Stormwind City","Alliance"}},nNpc=1,src="db2+wh_item",verified="2026-11-12"}, -- Recipe: Redridge Goulash
+  [2700]={price=400,vstack=1,limited=false,recipe=true,npcs={{"Kendor Kabonka","Stormwind City","Alliance"}},nNpc=1,src="db2+wh_item",verified="2026-11-12"}, -- Recipe: Succulent Pork Ribs
+  [2701]={price=1600,vstack=1,limited=false,recipe=true,npcs={{"Kendor Kabonka","Stormwind City","Alliance"}},nNpc=1,src="db2+wh_item",verified="2026-11-12"}, -- Recipe: Seasoned Wolf Kabob
+  [2723]={price=50,vstack=1,limited=false,recipe=false,npcs={{"Joshua Maclure","Elwynn Forest","Alliance"},{"Roberto Pupellyverbos","Stormwind City","Alliance"},{"Barkeep Dobbins","Elwynn Forest","Alliance"}},nNpc=26,src="db2+wh_item",verified="2026-11-12"}, -- Bottle of Dalaran Noir
+  [2880]={price=100,vstack=1,limited=false,recipe=false,npcs={{"Tharynn Bouden","Elwynn Forest","Alliance"},{"Karm Ironquill","Loch Modan","Alliance"},{"Amy Davenport","Redridge Mountains","Alliance"}},nNpc=124,src="db2+wh_item",verified="2026-11-12"}, -- Weak Flux
+  [2889]={price=240,vstack=1,limited=false,recipe=true,npcs={{"Kendor Kabonka","Stormwind City","Alliance"}},nNpc=1,src="db2+wh_item",verified="2026-11-12"}, -- Recipe: Beer Basted Boar Ribs
+  [2894]={price=50,vstack=1,limited=false,recipe=false,npcs={{"Innkeeper Belm","Dun Morogh","Alliance"},{"Yanni Stoutheart","Loch Modan","Alliance"},{"Innkeeper Thulfram","The Hinterlands","Alliance"}},nNpc=3,src="db2+wh_item",verified="2026-11-12"}, -- Rhapsody Malt
+  [3013]={price=100,vstack=1,limited=true,recipe=false,npcs={{"Dawn Brightstar","Elwynn Forest","Alliance"},{"Adair Gilroy","Stormwind City","Alliance"},{"Salazar Bloch","Undercity","Horde"}},nNpc=4,src="db2+wh_item",verified="2026-11-12"}, -- Scroll of Protection
+  [3355]={price=200,vstack=1,limited=true,recipe=false,npcs={{"Antonio Perelli","Westfall","Alliance"},{"Bernard Gump","Stormwind City","Alliance"},{"Maria Lumere","Stormwind City","Alliance"}},nNpc=7,src="db2+wh_item",verified="2026-11-12"}, -- Wild Steelbloom
+  [3356]={price=120,vstack=1,limited=true,recipe=false,npcs={{"Antonio Perelli","Westfall","Alliance"},{"Bernard Gump","Stormwind City","Alliance"},{"Maria Lumere","Stormwind City","Alliance"}},nNpc=7,src="db2+wh_item",verified="2026-11-12"}, -- Kingsblood
+  [3357]={price=300,vstack=1,limited=true,recipe=false,npcs={{"Antonio Perelli","Westfall","Alliance"},{"Bernard Gump","Stormwind City","Alliance"},{"Maria Lumere","Stormwind City","Alliance"}},nNpc=7,src="db2+wh_item",verified="2026-11-12"}, -- Liferoot
+  [3358]={price=700,vstack=1,limited=true,recipe=false,npcs={{"Lhara","Elwynn Forest","both"}},nNpc=1,src="db2+wh_item",verified="2026-11-12"}, -- Khadgar's Whisker
+  [3371]={price=20,vstack=5,limited=false,recipe=false,npcs={{"Tharynn Bouden","Elwynn Forest","Alliance"},{"Amy Davenport","Redridge Mountains","Alliance"},{"Gina MacGregor","Westfall","Alliance"}},nNpc=119,src="db2+wh_item",verified="2026-11-12"}, -- Empty Vial
+  [3372]={price=200,vstack=5,limited=false,recipe=false,npcs={{"Amy Davenport","Redridge Mountains","Alliance"},{"Antonio Perelli","Westfall","Alliance"},{"Dawn Brightstar","Elwynn Forest","Alliance"}},nNpc=104,src="db2+wh_item",verified="2026-11-12"}, -- Leaded Vial
+  [3385]={price=120,vstack=1,limited=true,recipe=false,npcs={{"Charys Yserian","Stormwind City","Alliance"},{"Bliztik","Duskwood","Alliance"},{"Deneb Walker","Arathi Highlands","Alliance"}},nNpc=9,src="db2+wh_item",verified="2026-11-12"}, -- Lesser Mana Potion
+  [3466]={price=2000,vstack=1,limited=false,recipe=false,npcs={{"Karm Ironquill","Loch Modan","Alliance"},{"Karen Taylor","Redridge Mountains","Alliance"},{"Gunder Thornbush","Duskwood","Alliance"}},nNpc=106,src="db2+wh_item",verified="2026-11-12"}, -- Strong Flux
+  [3678]={price=400,vstack=1,limited=false,recipe=true,npcs={{"Kendor Kabonka","Stormwind City","Alliance"}},nNpc=1,src="db2+wh_item",verified="2026-11-12"}, -- Recipe: Crocolisk Steak
+  [3679]={price=400,vstack=1,limited=false,recipe=true,npcs={{"Kendor Kabonka","Stormwind City","Alliance"}},nNpc=1,src="db2+wh_item",verified="2026-11-12"}, -- Recipe: Blood Sausage
+  [3680]={price=1600,vstack=1,limited=false,recipe=true,npcs={{"Kendor Kabonka","Stormwind City","Alliance"}},nNpc=1,src="db2+wh_item",verified="2026-11-12"}, -- Recipe: Murloc Fin Soup
+  [3681]={price=1600,vstack=1,limited=false,recipe=true,npcs={{"Kendor Kabonka","Stormwind City","Alliance"}},nNpc=1,src="db2+wh_item",verified="2026-11-12"}, -- Recipe: Crocolisk Gumbo
+  [3682]={price=1600,vstack=1,limited=false,recipe=true,npcs={{"Kendor Kabonka","Stormwind City","Alliance"},{"Nerrist","Stranglethorn Vale","Horde"},{"Keena","Arathi Highlands","Horde"}},nNpc=3,src="db2+wh_item",verified="2026-11-12"}, -- Recipe: Curiously Tasty Omelet
+  [3683]={price=1600,vstack=1,limited=false,recipe=true,npcs={{"Kendor Kabonka","Stormwind City","Alliance"}},nNpc=1,src="db2+wh_item",verified="2026-11-12"}, -- Recipe: Gooey Spider Cake
+  [3713]={price=160,vstack=1,limited=false,recipe=false,npcs={{"Gunder Thornbush","Duskwood","Alliance"},{"Banalash","Swamp of Sorrows","Horde"},{"Nerrist","Stranglethorn Vale","Horde"}},nNpc=65,src="db2+wh_item",verified="2026-11-12"}, -- Soothing Spices
+  [3734]={price=1600,vstack=1,limited=false,recipe=true,npcs={{"Ulthaan","Ashenvale","Alliance"},{"Super-Seller 680","Desolace","both"}},nNpc=2,src="db2+wh_item",verified="2026-11-12"}, -- Recipe: Big Bear Steak
+  [3735]={price=1800,vstack=1,limited=false,recipe=true,npcs={{"Zargh","The Barrens","Horde"},{"Vendor-Tron 1000","Desolace","both"}},nNpc=2,src="db2+wh_item",verified="2026-11-12"}, -- Recipe: Hot Lion Chops
+  [3827]={price=480,vstack=1,limited=true,recipe=false,npcs={{"Nandar Branson","Hillsbrad Foothills","Alliance"},{"Bro'kin","Alterac Mountains","both"},{"Drovnar Strongbrew","Arathi Highlands","Alliance"}},nNpc=8,src="db2+wh_item",verified="2026-11-12"}, -- Mana Potion
+  [3857]={price=500,vstack=1,limited=false,recipe=false,npcs={{"Karm Ironquill","Loch Modan","Alliance"},{"Karen Taylor","Redridge Mountains","Alliance"},{"Gunder Thornbush","Duskwood","Alliance"}},nNpc=80,src="db2+wh_item",verified="2026-11-12"}, -- Coal
+  [4234]={price=600,vstack=1,limited=true,recipe=false,npcs={{"Lhara","Elwynn Forest","both"}},nNpc=1,src="db2+wh_item",verified="2026-11-12"}, -- Heavy Leather
+  [4289]={price=50,vstack=1,limited=false,recipe=false,npcs={{"Tharynn Bouden","Elwynn Forest","Alliance"},{"Amy Davenport","Redridge Mountains","Alliance"},{"Gina MacGregor","Westfall","Alliance"}},nNpc=97,src="db2+wh_item",verified="2026-11-12"}, -- Salt
+  [4291]={price=500,vstack=1,limited=false,recipe=false,npcs={{"Gunder Thornbush","Duskwood","Alliance"},{"Banalash","Swamp of Sorrows","Horde"},{"Nerrist","Stranglethorn Vale","Horde"}},nNpc=97,src="db2+wh_item",verified="2026-11-12"}, -- Silken Thread
+  [4304]={price=1200,vstack=1,limited=true,recipe=false,npcs={{"Lhara","Elwynn Forest","both"}},nNpc=1,src="db2+wh_item",verified="2026-11-12"}, -- Thick Leather
+  [4340]={price=350,vstack=1,limited=false,recipe=false,npcs={{"Banalash","Swamp of Sorrows","Horde"},{"Nerrist","Stranglethorn Vale","Horde"},{"Edna Mullby","Stormwind City","Alliance"}},nNpc=88,src="db2+wh_item",verified="2026-11-12"}, -- Gray Dye
+  [4341]={price=500,vstack=1,limited=false,recipe=false,npcs={{"Banalash","Swamp of Sorrows","Horde"},{"Nerrist","Stranglethorn Vale","Horde"},{"Edna Mullby","Stormwind City","Alliance"}},nNpc=88,src="db2+wh_item",verified="2026-11-12"}, -- Yellow Dye
+  [4342]={price=2500,vstack=1,limited=false,recipe=false,npcs={{"Banalash","Swamp of Sorrows","Horde"},{"Nerrist","Stranglethorn Vale","Horde"},{"Edna Mullby","Stormwind City","Alliance"}},nNpc=88,src="db2+wh_item",verified="2026-11-12"}, -- Purple Dye
   [4355]={price=1500,vstack=1,limited=true,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Pattern: Icy Cloak
-  [4357]={price=16,vstack=1,limited=true,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Rough Blasting Powder
-  [4361]={price=480,vstack=1,limited=true,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Copper Tube
-  [4363]={price=200,vstack=1,limited=true,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Copper Modulator
-  [4364]={price=48,vstack=1,limited=true,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Coarse Blasting Powder
-  [4371]={price=800,vstack=1,limited=true,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Bronze Tube
-  [4382]={price=2400,vstack=1,limited=true,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Bronze Framework
-  [4389]={price=3000,vstack=1,limited=true,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Gyrochronatom
-  [4399]={price=200,vstack=1,limited=false,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Wooden Stock
-  [4400]={price=2000,vstack=1,limited=false,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Heavy Stock
-  [4404]={price=100,vstack=1,limited=true,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Silver Contact
-  [4470]={price=38,vstack=1,limited=true,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Simple Wood
-  [4536]={price=25,vstack=5,limited=true,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Shiny Red Apple
-  [4603]={price=80,vstack=1,limited=true,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Raw Spotted Yellowtail
-  [4605]={price=125,vstack=5,limited=true,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Red-speckled Mushroom
+  [4357]={price=16,vstack=1,limited=true,recipe=false,npcs={{"Neal Allen","Wetlands","Alliance"},{"Loslor Rudge","Dun Morogh","Alliance"},{"Fradd Swiftgear","Wetlands","Alliance"}},nNpc=29,src="db2+wh_item",verified="2026-11-12"}, -- Rough Blasting Powder
+  [4361]={price=480,vstack=1,limited=true,recipe=false,npcs={{"Neal Allen","Wetlands","Alliance"},{"Loslor Rudge","Dun Morogh","Alliance"},{"Fradd Swiftgear","Wetlands","Alliance"}},nNpc=25,src="db2+wh_item",verified="2026-11-12"}, -- Copper Tube
+  [4363]={price=200,vstack=1,limited=true,recipe=false,npcs={{"Neal Allen","Wetlands","Alliance"},{"Loslor Rudge","Dun Morogh","Alliance"},{"Fradd Swiftgear","Wetlands","Alliance"}},nNpc=25,src="db2+wh_item",verified="2026-11-12"}, -- Copper Modulator
+  [4364]={price=48,vstack=1,limited=true,recipe=false,npcs={{"Neal Allen","Wetlands","Alliance"},{"Loslor Rudge","Dun Morogh","Alliance"},{"Fradd Swiftgear","Wetlands","Alliance"}},nNpc=29,src="db2+wh_item",verified="2026-11-12"}, -- Coarse Blasting Powder
+  [4371]={price=800,vstack=1,limited=true,recipe=false,npcs={{"Neal Allen","Wetlands","Alliance"},{"Loslor Rudge","Dun Morogh","Alliance"},{"Fradd Swiftgear","Wetlands","Alliance"}},nNpc=25,src="db2+wh_item",verified="2026-11-12"}, -- Bronze Tube
+  [4382]={price=2400,vstack=1,limited=true,recipe=false,npcs={{"Neal Allen","Wetlands","Alliance"},{"Loslor Rudge","Dun Morogh","Alliance"},{"Fradd Swiftgear","Wetlands","Alliance"}},nNpc=25,src="db2+wh_item",verified="2026-11-12"}, -- Bronze Framework
+  [4389]={price=3000,vstack=1,limited=true,recipe=false,npcs={{"Neal Allen","Wetlands","Alliance"},{"Loslor Rudge","Dun Morogh","Alliance"},{"Fradd Swiftgear","Wetlands","Alliance"}},nNpc=25,src="db2+wh_item",verified="2026-11-12"}, -- Gyrochronatom
+  [4399]={price=200,vstack=1,limited=false,recipe=false,npcs={{"Gunder Thornbush","Duskwood","Alliance"},{"Banalash","Swamp of Sorrows","Horde"},{"Nerrist","Stranglethorn Vale","Horde"}},nNpc=70,src="db2+wh_item",verified="2026-11-12"}, -- Wooden Stock
+  [4400]={price=2000,vstack=1,limited=false,recipe=false,npcs={{"Gunder Thornbush","Duskwood","Alliance"},{"Banalash","Swamp of Sorrows","Horde"},{"Nerrist","Stranglethorn Vale","Horde"}},nNpc=70,src="db2+wh_item",verified="2026-11-12"}, -- Heavy Stock
+  [4404]={price=100,vstack=1,limited=true,recipe=false,npcs={{"Neal Allen","Wetlands","Alliance"},{"Loslor Rudge","Dun Morogh","Alliance"},{"Fradd Swiftgear","Wetlands","Alliance"}},nNpc=25,src="db2+wh_item",verified="2026-11-12"}, -- Silver Contact
+  [4470]={price=38,vstack=1,limited=false,recipe=false,npcs={{"Brog Hamfist","Elwynn Forest","Alliance"},{"Mabel Solaj","Duskwood","Alliance"},{"Quartermaster Lewis","Westfall","Alliance"}},nNpc=102,src="db2+wh_item",verified="2026-11-12"}, -- Simple Wood
+  [4536]={price=25,vstack=5,limited=false,recipe=false,npcs={{"Tharynn Bouden","Elwynn Forest","Alliance"},{"Corporal Bluth","Stranglethorn Vale","Alliance"},{"Homer Stonefield","Elwynn Forest","Alliance"}},nNpc=70,src="db2+wh_item",verified="2026-11-12"}, -- Shiny Red Apple
+  [4603]={price=80,vstack=1,limited=true,recipe=false,npcs={{"Vernon Hale","Redridge Mountains","Alliance"},{"Khara Deepwater","Loch Modan","Alliance"},{"Wigcik","Stranglethorn Vale","both"}},nNpc=26,src="db2+wh_item",verified="2026-11-12"}, -- Raw Spotted Yellowtail
+  [4605]={price=125,vstack=5,limited=false,recipe=false,npcs={{"Scott Carevin","Duskwood","Alliance"},{"Kor'jus","Orgrimmar","Horde"},{"Jason Lemieux","Hillsbrad Foothills","Horde"}},nNpc=21,src="db2+wh_item",verified="2026-11-12"}, -- Red-speckled Mushroom
   [4609]={price=1000,vstack=1,limited=true,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Recipe: Barbecued Buzzard Wing
   [5483]={price=140,vstack=1,limited=false,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Recipe: Scorpid Surprise
   [5484]={price=240,vstack=1,limited=false,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Recipe: Roasted Kodo Meat
@@ -114,33 +115,33 @@ ns.Vendor = {
   [6056]={price=2000,vstack=1,limited=false,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Recipe: Frost Protection Potion
   [6057]={price=2000,vstack=1,limited=false,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Recipe: Nature Protection Potion
   [6068]={price=1500,vstack=1,limited=false,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Recipe: Shadow Oil
-  [6217]={price=124,vstack=1,limited=true,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Copper Rod
-  [6260]={price=50,vstack=1,limited=false,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Blue Dye
-  [6261]={price=1000,vstack=1,limited=false,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Orange Dye
+  [6217]={price=124,vstack=1,limited=false,recipe=false,npcs={{"Tharynn Bouden","Elwynn Forest","Alliance"},{"Amy Davenport","Redridge Mountains","Alliance"},{"Gina MacGregor","Westfall","Alliance"}},nNpc=70,src="db2+wh_item",verified="2026-11-12"}, -- Copper Rod
+  [6260]={price=50,vstack=1,limited=false,recipe=false,npcs={{"Tharynn Bouden","Elwynn Forest","Alliance"},{"Gina MacGregor","Westfall","Alliance"},{"Drake Lindgren","Elwynn Forest","Alliance"}},nNpc=81,src="db2+wh_item",verified="2026-11-12"}, -- Blue Dye
+  [6261]={price=1000,vstack=1,limited=false,recipe=false,npcs={{"Alexandra Bolero","Stormwind City","Alliance"},{"Jennabink Powerseam","Wetlands","Alliance"},{"Rann Flamespinner","Loch Modan","Alliance"}},nNpc=56,src="db2+wh_item",verified="2026-11-12"}, -- Orange Dye
   [6270]={price=200,vstack=1,limited=false,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Pattern: Blue Linen Vest
   [6272]={price=300,vstack=1,limited=false,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Pattern: Blue Linen Robe
   [6274]={price=400,vstack=1,limited=false,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Pattern: Blue Overalls
   [6275]={price=800,vstack=1,limited=false,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Pattern: Greater Adept's Robe
-  [6289]={price=20,vstack=1,limited=true,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Raw Longjaw Mud Snapper
-  [6303]={price=20,vstack=1,limited=true,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Raw Slitherskin Mackerel
-  [6308]={price=40,vstack=1,limited=true,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Raw Bristle Whisker Catfish
+  [6289]={price=20,vstack=1,limited=true,recipe=false,npcs={{"Vernon Hale","Redridge Mountains","Alliance"},{"Khara Deepwater","Loch Modan","Alliance"},{"Wigcik","Stranglethorn Vale","both"}},nNpc=26,src="db2+wh_item",verified="2026-11-12"}, -- Raw Longjaw Mud Snapper
+  [6303]={price=20,vstack=1,limited=true,recipe=false,npcs={{"Vernon Hale","Redridge Mountains","Alliance"},{"Khara Deepwater","Loch Modan","Alliance"},{"Wigcik","Stranglethorn Vale","both"}},nNpc=26,src="db2+wh_item",verified="2026-11-12"}, -- Raw Slitherskin Mackerel
+  [6308]={price=40,vstack=1,limited=true,recipe=false,npcs={{"Vernon Hale","Redridge Mountains","Alliance"},{"Khara Deepwater","Loch Modan","Alliance"},{"Wigcik","Stranglethorn Vale","both"}},nNpc=26,src="db2+wh_item",verified="2026-11-12"}, -- Raw Bristle Whisker Catfish
   [6325]={price=40,vstack=1,limited=false,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Recipe: Brilliant Smallfish
   [6326]={price=40,vstack=1,limited=false,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Recipe: Slitherskin Mackerel
   [6328]={price=400,vstack=1,limited=false,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Recipe: Longjaw Mud Snapper
   [6329]={price=400,vstack=1,limited=false,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Recipe: Loch Frenzy Delight
   [6330]={price=1200,vstack=1,limited=false,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Recipe: Bristle Whisker Catfish
-  [6362]={price=80,vstack=1,limited=true,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Raw Rockscale Cod
+  [6362]={price=80,vstack=1,limited=true,recipe=false,npcs={{"Vernon Hale","Redridge Mountains","Alliance"},{"Khara Deepwater","Loch Modan","Alliance"},{"Wigcik","Stranglethorn Vale","both"}},nNpc=26,src="db2+wh_item",verified="2026-11-12"}, -- Raw Rockscale Cod
   [6368]={price=400,vstack=1,limited=false,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Recipe: Rainbow Fin Albacore
   [6369]={price=2200,vstack=1,limited=false,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Recipe: Rockscale Cod
   [6401]={price=1100,vstack=1,limited=false,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Pattern: Dark Silk Shirt
   [6474]={price=550,vstack=1,limited=false,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Pattern: Deviate Scale Cloak
   [6475]={price=1500,vstack=1,limited=false,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Pattern: Deviate Scale Gloves
-  [6530]={price=100,vstack=1,limited=true,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Nightcrawlers
+  [6530]={price=100,vstack=1,limited=false,recipe=false,npcs={{"Amy Davenport","Redridge Mountains","Alliance"},{"Gina MacGregor","Westfall","Alliance"},{"Gunder Thornbush","Duskwood","Alliance"}},nNpc=78,src="db2+wh_item",verified="2026-11-12"}, -- Nightcrawlers
   [6892]={price=250,vstack=1,limited=false,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Recipe: Smoked Bear Meat
-  [7076]={price=1600,vstack=1,limited=true,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Essence of Earth
-  [7078]={price=1600,vstack=1,limited=true,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Essence of Fire
-  [7080]={price=1600,vstack=1,limited=true,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Essence of Water
-  [7082]={price=1600,vstack=1,limited=true,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Essence of Air
+  [7076]={price=1600,vstack=1,limited=false,recipe=false,npcs={{"Lokhtos Darkbargainer","Blackrock Depths","both"}},nNpc=1,src="db2+wh_item",verified="2026-11-12"}, -- Essence of Earth
+  [7078]={price=1600,vstack=1,limited=false,recipe=false,npcs={{"Lokhtos Darkbargainer","Blackrock Depths","both"}},nNpc=1,src="db2+wh_item",verified="2026-11-12"}, -- Essence of Fire
+  [7080]={price=1600,vstack=1,limited=false,recipe=false,npcs={{"Lokhtos Darkbargainer","Blackrock Depths","both"}},nNpc=1,src="db2+wh_item",verified="2026-11-12"}, -- Essence of Water
+  [7082]={price=1600,vstack=1,limited=false,recipe=false,npcs={{"Lokhtos Darkbargainer","Blackrock Depths","both"}},nNpc=1,src="db2+wh_item",verified="2026-11-12"}, -- Essence of Air
   [7087]={price=1200,vstack=1,limited=false,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Pattern: Crimson Silk Cloak
   [7088]={price=5000,vstack=1,limited=false,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Pattern: Crimson Silk Robe
   [7089]={price=1500,vstack=1,limited=false,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Pattern: Azure Silk Cloak
@@ -156,24 +157,24 @@ ns.Vendor = {
   [7742]={price=2400,vstack=1,limited=false,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Schematic: Gnomish Cloaking Device
   [7995]={price=6000,vstack=1,limited=false,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Plans: Mithril Plate Bracers
   [8030]={price=10000,vstack=1,limited=false,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Plans: Ebon Shiv
-  [8170]={price=2000,vstack=1,limited=true,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Rugged Leather
-  [8343]={price=2000,vstack=1,limited=false,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Heavy Silken Thread
+  [8170]={price=2000,vstack=1,limited=true,recipe=false,npcs={{"Lhara","Elwynn Forest","both"}},nNpc=1,src="db2+wh_item",verified="2026-11-12"}, -- Rugged Leather
+  [8343]={price=2000,vstack=1,limited=false,recipe=false,npcs={{"Banalash","Swamp of Sorrows","Horde"},{"Nerrist","Stranglethorn Vale","Horde"},{"Edna Mullby","Stormwind City","Alliance"}},nNpc=88,src="db2+wh_item",verified="2026-11-12"}, -- Heavy Silken Thread
   [8385]={price=3500,vstack=1,limited=true,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Pattern: Turtle Scale Gloves
   [8409]={price=4000,vstack=1,limited=true,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Pattern: Nightscape Shoulders
-  [8766]={price=4000,vstack=5,limited=true,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Morning Glory Dew
-  [8845]={price=1500,vstack=1,limited=true,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Ghost Mushroom
-  [8846]={price=1000,vstack=1,limited=true,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Gromsblood
-  [8925]={price=2500,vstack=5,limited=false,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Crystal Vial
-  [8959]={price=3200,vstack=1,limited=true,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Raw Spinefin Halibut
-  [9260]={price=1600,vstack=1,limited=true,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Volatile Rum
+  [8766]={price=4000,vstack=5,limited=false,recipe=false,npcs={{"Joshua Maclure","Elwynn Forest","Alliance"},{"Barkeep Hann","Duskwood","Alliance"},{"Innkeeper Farley","Elwynn Forest","Alliance"}},nNpc=148,src="db2+wh_item",verified="2026-11-12"}, -- Morning Glory Dew
+  [8845]={price=1500,vstack=1,limited=true,recipe=false,npcs={{"Lhara","Elwynn Forest","both"}},nNpc=1,src="db2+wh_item",verified="2026-11-12"}, -- Ghost Mushroom
+  [8846]={price=1000,vstack=1,limited=true,recipe=false,npcs={{"Vi'el","Winterspring","both"}},nNpc=1,src="db2+wh_item",verified="2026-11-12"}, -- Gromsblood
+  [8925]={price=2500,vstack=5,limited=false,recipe=false,npcs={{"Antonio Perelli","Westfall","Alliance"},{"Dawn Brightstar","Elwynn Forest","Alliance"},{"Gunder Thornbush","Duskwood","Alliance"}},nNpc=99,src="db2+wh_item",verified="2026-11-12"}, -- Crystal Vial
+  [8959]={price=3200,vstack=1,limited=true,recipe=false,npcs={{"Vernon Hale","Redridge Mountains","Alliance"},{"Khara Deepwater","Loch Modan","Alliance"},{"Wigcik","Stranglethorn Vale","both"}},nNpc=26,src="db2+wh_item",verified="2026-11-12"}, -- Raw Spinefin Halibut
+  [9260]={price=1600,vstack=1,limited=true,recipe=false,npcs={{"Stomper Kreeg","Dire Maul","both"}},nNpc=1,src="db2+wh_item",verified="2026-11-12"}, -- Volatile Rum
   [9300]={price=10000,vstack=1,limited=false,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Recipe: Potion of Demon Slaying
   [9301]={price=10000,vstack=1,limited=true,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Recipe: Elixir of Shadow Power
   [9302]={price=9000,vstack=1,limited=false,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Recipe: Ghost Dye
   [9303]={price=8000,vstack=1,limited=false,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Recipe: Philosopher's Stone
   [9304]={price=8000,vstack=1,limited=false,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Recipe: Transmute Iron to Gold
   [9305]={price=8000,vstack=1,limited=false,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Recipe: Transmute Mithril to Truesilver
-  [10284]={price=200,vstack=1,limited=false,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Simple Flour
-  [10290]={price=2500,vstack=1,limited=false,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Pink Dye
+  [10284]={price=200,vstack=1,limited=false,recipe=false,npcs={{"Micha Yance","Hillsbrad Foothills","Alliance"},{"Derak Nightfall","Hillsbrad Foothills","Horde"},{"Kelsey Yance","Stranglethorn Vale","both"}},nNpc=24,src="db2+wh_item",verified="2026-11-12"}, -- Simple Flour
+  [10290]={price=2500,vstack=1,limited=false,recipe=false,npcs={{"Alexandra Bolero","Stormwind City","Alliance"},{"Jennabink Powerseam","Wetlands","Alliance"},{"Rann Flamespinner","Loch Modan","Alliance"}},nNpc=56,src="db2+wh_item",verified="2026-11-12"}, -- Pink Dye
   [10311]={price=3000,vstack=1,limited=false,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Pattern: Orange Martial Shirt
   [10314]={price=4000,vstack=1,limited=false,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Pattern: Lavender Mageweave Shirt
   [10317]={price=4000,vstack=1,limited=false,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Pattern: Pink Mageweave Shirt
@@ -185,14 +186,14 @@ ns.Vendor = {
   [10602]={price=3000,vstack=1,limited=false,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Schematic: Deadly Scope
   [10607]={price=3600,vstack=1,limited=false,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Schematic: Deepdive Helmet
   [10609]={price=4000,vstack=1,limited=false,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Schematic: Mithril Mechanical Dragonling
-  [10647]={price=2000,vstack=1,limited=false,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Engineer's Ink
-  [10648]={price=500,vstack=1,limited=false,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Blank Parchment
+  [10647]={price=2000,vstack=1,limited=false,recipe=false,npcs={{"Adair Gilroy","Stormwind City","Alliance"},{"Neal Allen","Wetlands","Alliance"},{"Loslor Rudge","Dun Morogh","Alliance"}},nNpc=31,src="db2+wh_item",verified="2026-11-12"}, -- Engineer's Ink
+  [10648]={price=500,vstack=1,limited=false,recipe=false,npcs={{"Adair Gilroy","Stormwind City","Alliance"},{"Neal Allen","Wetlands","Alliance"},{"Loslor Rudge","Dun Morogh","Alliance"}},nNpc=31,src="db2+wh_item",verified="2026-11-12"}, -- Blank Parchment
   [10728]={price=1500,vstack=1,limited=false,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Pattern: Black Swashbuckler's Shirt
   [10858]={price=3000,vstack=1,limited=false,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Plans: Solid Iron Maul
-  [10938]={price=800,vstack=1,limited=true,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Lesser Magic Essence
-  [10940]={price=800,vstack=1,limited=true,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Strange Dust
-  [11291]={price=4500,vstack=1,limited=false,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Star Wood
-  [11382]={price=3000,vstack=1,limited=true,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Blood of the Mountain
+  [10938]={price=800,vstack=1,limited=true,recipe=false,npcs={{"Jessara Cordell","Stormwind City","Alliance"},{"Nata Dawnstrider","Thunder Bluff","Horde"},{"Kithas","Orgrimmar","Horde"}},nNpc=12,src="db2+wh_item",verified="2026-11-12"}, -- Lesser Magic Essence
+  [10940]={price=800,vstack=1,limited=true,recipe=false,npcs={{"Jessara Cordell","Stormwind City","Alliance"},{"Nata Dawnstrider","Thunder Bluff","Horde"},{"Kithas","Orgrimmar","Horde"}},nNpc=12,src="db2+wh_item",verified="2026-11-12"}, -- Strange Dust
+  [11291]={price=4500,vstack=1,limited=false,recipe=false,npcs={{"Mabel Solaj","Duskwood","Alliance"},{"Corporal Bluth","Stranglethorn Vale","Alliance"},{"Lindsay Ashlock","Redridge Mountains","Alliance"}},nNpc=76,src="db2+wh_item",verified="2026-11-12"}, -- Star Wood
+  [11382]={price=3000,vstack=1,limited=false,recipe=false,npcs={{"Lokhtos Darkbargainer","Blackrock Depths","both"}},nNpc=1,src="db2+wh_item",verified="2026-11-12"}, -- Blood of the Mountain
   [12162]={price=3000,vstack=1,limited=false,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Plans: Hardened Iron Shortsword
   [12163]={price=4400,vstack=1,limited=false,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Plans: Moonsteel Broadsword
   [12164]={price=4400,vstack=1,limited=false,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Plans: Massive Iron Axe
@@ -205,10 +206,10 @@ ns.Vendor = {
   [12233]={price=3000,vstack=1,limited=false,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Recipe: Mystery Stew
   [12239]={price=7000,vstack=1,limited=true,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Recipe: Dragonbreath Chili
   [12240]={price=7000,vstack=1,limited=false,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Recipe: Heavy Kodo Stew
-  [12363]={price=8000,vstack=1,limited=true,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Arcane Crystal
+  [12363]={price=8000,vstack=1,limited=false,recipe=false,npcs={{"Mister Graphed","Riverglades","hostile"}},nNpc=1,src="db2+wh_item",verified="2026-11-12"}, -- Arcane Crystal
   [12698]={price=22000,vstack=1,limited=true,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Plans: Dawnbringer Shoulders
   [12703]={price=40000,vstack=1,limited=true,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Pattern: Storm Gauntlets
-  [12810]={price=2000,vstack=1,limited=true,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Enchanted Leather
+  [12810]={price=2000,vstack=1,limited=true,recipe=false,npcs={{"Lhara","Elwynn Forest","both"}},nNpc=1,src="db2+wh_item",verified="2026-11-12"}, -- Enchanted Leather
   [12819]={price=16000,vstack=1,limited=true,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Plans: Ornate Thorium Handaxe
   [12823]={price=20000,vstack=1,limited=false,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Plans: Huge Thorium Battleaxe
   [12958]={price=50000,vstack=1,limited=false,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Recipe: Transmute Arcanite
@@ -218,10 +219,10 @@ ns.Vendor = {
   [13309]={price=1000,vstack=1,limited=false,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Schematic: Lovingly Crafted Boomstick
   [13310]={price=2000,vstack=1,limited=false,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Schematic: Accurate Scope
   [13311]={price=10000,vstack=1,limited=true,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Schematic: Mechanical Dragonling
-  [13444]={price=6000,vstack=1,limited=true,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Major Mana Potion
-  [13463]={price=400,vstack=1,limited=true,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Dreamfoil
-  [13464]={price=400,vstack=1,limited=true,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Golden Sansam
-  [13468]={price=4000,vstack=1,limited=true,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Black Lotus
+  [13444]={price=6000,vstack=1,limited=true,recipe=false,npcs={{"Lieutenant General Andorov","Ruins of Ahn'Qiraj","both"}},nNpc=1,src="db2+wh_item",verified="2026-11-12"}, -- Major Mana Potion
+  [13463]={price=400,vstack=1,limited=true,recipe=false,npcs={{"Lhara","Elwynn Forest","both"}},nNpc=1,src="db2+wh_item",verified="2026-11-12"}, -- Dreamfoil
+  [13464]={price=400,vstack=1,limited=true,recipe=false,npcs={{"Lhara","Elwynn Forest","both"}},nNpc=1,src="db2+wh_item",verified="2026-11-12"}, -- Golden Sansam
+  [13468]={price=4000,vstack=1,limited=false,recipe=false,npcs={{"Mister Graphed","Riverglades","hostile"}},nNpc=1,src="db2+wh_item",verified="2026-11-12"}, -- Black Lotus
   [13477]={price=12000,vstack=1,limited=false,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Recipe: Superior Mana Potion
   [13478]={price=13000,vstack=1,limited=false,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Recipe: Elixir of Superior Defense
   [13482]={price=15000,vstack=1,limited=true,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Recipe: Transmute Air to Fire
@@ -245,8 +246,8 @@ ns.Vendor = {
   [13947]={price=20000,vstack=1,limited=false,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Recipe: Lobster Stew
   [13948]={price=20000,vstack=1,limited=false,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Recipe: Mightfish Steak
   [13949]={price=20000,vstack=1,limited=false,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Recipe: Baked Salmon
-  [14256]={price=8000,vstack=1,limited=true,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Felcloth
-  [14341]={price=5000,vstack=1,limited=false,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Rune Thread
+  [14256]={price=8000,vstack=1,limited=true,recipe=false,npcs={{"Vi'el","Winterspring","both"}},nNpc=1,src="db2+wh_item",verified="2026-11-12"}, -- Felcloth
+  [14341]={price=5000,vstack=1,limited=false,recipe=false,npcs={{"Alexandra Bolero","Stormwind City","Alliance"},{"Jennabink Powerseam","Wetlands","Alliance"},{"Rann Flamespinner","Loch Modan","Alliance"}},nNpc=56,src="db2+wh_item",verified="2026-11-12"}, -- Rune Thread
   [14468]={price=12000,vstack=1,limited=false,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Pattern: Runecloth Bag
   [14469]={price=12000,vstack=1,limited=false,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Pattern: Runecloth Robe
   [14472]={price=12000,vstack=1,limited=false,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Pattern: Runecloth Cloak
@@ -254,7 +255,7 @@ ns.Vendor = {
   [14483]={price=16000,vstack=1,limited=false,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Pattern: Felcloth Pants
   [14488]={price=20000,vstack=1,limited=false,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Pattern: Runecloth Boots
   [14526]={price=20000,vstack=1,limited=false,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Pattern: Mooncloth
-  [14530]={price=4000,vstack=1,limited=true,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Heavy Runecloth Bandage
+  [14530]={price=4000,vstack=1,limited=true,recipe=false,npcs={{"Lieutenant General Andorov","Ruins of Ahn'Qiraj","both"}},nNpc=1,src="db2+wh_item",verified="2026-11-12"}, -- Heavy Runecloth Bandage
   [14627]={price=800,vstack=1,limited=false,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Pattern: Bright Yellow Shirt
   [14630]={price=1000,vstack=1,limited=false,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Pattern: Enchanter's Cowl
   [14634]={price=2500,vstack=1,limited=true,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Recipe: Frost Oil
@@ -284,16 +285,16 @@ ns.Vendor = {
   [16113]={price=5000,vstack=1,limited=false,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Manual: Mageweave Bandage
   [16243]={price=22000,vstack=1,limited=false,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Formula: Runed Arcanite Rod
   [16767]={price=3000,vstack=1,limited=false,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Recipe: Undermine Clam Chowder
-  [17010]={price=8000,vstack=1,limited=true,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Fiery Core
-  [17011]={price=8000,vstack=1,limited=true,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Lava Core
-  [17012]={price=4000,vstack=1,limited=true,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Core Leather
+  [17010]={price=8000,vstack=1,limited=false,recipe=false,npcs={{"Pix Xizzix","Stranglethorn Vale","both"}},nNpc=1,src="db2+wh_item",verified="2026-11-12"}, -- Fiery Core
+  [17011]={price=8000,vstack=1,limited=false,recipe=false,npcs={{"Pix Xizzix","Stranglethorn Vale","both"}},nNpc=1,src="db2+wh_item",verified="2026-11-12"}, -- Lava Core
+  [17012]={price=4000,vstack=1,limited=false,recipe=false,npcs={{"Pix Xizzix","Stranglethorn Vale","both"}},nNpc=1,src="db2+wh_item",verified="2026-11-12"}, -- Core Leather
   [17017]={price=180000,vstack=1,limited=false,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Pattern: Flarecore Mantle
   [17018]={price=80000,vstack=1,limited=false,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Pattern: Flarecore Gloves
   [17022]={price=150000,vstack=1,limited=false,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Pattern: Corehound Boots
   [17023]={price=160000,vstack=1,limited=false,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Pattern: Molten Helm
   [17025]={price=160000,vstack=1,limited=false,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Pattern: Black Dragonscale Boots
-  [17034]={price=200,vstack=1,limited=false,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Maple Seed
-  [17035]={price=400,vstack=1,limited=false,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Stranglethorn Seed
+  [17034]={price=200,vstack=1,limited=false,recipe=false,npcs={{"Dawn Brightstar","Elwynn Forest","Alliance"},{"Thultazor","Swamp of Sorrows","Horde"},{"Keldric Boucher","Stormwind City","Alliance"}},nNpc=42,src="db2+wh_item",verified="2026-11-12"}, -- Maple Seed
+  [17035]={price=400,vstack=1,limited=false,recipe=false,npcs={{"Dawn Brightstar","Elwynn Forest","Alliance"},{"Thultazor","Swamp of Sorrows","Horde"},{"Keldric Boucher","Stormwind City","Alliance"}},nNpc=42,src="db2+wh_item",verified="2026-11-12"}, -- Stranglethorn Seed
   [17049]={price=90000,vstack=1,limited=true,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Plans: Fiery Chain Girdle
   [17051]={price=70000,vstack=1,limited=true,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Plans: Dark Iron Bracers
   [17052]={price=180000,vstack=1,limited=true,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Plans: Dark Iron Leggings
@@ -301,17 +302,17 @@ ns.Vendor = {
   [17059]={price=220000,vstack=1,limited=true,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Plans: Dark Iron Reaver
   [17060]={price=220000,vstack=1,limited=true,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Plans: Dark Iron Destroyer
   [17062]={price=2200,vstack=1,limited=false,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Recipe: Mithril Head Trout
-  [17194]={price=10,vstack=5,limited=false,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Holiday Spices
-  [17196]={price=50,vstack=1,limited=false,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Holiday Spirits
+  [17194]={price=10,vstack=5,limited=false,recipe=false,npcs={{"Penney Copperpinch","Orgrimmar","Horde"},{"Nardstrum Copperpinch","Undercity","Horde"},{"Seersa Copperpinch","Thunder Bluff","Horde"}},nNpc=6,src="db2+wh_item",verified="2026-11-12"}, -- Holiday Spices
+  [17196]={price=50,vstack=1,limited=false,recipe=false,npcs={{"Penney Copperpinch","Orgrimmar","Horde"},{"Nardstrum Copperpinch","Undercity","Horde"},{"Seersa Copperpinch","Thunder Bluff","Horde"}},nNpc=6,src="db2+wh_item",verified="2026-11-12"}, -- Holiday Spirits
   [17200]={price=25,vstack=1,limited=false,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Recipe: Gingerbread Cookie
   [17201]={price=240,vstack=1,limited=false,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Recipe: Egg Nog
-  [17202]={price=10,vstack=5,limited=false,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Snowball
+  [17202]={price=10,vstack=5,limited=false,recipe=false,npcs={{"Penney Copperpinch","Orgrimmar","Horde"},{"Nardstrum Copperpinch","Undercity","Horde"},{"Seersa Copperpinch","Thunder Bluff","Horde"}},nNpc=6,src="db2+wh_item",verified="2026-11-12"}, -- Snowball
   [18046]={price=12000,vstack=1,limited=false,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Recipe: Tender Wolf Steak
   [18160]={price=200,vstack=1,limited=true,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Recipe: Thistle Tea
   [18239]={price=3500,vstack=1,limited=true,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Pattern: Shadowskin Gloves
-  [18256]={price=30000,vstack=5,limited=false,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Imbued Vial
+  [18256]={price=30000,vstack=5,limited=false,recipe=false,npcs={{"Antonio Perelli","Westfall","Alliance"},{"Dawn Brightstar","Elwynn Forest","Alliance"},{"Thultazor","Swamp of Sorrows","Horde"}},nNpc=31,src="db2+wh_item",verified="2026-11-12"}, -- Imbued Vial
   [18487]={price=40000,vstack=1,limited=false,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Pattern: Mooncloth Robe
-  [18567]={price=150000,vstack=1,limited=false,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Elemental Flux
+  [18567]={price=150000,vstack=1,limited=false,recipe=false,npcs={{"Karen Taylor","Redridge Mountains","Alliance"},{"Thrawn Boltar","Dun Morogh","Alliance"},{"Hurklor","Stranglethorn Vale","both"}},nNpc=27,src="db2+wh_item",verified="2026-11-12"}, -- Elemental Flux
   [18647]={price=1800,vstack=1,limited=false,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Schematic: Red Firework
   [18648]={price=1800,vstack=1,limited=false,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Schematic: Green Firework
   [18649]={price=1800,vstack=1,limited=false,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Schematic: Blue Firework
@@ -407,19 +408,20 @@ ns.Vendor = {
   [215431]={price=50000,vstack=1,limited=true,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Schematic: High-Yield Radiation Bomb
   [215432]={price=50000,vstack=1,limited=true,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Schematic: Ez-Thro Radiation Bomb
   [215433]={price=25000,vstack=1,limited=true,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Recipe: Insulating Gniodine
-  [247786]={price=10,vstack=1,limited=true,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Mote of Magic
-  [248819]={price=12000,vstack=1,limited=true,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Fel Crystal
-  [248820]={price=60000,vstack=1,limited=true,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Torbernite
-  [248822]={price=6000,vstack=1,limited=true,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Death Lotus
-  [249274]={price=1000,vstack=1,limited=true,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Stranglevine
-  [249391]={price=400,vstack=1,limited=true,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Pyrite
-  [249399]={price=120,vstack=1,limited=true,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Frilled Lichen
-  [249424]={price=380,vstack=1,limited=true,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Rosecap
-  [249425]={price=1000,vstack=1,limited=true,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Bauxite
-  [249426]={price=1500,vstack=1,limited=true,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Pitchblende
-  [249427]={price=500,vstack=1,limited=true,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Pristine Leather
-  [249428]={price=1000,vstack=1,limited=true,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Pristine Hide
-  [249429]={price=1500,vstack=1,limited=true,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Pristine Scale
+  [238737]={price=10526,vstack=1,limited=false,recipe=false,npcs={{"Fizzlefuse","","both"}},nNpc=1,src="db2+wh_item",verified="2026-11-12"}, -- Tinkerbox
+  [247786]={price=10,vstack=1,limited=false,recipe=false,npcs={{"Jessara Cordell","Stormwind City","Alliance"},{"Nata Dawnstrider","Thunder Bluff","Horde"},{"Kithas","Orgrimmar","Horde"}},nNpc=12,src="db2+wh_item",verified="2026-11-12"}, -- Mote of Magic
+  [248819]={price=12000,vstack=1,limited=false,recipe=false,npcs={{"Mister Graphed","Riverglades","hostile"}},nNpc=1,src="db2+wh_item",verified="2026-11-12"}, -- Fel Crystal
+  [248820]={price=60000,vstack=1,limited=false,recipe=false,npcs={{"Mister Graphed","Riverglades","hostile"}},nNpc=1,src="db2+wh_item",verified="2026-11-12"}, -- Torbernite
+  [248822]={price=6000,vstack=1,limited=false,recipe=false,npcs={{"Mister Graphed","Riverglades","hostile"}},nNpc=1,src="db2+wh_item",verified="2026-11-12"}, -- Death Lotus
+  [249274]={price=1000,vstack=1,limited=false,recipe=false,npcs={{"Mister Graphed","Riverglades","hostile"}},nNpc=1,src="db2+wh_item",verified="2026-11-12"}, -- Stranglevine
+  [249391]={price=400,vstack=1,limited=false,recipe=false,npcs={{"Mister Graphed","Riverglades","hostile"}},nNpc=1,src="db2+wh_item",verified="2026-11-12"}, -- Pyrite
+  [249399]={price=120,vstack=1,limited=false,recipe=false,npcs={{"Mister Graphed","Riverglades","hostile"}},nNpc=1,src="db2+wh_item",verified="2026-11-12"}, -- Frilled Lichen
+  [249424]={price=380,vstack=1,limited=false,recipe=false,npcs={{"Mister Graphed","Riverglades","hostile"}},nNpc=1,src="db2+wh_item",verified="2026-11-12"}, -- Rosecap
+  [249425]={price=1000,vstack=1,limited=false,recipe=false,npcs={{"Mister Graphed","Riverglades","hostile"}},nNpc=1,src="db2+wh_item",verified="2026-11-12"}, -- Bauxite
+  [249426]={price=1500,vstack=1,limited=false,recipe=false,npcs={{"Mister Graphed","Riverglades","hostile"}},nNpc=1,src="db2+wh_item",verified="2026-11-12"}, -- Pitchblende
+  [249427]={price=500,vstack=1,limited=false,recipe=false,npcs={{"Mister Graphed","Riverglades","hostile"}},nNpc=1,src="db2+wh_item",verified="2026-11-12"}, -- Pristine Leather
+  [249428]={price=1000,vstack=1,limited=false,recipe=false,npcs={{"Mister Graphed","Riverglades","hostile"}},nNpc=1,src="db2+wh_item",verified="2026-11-12"}, -- Pristine Hide
+  [249429]={price=1500,vstack=1,limited=false,recipe=false,npcs={{"Mister Graphed","Riverglades","hostile"}},nNpc=1,src="db2+wh_item",verified="2026-11-12"}, -- Pristine Scale
   [249476]={price=3250,vstack=1,limited=true,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Formula: Mystic Mushroom
   [249477]={price=3250,vstack=1,limited=true,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Formula: Tenets of the Silver Hand
   [249478]={price=3250,vstack=1,limited=true,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Formula: Polished Driftwood Icon
@@ -730,7 +732,7 @@ ns.Vendor = {
   [264237]={price=7500,vstack=1,limited=false,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Schematic: Stealthman 52
   [269901]={price=3000,vstack=1,limited=true,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Schematic: Centaur Banner Deployment Device
   [269903]={price=3000,vstack=1,limited=true,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Schematic: Hoof-Shaped Foot Pedal
-  [272941]={price=200000,vstack=1,limited=false,recipe=false,src="db2+wh_list",verified="2026-11-12"}, -- Thick Logs
+  [272941]={price=200000,vstack=1,limited=false,recipe=false,npcs={{"Terry Palin","Elwynn Forest","Alliance"},{"Micha Yance","Hillsbrad Foothills","Alliance"},{"Derak Nightfall","Hillsbrad Foothills","Horde"}},nNpc=25,src="db2+wh_item",verified="2026-11-12"}, -- Thick Logs
   [274415]={price=5000,vstack=1,limited=false,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Recipe: Sweetpaw Jam
   [274972]={price=2000,vstack=1,limited=true,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Recipe: Briny Seafood Stew
   [274977]={price=2000,vstack=1,limited=true,recipe=true,src="db2+wh_list",verified="2026-11-12"}, -- Recipe: Plain Ol' Paletusk

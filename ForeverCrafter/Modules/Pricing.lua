@@ -56,7 +56,7 @@ end
 function P.SellValue(id)
   local out = { vendor = nil, ah = nil }
   local sell, from = Util.SellPrice(id)
-  if sell and sell > 0 then out.vendor, out.vendorEst = sell, from == "db2" end
+  if sell and sell > 0 then out.vendor, out.vendorEst = sell, from ~= "client" end
   if not Util.IsBoP(id) then
     local p = ns.Scanner.Price(id)
     if p then

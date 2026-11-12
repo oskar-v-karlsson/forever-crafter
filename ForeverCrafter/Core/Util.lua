@@ -33,6 +33,12 @@ function Util.ParseMoney(text)
   return math.floor(total + 0.5)
 end
 
+-- C_TradeSkillUI.GetRecipeSourceText output ("Vendor: X|nZone: Y", with colour and money icon codes) on one line.
+function Util.SourceText(text)
+  text = tostring(text or ""):gsub("|n", "; "):gsub("^[;%s]+", ""):gsub("[;%s]+$", "")
+  return text
+end
+
 local QUALITY_COLORS = {
   [0] = "ff9d9d9d", [1] = "ffffffff", [2] = "ff1eff00", [3] = "ff0070dd", [4] = "ffa335ee", [5] = "ffff8000",
 }
@@ -72,12 +78,13 @@ function Util.ItemText(id)
 end
 
 -- Vendor sell price for one item: the client's value when loaded, else DB2 ItemSparse.SellPrice, which the
--- Wowhead Forever tooltips contradict for some items (research/crosscheck_*.txt). → copper, "client"|"db2" or nil
+-- Wowhead Forever tooltips contradict for some items (research/crosscheck_*.txt). Items without an ItemSparse row
+-- carry the price from their Wowhead Forever page or tooltip. → copper, "client"|"db2"|"wowhead" or nil
 function Util.SellPrice(id)
   local c = clientInfo(id)
   if c and c.sell then return c.sell, "client" end
   local d = ns.Items[id]
-  if d and d.sell then return d.sell, "db2" end
+  if d and d.sell then return d.sell, d.missing and "wowhead" or "db2" end
   return nil
 end
 
@@ -117,7 +124,36 @@ Util.SOURCE_NAMES = {
   [1] = "Crafted", [2] = "Drop", [3] = "PvP", [4] = "Quest", [5] = "Vendor", [6] = "Trainer", [7] = "Discovery",
   [10] = "Starter", [14] = "Black Market", [15] = "Disenchanted", [16] = "Fished", [17] = "Gathered",
   [19] = "Mined", [21] = "Pickpocketed", [23] = "Skinned",
+  [101] = "Container (object)", [102] = "Container (item)",
 }
+
+local FROM_ROLE = { vendor = "Sold by", drop = "Dropped by", npc = "NPC", quest = "Quest", object = "Object",
+  item = "Item", zone = "Zone" }
+
+-- Where Wowhead Forever says a recipe item comes from (Data/Items.lua from). → text or nil
+function Util.FromText(id)
+  local d = ns.Items[id]
+  if not d or not d.from then return nil end
+  local out = {}
+  for _, f in ipairs(d.from) do
+    local role, name, zone = f[1], f[2], f[3]
+    if role == "zone" then
+      table.insert(out, "Zone: " .. zone)
+    else
+      table.insert(out, (FROM_ROLE[role] or role) .. ": " .. name .. (zone ~= "" and (" (" .. zone .. ")") or ""))
+    end
+  end
+  return table.concat(out, ", ")
+end
+
+-- The first NPC Wowhead Forever lists as selling an item (Data/Vendor.lua npcs). → " (name, zone +N)" or ""
+function Util.VendorNPC(id)
+  local v = ns.Vendor[id]
+  if not v or not v.npcs or not v.npcs[1] then return "" end
+  local n = v.npcs[1]
+  local more = (v.nNpc or 1) > 1 and string.format(" +%d", v.nNpc - 1) or ""
+  return " (" .. n[1] .. (n[2] ~= "" and (", " .. n[2]) or "") .. more .. ")"
+end
 
 function Util.Sources(list)
   if not list or #list == 0 then return "source unknown" end

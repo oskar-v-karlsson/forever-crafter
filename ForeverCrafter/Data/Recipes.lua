@@ -31,8 +31,11 @@ ns.SkillLines = {
 -- [spellID] = { name, skill = skill line, learn = rank needed to learn,
 --   trivLo/trivHi = yellow/grey skill-up thresholds, out = {itemID, min, max},
 --   reagents = {{itemID, count}}, how = Wowhead source codes (6 trainer, 5 vendor,
---   2 drop, 4 quest, ...), cost = trainer cost (copper), items = recipe item IDs,
---   acquire = SkillLineAbility.AcquireMethod }
+--   2 drop, 4 quest, ...; from the profession lists, or from the recipe's own page when
+--   src has wh_item), cost = trainer cost (copper), items = recipe item IDs,
+--   acquire = SkillLineAbility.AcquireMethod, learnText = the game's own "how to learn" text
+--   (C_TradeSkillUI.GetRecipeSourceText, src client); src client = the game listed the recipe
+--   and its reagents/output come from the game }
 ns.Recipes = {
   [2149]={name="Handstitched Leather Boots",skill=165,learn=40,trivLo=40,trivHi=70,out={2302,1,1},reagents={{2318,2},{2320,1}},how={},cost=0,items={},acquire=1,src="db2+wh_list",verified="2026-11-12"},
   [2152]={name="Light Armor Kit",skill=165,learn=30,trivLo=30,trivHi=60,out={2304,1,1},reagents={{2318,1}},how={},cost=0,items={},acquire=1,src="db2+wh_list",verified="2026-11-12"},

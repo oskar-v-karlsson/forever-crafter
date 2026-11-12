@@ -131,7 +131,7 @@ def check_gen_data():
 
 def check_data(ns):
     keys = source_keys()
-    expect({"db2", "wh_list", "wh_tt", "wh_item", "ui", "in-game"} <= keys,
+    expect({"db2", "wh_list", "wh_tt", "wh_item", "ui", "in-game", "client"} <= keys,
            f"SOURCES.md sources table misses keys (has {sorted(keys)})")
     expect(ns.DATA_BUILD in read(os.path.join(ROOT, "SOURCES.md")), "SOURCES.md does not name the pinned DB2 build")
     date = re.compile(r"^\d{4}-\d{2}-\d{2}$")
@@ -166,6 +166,41 @@ def check_data(ns):
     counts["zero output count"] = zero_count
     for i in ns.Vendor.keys():
         expect(items[i] is not None, f"Vendor[{i}] is not in Data/Items.lua")
+    # Wowhead Forever pages, tooltips and list sourcemore (wh_item, wh_tt, wh_list).
+    sides = {"Alliance", "Horde", "both", "hostile"}
+    named = None
+    for i, v in ns.Vendor.items():
+        if v.npcs is None:
+            continue
+        npcs = list(v.npcs.values())
+        expect("wh_item" in v.src.split("+") and npcs and v.nNpc >= len(npcs),
+               f"Vendor[{i}] npcs need src wh_item and nNpc >= {len(npcs)}")
+        for n in npcs:
+            expect(isinstance(n[1], str) and n[1] and isinstance(n[2], str) and n[3] in sides,
+                   f"Vendor[{i}] npc entry {list(n.values())}")
+        if named is None and v.npcs[1][2] != "":
+            named = i
+    expect(named is not None, "no Data/Vendor.lua entry names an NPC and zone")
+    if named is not None:
+        txt = ns.Util.VendorNPC(named)
+        expect(ns.Vendor[named].npcs[1][1] in txt and ns.Vendor[named].npcs[1][2] in txt,
+               f"Util.VendorNPC({named}) = {txt!r}")
+    roles = {"vendor", "drop", "npc", "quest", "object", "item", "zone"}
+    n_from = 0
+    for i, e in items.items():
+        if e["from"] is not None:
+            n_from += 1
+            for f in e["from"].values():
+                expect(f[1] in roles and (f[2] or f[3]), f"Items[{i}] from entry {list(f.values())}")
+            expect(ns.Util.FromText(i), f"Util.FromText({i}) is empty")
+        if e.missing and (e.sell is not None or e.q is not None):
+            expect({"wh_item", "wh_tt", "client"} & set(e.src.split("+")),
+                   f"Items[{i}] has values without an ItemSparse row but src {e.src}")
+    expect(n_from > 500, f"only {n_from} recipe items carry Wowhead sourcemore")
+    counts["recipe items with from"] = n_from
+    for spell, r in ns.Recipes.items():
+        if r.learnText is not None:
+            expect("client" in r.src.split("+") and r.learnText, f"Recipes[{spell}] learnText needs src client")
     # wh_tt cross-check (nether.wowhead.com/forever/tooltip/spell/3170, 2026-11-11) = DB2 SpellReagents.
     r = ns.Recipes[3170]
     got = sorted((rg[1], rg[2]) for rg in r.reagents.values()) if r else None
@@ -240,10 +275,11 @@ def ltable(lua, v):
 
 
 def open_ts(lua, stub, line, rank, recipes, show_unlearned=False):
-    """recipes: {spell: (learned, difficulty, schematic or None)}"""
+    """recipes: {spell: (learned, difficulty, schematic or None[, GetRecipeSourceText])}"""
     t = {"line": line, "rank": rank, "max": 300, "showUnlearned": show_unlearned, "recipes": {}}
-    for spell, (learned, diff, schem) in recipes.items():
-        t["recipes"][spell] = {"learned": learned, "difficulty": diff, "schematic": schem}
+    for spell, (learned, diff, schem, *source) in recipes.items():
+        t["recipes"][spell] = {"learned": learned, "difficulty": diff, "schematic": schem,
+                               "source": source[0] if source else None}
     stub.ts = ltable(lua, t)
     stub.fire("TRADE_SKILL_SHOW")
     stub.runTimers()
@@ -501,6 +537,64 @@ def check_full_run():
     return n, stats.evaluated, took
 
 
+SOURCE_TEXT = ("|cFFFFD200Trainer: |rAny Tailoring trainer|n|cFFFFD200Cost: |r50"
+               "|TInterface\\MoneyFrame\\UI-SilverIcon:0:0:2:0|t")
+
+
+def check_dump():
+    """/crafter dump in the fake client -> SavedVariables text -> gen_data.py client-dump merge -> build."""
+    import tempfile
+    sys.path.insert(0, os.path.join(ROOT, "tools"))
+    import gen_data
+    lua, ns, stub = new_runtime()
+    login(lua, stub, skills={TAILORING: 30})
+    missing = sorted(i for i, e in ns.Items.items() if e.missing)
+    got_item, never = missing[0], missing[1]
+    stub["items"][got_item] = lua.table_from({"name": "Client Item", "quality": 2, "sell": 77})
+    open_ts(lua, stub, TAILORING, 30, {
+        R_BOLT: (True, 0, {"name": "Bolt of Linen Cloth", "out": [BOLT, 1, 1], "reagents": [[LINEN, 3]]}),
+        R_VEST: (True, 1, None),
+        R_SHIRT: (False, None, None, SOURCE_TEXT),
+    })
+    acq = ns.Planner.Acquire(ns.Recipes[R_SHIRT], R_SHIRT).text
+    expect(acq.startswith("Game: ") and "Any Tailoring trainer" in acq,
+           f"Acquire does not show the game's source text first: {acq!r}")
+    n0 = len(stub.prints)
+    slash(lua, "dump")
+    stub.runTimers(30)
+    out = " / ".join(prints(stub, n0))
+    expect("3 recipes (1 unlearned, 1 with the game's source text)" in out and "item data for" in out,
+           f"/crafter dump output: {out}")
+    expect(stub.ts.showUnlearned is False, "/crafter dump did not put the unlearned filter back")
+    d = lua.globals().ForeverCrafterDB.dump
+    expect(d.lines[TAILORING].complete and d.lines[TAILORING].recipes[R_SHIRT].s == SOURCE_TEXT,
+           "dump misses the unlearned recipe's source text")
+    expect(d["items"][got_item] and d["items"][got_item].n == "Client Item" and d["items"][never] is None,
+           "dump item data wrong")
+    with tempfile.TemporaryDirectory() as tmp:
+        path = os.path.join(tmp, "ForeverCrafter.lua")
+        with open(path, "w", encoding="utf-8") as f:
+            f.write(stub.savedVariables("ForeverCrafterDB"))
+        store = {"lines": {}, "items": {}}
+        expect(gen_data.merge_dump(store, gen_data.read_dump(path)) == (1, 1), "client-dump merge counts")
+    rec = store["lines"][str(TAILORING)]["recipes"]
+    expect(sorted(rec) == sorted(str(x) for x in (R_BOLT, R_VEST, R_SHIRT)) and "learned" not in rec[str(R_BOLT)],
+           f"merged recipes {rec}")
+    manifest, db, wh, _ = gen_data.load_research()
+    files, report = gen_data.build(manifest, db, wh, store)
+    recipes = files["Data/Recipes.lua"]
+    shirt = re.search(r"\n  \[%d\]=\{[^\n]*" % R_SHIRT, recipes)
+    expect(shirt and 'learnText="Trainer: Any Tailoring trainer; Cost: 50s"' in shirt.group(0)
+           and "client" in shirt.group(0), f"built Shirt: {shirt and shirt.group(0)}")
+    bolt = re.search(r"\n  \[%d\]=\{[^\n]*" % R_BOLT, recipes)
+    expect(bolt and "reagents={{%d,3}}" % LINEN in bolt.group(0), "client reagents do not replace DB2's")
+    expect(not re.search(r"\n  \[%d\]=" % R_BOOTS, recipes) and str(R_BOOTS) in
+           files["../research/excluded_recipes.txt"], "a recipe missing from the game's full list is not left out")
+    expect(re.search(r"\n  \[%d\]=\{name=\"Client Item\"[^\n]*src=\"[^\"]*client" % got_item,
+                     files["Data/Items.lua"]), "client item info not used")
+    expect(any("client reagents differ %d" % R_BOLT in x for x in report), "client reagent difference not reported")
+
+
 def check_zip():
     import tempfile
     import zipfile
@@ -527,6 +621,7 @@ def main():
         check_core_flow()
         check_solver_shapes()
         check_missing_apis()
+        check_dump()
         n, evaluated, took = check_full_run()
         summary.append(f"full run: {evaluated} recipes evaluated, {n} profitable, {took:.2f} s")
         check_zip()
