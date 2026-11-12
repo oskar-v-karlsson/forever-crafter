@@ -304,8 +304,9 @@ def utc_date(t):
 
 def merge_dump(store, dump):
     """Merge one /crafter dump into store {lines, items}. A profession's newer listing replaces the older one, unless
-    only the older one lists the unlearned recipes too. Only facts about the game are kept (no character data:
-    no name, skill or learned flags). → (lines merged, items merged)"""
+    only the older one lists the unlearned recipes too. Only facts about the game are kept: no character name or
+    skill. Whether some dumped character knows a recipe is kept, without saying who, in store["known"]
+    (spell → latest dump date), as proof that the recipe can be learned in Forever. → (lines merged, items merged)"""
     if not dump or dump.get("v") != 1:
         return 0, 0
     c = dump.get("client") or {}
@@ -322,13 +323,21 @@ def merge_dump(store, dump):
                 r["reagents"] = [[int(a), int(b)] for a, b in e["r"]]
             if e.get("s"):
                 r["text"] = e["s"]
+            if e.get("l"):
+                known = store.setdefault("known", {})
+                known[str(int(sp))] = max(known.get(str(int(sp)), ""), new["captured"])
             new["recipes"][str(int(sp))] = r
         old = store["lines"].get(str(int(line)))
         if old and (old["time"] > new["time"] or (old["complete"] and not new["complete"])):
             continue
         store["lines"][str(int(line))] = new
         n_lines += 1
+    no_item = store.setdefault("noItem", {})
+    for i, t in (dump.get("noItem") or {}).items():
+        if str(int(i)) not in store["items"]:
+            no_item[str(int(i))] = max(no_item.get(str(int(i)), ""), utc_date(t))
     for i, e in sorted((dump.get("items") or {}).items(), key=lambda kv: int(kv[0])):
+        no_item.pop(str(int(i)), None)
         old = store["items"].get(str(int(i)))
         if old and old["time"] > int(e.get("time", 0)):
             continue
@@ -469,6 +478,7 @@ def build(manifest, db, wh, client=None):
     cl_lines = {k: v for k, v in ((client or {}).get("lines") or {}).items() if v.get("complete")}
     cl_rec = {sp: (ln, e) for ln in cl_lines.values() for sp, e in ln["recipes"].items()}
     cl_items = (client or {}).get("items") or {}
+    cl_known = (client or {}).get("known") or {}
     lines = {str(p) for p in PROFESSIONS}
     sparse = {r["ID"]: r for r in db["ItemSparse"]}
     spell_name = {r["ID"]: r["Name_lang"] for r in db["SpellName"]}
@@ -508,11 +518,14 @@ def build(manifest, db, wh, client=None):
             continue
         w = wh_rec.get(sp)
         cl_ln, cl = cl_rec.get(sp, (None, None))
-        if a["SkillLine"] in cl_lines:
-            if not cl:
-                excluded.append((int(sp), int(a["SkillLine"]), spell_name.get(sp, "?") + " (not in the game's list, "
-                                 "client dump %s)" % cl_lines[a["SkillLine"]]["captured"]))
-                continue
+        # The game's list holds every SkillLineAbility recipe of the line, obtainable or not (client dump
+        # 2026-11-12), so being listed proves nothing; a recipe some dumped character knows does exist.
+        if a["SkillLine"] in cl_lines and not cl:
+            excluded.append((int(sp), int(a["SkillLine"]), spell_name.get(sp, "?") + " (not in the game's list, "
+                             "client dump %s)" % cl_lines[a["SkillLine"]]["captured"]))
+            continue
+        if sp in cl_known:
+            pass
         elif not w:
             excluded.append((int(sp), int(a["SkillLine"]), spell_name.get(sp, "?")))
             continue
@@ -550,12 +563,17 @@ def build(manifest, db, wh, client=None):
             "whLearn": int(w.get("learnedat", 0) or 0) if w else int(a["MinSkillLineRank"]),
             "items": [],
         }
+        if w:
+            recipes[sp]["onWh"] = True
+        if sp in cl_known:
+            recipes[sp]["known"] = cl_known[sp]
         if cl:
             recipes[sp]["client"] = cl_ln["captured"]
             if cl.get("text"):
                 recipes[sp]["learnText"] = clean_source_text(cl["text"])
     known_spells = {r["Spell"] for r in db["SkillLineAbility"]}
-    not_in_db2 = sorted((int(sp), ln, e) for sp, (ln, e) in cl_rec.items() if sp not in recipes)
+    db2_recipes = {a["Spell"] for a in db["SkillLineAbility"] if a["SkillLine"] in lines and a["Spell"] in creates}
+    not_in_db2 = sorted((int(sp), ln, e) for sp, (ln, e) in cl_rec.items() if sp not in db2_recipes)
     for sp, _, e in not_in_db2:
         report.append("game lists recipe %d %s, not a DB2 create-item recipe%s" % (
             sp, e.get("name", ""), "" if str(sp) in known_spells else " (no SkillLineAbility row)"))
@@ -679,20 +697,25 @@ def build(manifest, db, wh, client=None):
     def sourced(r):
         return r["how"] or r.get("learnText") or any(items.get(i, {}).get("how") or items.get(i, {}).get("from") for i in r["items"])
 
-    open_recipes = []
+    open_recipes, known_open = [], []
     for sp in sorted(recipes, key=int):
         r = recipes[sp]
         if sourced(r):
             continue
         its = sorted(r["items"])
         why = ("db2 recipe item " + " | ".join(recipe_item_text(i) for i in its)) if its else "no db2 recipe item"
-        open_recipes.append("%s\t%d\t%s\t%d\t%s" % (sp, r["skill"], r["name"], r["acquire"], why))
+        row = "%s\t%d\t%s\t%d\t%s" % (sp, r["skill"], r["name"], r["acquire"], why)
+        if r.get("known"):
+            known_open.append(row + "\tknown in game, client dump " + r["known"])
+        else:
+            open_recipes.append(row)
     report.append("recipes kept %d, excluded %d, items %d, vendor %d (unlimited %d)" % (
         len(recipes), len(excluded), len(items), len(vendor),
         sum(1 for v in vendor.values() if not v["limited"])))
     no_src = sorted(int(sp) for sp, r in recipes.items() if not r["how"] and not r.get("learnText"))
     report.append("recipes without a source of their own: %d; of those with no recipe item source either: %d" % (
-        len(no_src), len(open_recipes)))
+        len(no_src), len(open_recipes)) + ("; known in game (client dump) with no source named: %d" % len(known_open)
+                                           if known_open else ""))
     no_item_src = sorted(i for i in reagent_ids if not items.get(i, {}).get("how"))
     report.append("reagents without Wowhead source data: %d %s" % (len(no_item_src), no_item_src))
 
@@ -729,11 +752,18 @@ def build(manifest, db, wh, client=None):
            "", "## Recipes with no source: neither the recipe nor its recipe item has one on Wowhead Forever",
            "# spellID, skillLine, name, SkillLineAbility.AcquireMethod (1 = learned with the skill?), recipe items in the DB2"]
     opn += open_recipes
+    if known_open:
+        opn += ["", "## Recipes a character knows (client dump) but no source names: they exist, how they are learned is open",
+                "# spellID, skillLine, name, AcquireMethod, recipe items in the DB2, dump date"]
+        opn += known_open
     opn += ["", "## Reagents with no source on Wowhead Forever", "# itemID, name, used by"]
     opn += ["%d\t%s\t%s" % (i, items[i]["name"], uses(i)) for i in no_item_src]
     opn += ["", "## Items with no ItemSparse row and no Wowhead Forever item (tooltip 404)",
             "# itemID, used by (name, quality and prices come from GetItemInfo in game)"]
-    opn += ["%d\t%s" % (i, uses(i)) for i in sorted(items) if items[i].get("notOnWh") and not items[i].get("client")]
+    no_item = (client or {}).get("noItem") or {}
+    opn += ["%d\t%s%s" % (i, uses(i), ("\tthe game gave no item info, client dump " + no_item[str(i)])
+                         if str(i) in no_item else "")
+            for i in sorted(items) if items[i].get("notOnWh") and not items[i].get("client")]
     opn += ["", "## Vendor items with no NPC named: page not read and no sourcemore NPC (stock unknown)",
             "# itemID, name"]
     opn += ["%d\t%s" % (i, items[i]["name"]) for i in sorted(vendor)
@@ -947,15 +977,17 @@ def lua_recipes(recipes, prof):
             "--   2 drop, 4 quest, ...; from the profession lists, or from the recipe's own page when",
             "--   src has wh_item), cost = trainer cost (copper), items = recipe item IDs,",
             "--   acquire = SkillLineAbility.AcquireMethod, learnText = the game's own \"how to learn\" text",
-            "--   (C_TradeSkillUI.GetRecipeSourceText, src client); src client = the game listed the recipe",
-            "--   and its reagents/output come from the game }",
+            "--   (C_TradeSkillUI.GetRecipeSourceText, src client), known = date of the client dump in which a",
+            "--   character knew the recipe (src client); src client = the game listed the recipe and its",
+            "--   reagents/output come from the game }",
             "ns.Recipes = {"]
     for sp in sorted(recipes, key=int):
         r = recipes[sp]
-        src = ["db2"] + (["wh_list"] if r["how"] or not r.get("client") else []) + (
-            ["wh_item"] if r.get("page") else []) + (["client"] if r.get("client") else [])
-        ver = max(PAGES_VERIFIED if r.get("page") else DB2_VERIFIED, r.get("client") or "")
+        src = ["db2"] + (["wh_list"] if r["how"] or r.get("onWh") else []) + (
+            ["wh_item"] if r.get("page") else []) + (["client"] if r.get("client") or r.get("known") else [])
+        ver = max(PAGES_VERIFIED if r.get("page") else DB2_VERIFIED, r.get("client") or "", r.get("known") or "")
         text = ",learnText=%s" % lstr(r["learnText"]) if r.get("learnText") else ""
+        text += ",known=%s" % lstr(r["known"]) if r.get("known") else ""
         out.append(
             "  [%s]={name=%s,skill=%d,learn=%d,trivLo=%d,trivHi=%d,out=%s,reagents=%s,how=%s,"
             "cost=%d,items=%s,acquire=%d%s,src=\"%s\",verified=\"%s\"}," % (
