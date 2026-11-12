@@ -1,0 +1,24 @@
+## Interface: 16001
+## Title: ForeverCrafter
+## Notes: Finds profitable crafts and craft chains for World of Warcraft: Forever from one auction house snapshot.
+## Author: oskar-v-karlsson
+## Version: 0.1.0
+## SavedVariables: ForeverCrafterDB
+## IconTexture: Interface\Icons\INV_Misc_Coin_01
+## AddonCompartmentFunc: ForeverCrafter_OnCompartmentClick
+## AddonCompartmentFuncOnEnter: ForeverCrafter_OnCompartmentEnter
+## AddonCompartmentFuncOnLeave: ForeverCrafter_OnCompartmentLeave
+## X-License: GPL-2.0-or-later
+
+Core\Init.lua
+Core\Util.lua
+Data\Recipes.lua
+Data\Items.lua
+Data\Vendor.lua
+Modules\Professions.lua
+Modules\Dump.lua
+Modules\Scanner.lua
+Modules\Pricing.lua
+Modules\Planner.lua
+Modules\UI.lua
+Modules\Minimap.lua

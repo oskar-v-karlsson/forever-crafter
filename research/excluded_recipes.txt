@@ -1,0 +1,272 @@
+# ForeverCrafter: DB2 create-item recipes left out of Data/Recipes.lua
+# Reason: absent from every Wowhead Forever profession list (likely unobtainable),
+# or Wowhead learnedat 9999. A recipe the player knows still comes in at runtime
+# through C_TradeSkillUI. Columns: spellID, skillLine, name, the recipe items that
+# teach it in the DB2 (ItemXItemEffect -> ItemEffect.SpellID) with what the Wowhead
+# Forever recipe lists say about them, and what the recipe's own Wowhead Forever page
+# (www.wowhead.com/forever/spell=<id>) lists as a source
+# db2 build 1.60.1.70888, Wowhead lists fetched 2026-11-11
+2671	164	Rough Bronze Bracers	db2 recipe item 5577 (no name in the data): not on the Wowhead Forever recipe lists	spell page not read
+7636	197	Green Woolen Robe	db2 recipe item 6273 (no name in the data): not on the Wowhead Forever recipe lists	spell page not read
+8366	164	Ironforge Chain	db2 recipe item 6734 (no name in the data): not on the Wowhead Forever recipe lists	spell page not read
+8368	164	Ironforge Gauntlets	db2 recipe item 6736 (no name in the data): not on the Wowhead Forever recipe lists	spell page not read
+8778	197	Boots of Darkness	db2 recipe item 7093 (no name in the data): not on the Wowhead Forever recipe lists	spell page not read
+9942	164	Mithril Plate Gloves	db2 recipe item 7977 (no name in the data): not on the Wowhead Forever recipe lists	spell page not read
+10550	165	Nightscape Cloak	db2 recipe item 8388 Pattern: Nightscape Cloak: Wowhead Drop; zone Shen'dralas	spell page not read
+11447	171	Draught of Water Walking	db2 recipe item 288206 (no name in the data): not on the Wowhead Forever recipe lists	spell page not read
+12062	197	Stormcloth Pants	db2 recipe item 10303 (no name in the data): not on the Wowhead Forever recipe lists | 254681 Pattern: Stormcloth Pants: Wowhead lists no source	spell page: taught by item 254681
+12063	197	Stormcloth Gloves	db2 recipe item 10304 (no name in the data): not on the Wowhead Forever recipe lists | 254682 Pattern: Stormcloth Gloves: Wowhead Quest, Vendor; I Need a Tailor, zone Desolace	spell page not read
+12068	197	Stormcloth Vest	db2 recipe item 10313 (no name in the data): not on the Wowhead Forever recipe lists | 254683 Pattern: Stormcloth Vest: Wowhead lists no source	spell page not read
+12083	197	Stormcloth Headband	db2 recipe item 10319 (no name in the data): not on the Wowhead Forever recipe lists | 254684 Pattern: Stormcloth Headband: Wowhead lists no source	spell page not read
+12087	197	Stormcloth Shoulders	db2 recipe item 10322 (no name in the data): not on the Wowhead Forever recipe lists | 254685 Pattern: Stormcloth Shoulders: Wowhead lists no source	spell page not read
+12090	197	Stormcloth Boots	db2 recipe item 10324 (no name in the data): not on the Wowhead Forever recipe lists | 254686 Pattern: Stormcloth Boots: Wowhead Drop; Hatecrest Serpent Guard (Feralas)	spell page not read
+12719	202	Explosive Arrow	no db2 recipe item	spell page not read
+12720	202	Goblin "Boom" Box	no db2 recipe item	spell page not read
+12722	202	Goblin Radio	no db2 recipe item	spell page not read
+12900	202	Mobile Alarm	no db2 recipe item	spell page not read
+12904	202	Gnomish Ham Radio	no db2 recipe item	spell page not read
+16960	164	Thorium Greatsword	db2 recipe item 12816 (no name in the data): not on the Wowhead Forever recipe lists	spell page not read
+16965	164	Bleakwood Hew	db2 recipe item 12817 (no name in the data): not on the Wowhead Forever recipe lists	spell page not read
+16967	164	Inlaid Thorium Hammer	db2 recipe item 12818 (no name in the data): not on the Wowhead Forever recipe lists	spell page not read
+16980	164	Rune Edge	db2 recipe item 12826 (no name in the data): not on the Wowhead Forever recipe lists	spell page not read
+16986	164	Blood Talon	db2 recipe item 12831 (no name in the data): not on the Wowhead Forever recipe lists	spell page not read
+16987	164	Darkspear	db2 recipe item 12832 (no name in the data): not on the Wowhead Forever recipe lists	spell page not read
+17579	171	Greater Holy Protection Potion	db2 recipe item 13500 Recipe: Greater Holy Protection Potion: Wowhead lists no source	spell page: taught by item 13500
+19106	165	Onyxia Scale Breastplate	db2 recipe item 15780 (no name in the data): not on the Wowhead Forever recipe lists	spell page not read
+22430	171	Refined Scale of Onyxia	no db2 recipe item	spell page: no teacher, recipe item or other source
+30021	129	Crystal Infused Bandage	db2 recipe item 23689 (no name in the data): not on the Wowhead Forever recipe lists	spell page not read
+426607	171	Elixir of Coalesced Regret	db2 recipe item 210709 Recipe: Elixir of Coalesced Regret: not on the Wowhead Forever recipe lists	spell page not read
+427061	164	Mantle of the Second War	db2 recipe item 210779 Plans: Mantle of the Second War: not on the Wowhead Forever recipe lists	spell page not read
+428424	197	Phoenix Bindings	db2 recipe item 211247 Pattern: Phoenix Bindings: not on the Wowhead Forever recipe lists	spell page not read
+429351	197	Extraplanar Spidersilk Boots	no db2 recipe item	spell page not read
+429354	165	Void-Touched Leather Gloves	no db2 recipe item	spell page not read
+429869	165	Void-Touched Leather Gauntlets	no db2 recipe item	spell page not read
+430397	164	Blackfathom Sharpening Stone	db2 recipe item 211846 (no name in the data): not on the Wowhead Forever recipe lists	spell page not read
+430409	333	Blackfathom Mana Oil	db2 recipe item 211849 (no name in the data): not on the Wowhead Forever recipe lists	spell page not read
+431362	202	Soul Vessel	db2 recipe item 212230 Schematic: Soul Vessel: not on the Wowhead Forever recipe lists	spell page not read
+435819	165	Faintly Glowing Leather	db2 recipe item 215367 Pattern: Faintly Glowing Leather: not on the Wowhead Forever recipe lists	spell page not read
+435841	197	Invoker's Cord	db2 recipe item 215369 Pattern: Invoker's Cord: not on the Wowhead Forever recipe lists	spell page not read
+435848	197	Invoker's Mantle	db2 recipe item 215370 Pattern: Invoker's Mantle: not on the Wowhead Forever recipe lists	spell page not read
+435904	165	Glowing Gneuro-Linked Cowl	db2 recipe item 215152 Pattern: Glowing Gneuro-Linked Cowl: not on the Wowhead Forever recipe lists	spell page not read
+435949	165	Glowing Hyperconductive Scale Coif	db2 recipe item 215422 Pattern: Glowing Hyperconductive Scale Coif: not on the Wowhead Forever recipe lists	spell page not read
+435951	165	Gneuro-Conductive Channeler's Hood	db2 recipe item 215423 Pattern: Gneuro-Conductive Channeler's Hood: not on the Wowhead Forever recipe lists	spell page not read
+435953	165	Rad-Resistant Scale Hood	db2 recipe item 215424 Pattern: Rad-Resistant Scale Hood: not on the Wowhead Forever recipe lists	spell page not read
+439085	197	Crimson Silk Robe	db2 recipe item 217244 Pattern: Crimson Silk Robe: not on the Wowhead Forever recipe lists	spell page not read
+439086	197	Black Mageweave Vest	no db2 recipe item	spell page: no teacher, recipe item or other source
+439088	197	Black Mageweave Leggings	no db2 recipe item	spell page not read
+439091	197	Earthen Silk Belt	db2 recipe item 217249 Pattern: Earthen Silk Belt: not on the Wowhead Forever recipe lists	spell page not read
+439093	197	Crimson Silk Shoulders	db2 recipe item 217251 Pattern: Crimson Silk Shoulders: not on the Wowhead Forever recipe lists	spell page not read
+439094	197	Long Silken Cloak	no db2 recipe item	spell page not read
+439097	197	Boots of the Enchanter	db2 recipe item 217254 Pattern: Boots of the Enchanter: not on the Wowhead Forever recipe lists	spell page not read
+439098	197	Crimson Silk Belt	no db2 recipe item	spell page not read
+439100	197	Earthen Vest	no db2 recipe item	spell page not read
+439102	197	Enchanter's Cowl	db2 recipe item 217258 Pattern: Enchanter's Cowl: not on the Wowhead Forever recipe lists	spell page not read
+439105	165	Big Voodoo Mask	db2 recipe item 217260 Pattern: Big Voodoo Mask: not on the Wowhead Forever recipe lists	spell page: no teacher, recipe item or other source
+439108	165	Big Voodoo Robe	db2 recipe item 217262 Pattern: Big Voodoo Robe: not on the Wowhead Forever recipe lists	spell page not read
+439110	165	Guardian Leather Bracers	db2 recipe item 217264 Pattern: Guardian Leather Bracers: not on the Wowhead Forever recipe lists	spell page not read
+439112	165	Guardian Belt	db2 recipe item 217266 Pattern: Guardian Belt: not on the Wowhead Forever recipe lists	spell page not read
+439114	165	Guardian Pants	no db2 recipe item	spell page not read
+439116	165	Turtle Scale Breastplate	no db2 recipe item	spell page not read
+439118	165	Turtle Scale Gloves	db2 recipe item 217271 Pattern: Turtle Scale Gloves: not on the Wowhead Forever recipe lists	spell page: no teacher, recipe item or other source
+439120	164	Golden Scale Gauntlets	db2 recipe item 217274 Plans: Golden Scale Gauntlets: not on the Wowhead Forever recipe lists	spell page not read
+439122	164	Golden Scale Boots	db2 recipe item 217276 Plans: Golden Scale Boots: not on the Wowhead Forever recipe lists	spell page not read
+439124	164	Golden Scale Cuirass	db2 recipe item 217278 Plans: Golden Scale Cuirass: not on the Wowhead Forever recipe lists	spell page not read
+439126	164	Golden Scale Coif	db2 recipe item 217280 Plans: Golden Scale Coif: not on the Wowhead Forever recipe lists	spell page not read
+439128	164	Moonsteel Broadsword	db2 recipe item 217282 Plans: Moonsteel Broadsword: not on the Wowhead Forever recipe lists	spell page not read
+439130	164	Golden Scale Shoulders	db2 recipe item 217284 Plans: Golden Scale Shoulders: not on the Wowhead Forever recipe lists	spell page not read
+439132	164	Golden Scale Leggings	db2 recipe item 217286 Plans: Golden Scale Leggings: not on the Wowhead Forever recipe lists	spell page not read
+439134	333	Greater Mystic Wand	no db2 recipe item	spell page not read
+439156	333	Sigil of Innovation	db2 recipe item 215141 Enchanted Sigil: Innovation: not on the Wowhead Forever recipe lists	spell page not read
+439960	171	Lesser Arcane Elixir	db2 recipe item 217399 Recipe: Lesser Arcane Elixir: not on the Wowhead Forever recipe lists	spell page not read
+446183	165	Paranoia Mantle	no db2 recipe item	spell page not read
+446185	165	Shrieking Spaulders	no db2 recipe item	spell page not read
+446186	165	Cacophonous Chain Shoulderguards	no db2 recipe item	spell page not read
+446189	165	Shoulderpads of Obsession	no db2 recipe item	spell page not read
+446190	165	Wailing Chain Mantle	no db2 recipe item	spell page not read
+446192	165	Membrane of Dark Neurosis	no db2 recipe item	spell page not read
+451706	165	Screaming Chain Pauldrons	no db2 recipe item	spell page not read
+460460	164	Sulfuron Hammer	db2 recipe item 227727 Plans: Sulfuron Hammer: not on the Wowhead Forever recipe lists	spell page not read
+461645	165	Honed Blue Dragonscale Shoulders	db2 recipe item 227899 Pattern: Honed Blue Dragonscale Shoulders: not on the Wowhead Forever recipe lists	spell page not read
+461647	164	Skyrider's Masterwork Stormhammer	db2 recipe item 227905 Plans: Skyrider's Masterwork Stormhammer: not on the Wowhead Forever recipe lists	spell page not read
+461649	165	Living Green Dragonscale Leggings	db2 recipe item 227900 Pattern: Living Green Dragonscale Leggings: not on the Wowhead Forever recipe lists	spell page not read
+461651	164	Fiery Plate Gauntlets of the Hidden Technique	db2 recipe item 227909 Plans: Fiery Plate Gauntlets of the Hidden Technique: not on the Wowhead Forever recipe lists	spell page not read
+461653	165	Brilliant Chromatic Cloak	db2 recipe item 227910 Pattern: Brilliant Chromatic Cloak: not on the Wowhead Forever recipe lists	spell page not read
+461655	165	Hardened Black Dragonscale Breastplate	db2 recipe item 227902 Pattern: Hardened Black Dragonscale Breastplate: not on the Wowhead Forever recipe lists	spell page not read
+461657	165	Hardened Black Dragonscale Leggings	db2 recipe item 227903 Pattern: Hardened Black Dragonscale Leggings: not on the Wowhead Forever recipe lists	spell page not read
+461659	165	Hardened Black Dragonscale Shoulders	db2 recipe item 227904 Pattern: Hardened Black Dragonscale Shoulders: not on the Wowhead Forever recipe lists	spell page not read
+461661	165	Masterwork Volcanic Breastplate	db2 recipe item 227906 Pattern: Masterwork Volcanic Breastplate: not on the Wowhead Forever recipe lists	spell page not read
+461663	165	Masterwork Volcanic Shoulders	db2 recipe item 227907 Pattern: Masterwork Volcanic Shoulders: not on the Wowhead Forever recipe lists	spell page not read
+461665	165	Masterwork Volcanic Leggings	db2 recipe item 227908 Pattern: Masterwork Volcanic Leggings: not on the Wowhead Forever recipe lists	spell page not read
+461667	164	Tempered Dark Iron Plate	db2 recipe item 227901 Plans: Tempered Dark Iron Plate: not on the Wowhead Forever recipe lists	spell page not read
+461669	164	Refined Arcanite Champion	db2 recipe item 228117 Plans: Refined Arcanite Champion: not on the Wowhead Forever recipe lists	spell page not read
+461671	164	Stronger-hold Gauntlets	db2 recipe item 228250 Plans: Stronger-hold Gauntlets: not on the Wowhead Forever recipe lists	spell page not read
+461673	165	Honed Blue Dragonscale Breastplate	db2 recipe item 227898 Pattern: Honed Blue Dragonscale Breastplate: not on the Wowhead Forever recipe lists	spell page not read
+461675	164	Refined Arcanite Reaper	db2 recipe item 228114 Plans: Refined Arcanite Reaper: not on the Wowhead Forever recipe lists	spell page not read
+461677	165	Living Green Dragonscale Gauntlets	db2 recipe item 228251 Pattern: Living Green Dragonscale Gauntlets: not on the Wowhead Forever recipe lists	spell page: no teacher, recipe item or other source
+461690	165	Mastercrafted Shifting Cloak	db2 recipe item 228276 Pattern: Mastercrafted Shifting Cloak: not on the Wowhead Forever recipe lists	spell page not read
+461692	165	Synthetic Gordok Ogre Suit	db2 recipe item 228115 (no name in the data): not on the Wowhead Forever recipe lists	spell page not read
+461692	197	Synthetic Gordok Ogre Suit	db2 recipe item 228115 (no name in the data): not on the Wowhead Forever recipe lists	spell page not read
+461706	165	Swift Flight Vambraces	db2 recipe item 228301 Pattern: Swift Flight Vambraces: not on the Wowhead Forever recipe lists	spell page not read
+461708	197	Incandescent Mooncloth Robe	db2 recipe item 228303 Pattern: Incandescent Mooncloth Robe: not on the Wowhead Forever recipe lists	spell page not read
+461710	202	Fiery Core Sharpshooter Rifle	db2 recipe item 228304 (no name in the data): not on the Wowhead Forever recipe lists	spell page not read
+461712	164	Refined Hammer of the Titans	db2 recipe item 228305 (no name in the data): not on the Wowhead Forever recipe lists	spell page not read
+461714	164	Desecration	db2 recipe item 228306 (no name in the data): not on the Wowhead Forever recipe lists	spell page not read
+461716	164	Deadly Heartseeker	db2 recipe item 228307 (no name in the data): not on the Wowhead Forever recipe lists	spell page not read
+461718	164	Tranquility	db2 recipe item 228308 (no name in the data): not on the Wowhead Forever recipe lists	spell page not read
+461720	165	Living Green Dragonscale Breastplate	db2 recipe item 228309 Pattern: Living Green Dragonscale Breastplate: not on the Wowhead Forever recipe lists	spell page not read
+461722	165	Devilcore Gauntlets	db2 recipe item 228119 Pattern: Devilcore Gauntlets: not on the Wowhead Forever recipe lists	spell page not read
+461724	165	Devilcore Leggings	db2 recipe item 228120 Pattern: Devilcore Leggings: not on the Wowhead Forever recipe lists	spell page not read
+461727	197	Leather-Reinforced Runecloth Bag	db2 recipe item 228121 Pattern: Leather-Reinforced Runecloth Bag: not on the Wowhead Forever recipe lists	spell page not read
+461730	164	Hardened Frostguard	db2 recipe item 228310 Plans: Hardened Frostguard: not on the Wowhead Forever recipe lists	spell page not read
+461733	164	Finely-Enchanted Battlehammer	db2 recipe item 228311 Plans: Finely-Enchanted Battlehammer: not on the Wowhead Forever recipe lists	spell page not read
+461735	164	Invincible Mail	db2 recipe item 228312 Plans: Invincible Mail: not on the Wowhead Forever recipe lists	spell page not read
+461737	164	Tempest Gauntlets	db2 recipe item 228313 Plans: Tempest Gauntlets: not on the Wowhead Forever recipe lists	spell page not read
+461739	164	Warcrest of the Great Chief	db2 recipe item 228314 Plans: Warcrest of the Great Chief: not on the Wowhead Forever recipe lists	spell page not read
+461743	164	Sageblade of the Archmagus	db2 recipe item 228315 Plans: Sageblade of the Archmagus: not on the Wowhead Forever recipe lists	spell page not read
+461747	197	Incandescent Mooncloth Vest	db2 recipe item 228316 Pattern: Incandescent Mooncloth Vest: not on the Wowhead Forever recipe lists	spell page not read
+461750	197	Incandescent Mooncloth Circlet	db2 recipe item 228317 Pattern: Incandescent Mooncloth Circlet: not on the Wowhead Forever recipe lists	spell page not read
+461752	197	Incandescent Mooncloth Leggings	db2 recipe item 228318 Pattern: Incandescent Mooncloth Leggings: not on the Wowhead Forever recipe lists	spell page not read
+461754	165	Girdle of Arcane Insight	db2 recipe item 228319 Pattern: Girdle of Arcane Insight: not on the Wowhead Forever recipe lists	spell page not read
+462227	165	Honed Blue Dragonscale Leggings	no db2 recipe item	spell page not read
+462282	197	Embroidered Belt of the Archmage	db2 recipe item 228477 Pattern: Embroidered Belt of the Archmage: not on the Wowhead Forever recipe lists	spell page not read
+463866	333	Sigil of Flowing Waters	db2 recipe item 228979 Enchanted Sigil: Flowing Waters: not on the Wowhead Forever recipe lists	spell page not read
+463869	333	Conductive Shield Coating	db2 recipe item 228981 Formula: Conductive Shield Coating: not on the Wowhead Forever recipe lists	spell page not read
+463972	197	Bottomless Bag	db2 recipe item 228993 Pattern: Bottomless Bag: not on the Wowhead Forever recipe lists	spell page not read
+470349	129	Dense Runecloth Bandage	db2 recipe item 232434 Manual: Dense Runecloth Bandage: not on the Wowhead Forever recipe lists	spell page not read
+470359	185	Darkclaw Bisque	db2 recipe item 232437 Recipe: Darkclaw Bisque: not on the Wowhead Forever recipe lists	spell page not read
+470370	185	Smoked Redgill	db2 recipe item 232443 Recipe: Smoked Redgill: not on the Wowhead Forever recipe lists	spell page: no teacher, recipe item or other source
+471400	333	Magnificent Trollshine	db2 recipe item 232610 Formula: Magnificent Trollshine: not on the Wowhead Forever recipe lists	spell page not read
+1213481	164	Razorspike Headcage	db2 recipe item 234220 (no name in the data): not on the Wowhead Forever recipe lists	spell page not read
+1213484	164	Razorspike Shoulderplate	db2 recipe item 234221 (no name in the data): not on the Wowhead Forever recipe lists	spell page not read
+1213490	164	Razorspike Battleplate	db2 recipe item 234222 (no name in the data): not on the Wowhead Forever recipe lists	spell page not read
+1213492	164	Obsidian Reaver	db2 recipe item 234223 (no name in the data): not on the Wowhead Forever recipe lists	spell page not read
+1213492	164	Obsidian Reaver	db2 recipe item 234223 (no name in the data): not on the Wowhead Forever recipe lists	spell page not read
+1213498	164	Obsidian Champion	db2 recipe item 234224 (no name in the data): not on the Wowhead Forever recipe lists	spell page not read
+1213500	164	Obsidian Destroyer	db2 recipe item 234225 (no name in the data): not on the Wowhead Forever recipe lists	spell page not read
+1213502	164	Obsidian Stormhammer	db2 recipe item 234226 (no name in the data): not on the Wowhead Forever recipe lists	spell page not read
+1213504	164	Obsidian Sageblade	db2 recipe item 234227 (no name in the data): not on the Wowhead Forever recipe lists	spell page not read
+1213506	164	Obsidian Defender	db2 recipe item 234228 (no name in the data): not on the Wowhead Forever recipe lists	spell page not read
+1213513	165	Glowing Chitin Armor Kit	db2 recipe item 234235 (no name in the data): not on the Wowhead Forever recipe lists	spell page not read
+1213519	165	Sharpened Chitin Armor Kit	db2 recipe item 234236 (no name in the data): not on the Wowhead Forever recipe lists	spell page not read
+1213521	165	Razorbramble Cowl	db2 recipe item 234237 (no name in the data): not on the Wowhead Forever recipe lists	spell page not read
+1213523	165	Razorbramble Shoulderpads	db2 recipe item 234238 (no name in the data): not on the Wowhead Forever recipe lists	spell page not read
+1213525	165	Razorbramble Leathers	db2 recipe item 234239 (no name in the data): not on the Wowhead Forever recipe lists	spell page: no teacher, recipe item or other source
+1213527	197	Vampiric Cowl	db2 recipe item 234240 (no name in the data): not on the Wowhead Forever recipe lists	spell page not read
+1213530	197	Vampiric Shawl	db2 recipe item 234241 (no name in the data): not on the Wowhead Forever recipe lists	spell page not read
+1213532	197	Vampiric Robe	db2 recipe item 234242 (no name in the data): not on the Wowhead Forever recipe lists	spell page not read
+1213534	197	Qiraji Silk Scarf	db2 recipe item 234244 (no name in the data): not on the Wowhead Forever recipe lists	spell page not read
+1213536	197	Qiraji Silk Cape	db2 recipe item 234249 (no name in the data): not on the Wowhead Forever recipe lists	spell page not read
+1213538	197	Qiraji Silk Cloak	db2 recipe item 234250 (no name in the data): not on the Wowhead Forever recipe lists	spell page not read
+1213540	197	Qiraji Silk Drape	db2 recipe item 234251 (no name in the data): not on the Wowhead Forever recipe lists	spell page not read
+1213544	171	Flask of Unyielding Sorrow	db2 recipe item 234252 (no name in the data): not on the Wowhead Forever recipe lists	spell page not read
+1213546	171	Flask of Ancient Knowledge	db2 recipe item 234253 (no name in the data): not on the Wowhead Forever recipe lists	spell page: no teacher, recipe item or other source
+1213548	171	Flask of the Old Gods	db2 recipe item 234255 (no name in the data): not on the Wowhead Forever recipe lists	spell page not read
+1213552	171	Flask of Madness	db2 recipe item 234256 (no name in the data): not on the Wowhead Forever recipe lists	spell page not read
+1213559	171	Elixir of the Honey Badger	db2 recipe item 234257 (no name in the data): not on the Wowhead Forever recipe lists	spell page not read
+1213563	171	Elixir of the Mage-Lord	db2 recipe item 234258 (no name in the data): not on the Wowhead Forever recipe lists	spell page: no teacher, recipe item or other source
+1213565	171	Elixir of the Ironside	db2 recipe item 234259 (no name in the data): not on the Wowhead Forever recipe lists	spell page not read
+1213571	171	Elixir of Alacrity	db2 recipe item 234260 (no name in the data): not on the Wowhead Forever recipe lists	spell page not read
+1213573	202	Arcane Megabomb	db2 recipe item 234261 (no name in the data): not on the Wowhead Forever recipe lists	spell page not read
+1213576	202	The Fumigator	db2 recipe item 234262 (no name in the data): not on the Wowhead Forever recipe lists	spell page not read
+1213578	202	Obsidian Bomb	db2 recipe item 234263 (no name in the data): not on the Wowhead Forever recipe lists	spell page not read
+1213586	202	G00 DV-1B3 Generator	db2 recipe item 234264 (no name in the data): not on the Wowhead Forever recipe lists	spell page not read
+1213588	202	Tuned Force Reactive Disk	db2 recipe item 234265 (no name in the data): not on the Wowhead Forever recipe lists	spell page not read
+1213593	333	Speedstone	db2 recipe item 234266 (no name in the data): not on the Wowhead Forever recipe lists	spell page not read
+1213595	333	Tear of the Dreamer	db2 recipe item 234267 (no name in the data): not on the Wowhead Forever recipe lists	spell page not read
+1213598	333	Lodestone of Retaliation	db2 recipe item 234268 (no name in the data): not on the Wowhead Forever recipe lists	spell page not read
+1213600	333	Enchanted Stopwatch	db2 recipe item 234269 (no name in the data): not on the Wowhead Forever recipe lists	spell page not read
+1213603	333	Ruby-Encrusted Broach	db2 recipe item 234270 (no name in the data): not on the Wowhead Forever recipe lists	spell page: no teacher, recipe item or other source
+1213607	333	Scroll: Wrath of the Swarm	db2 recipe item 234271 (no name in the data): not on the Wowhead Forever recipe lists	spell page not read
+1213610	333	Enchanted Repellent	db2 recipe item 234272 (no name in the data): not on the Wowhead Forever recipe lists	spell page not read
+1213628	333	Enchanted Prayer Tome	db2 recipe item 234275 (no name in the data): not on the Wowhead Forever recipe lists	spell page not read
+1213633	333	Enchanted Totem	db2 recipe item 234276 (no name in the data): not on the Wowhead Forever recipe lists	spell page not read
+1213635	333	Enchanted Mushroom	db2 recipe item 234277 (no name in the data): not on the Wowhead Forever recipe lists	spell page not read
+1213638	186	Smelt Obsidian-Infused Thorium Bar	db2 recipe item 234278 (no name in the data): not on the Wowhead Forever recipe lists	spell page not read
+1213643	164	Obsidian Grinding Stone	db2 recipe item 234279 (no name in the data): not on the Wowhead Forever recipe lists	spell page: no teacher, recipe item or other source
+1213646	202	Obsidian Blasting Powder	db2 recipe item 234280 (no name in the data): not on the Wowhead Forever recipe lists	spell page not read
+1213709	164	Ironvine Belt	db2 recipe item 234289 (no name in the data): not on the Wowhead Forever recipe lists	spell page not read
+1213711	164	Ironvine Gloves	db2 recipe item 234291 (no name in the data): not on the Wowhead Forever recipe lists	spell page not read
+1213715	164	Ironvine Breastplate	db2 recipe item 234293 (no name in the data): not on the Wowhead Forever recipe lists	spell page not read
+1213717	165	Sandstalker Bracers	db2 recipe item 234295 (no name in the data): not on the Wowhead Forever recipe lists	spell page not read
+1213720	165	Sandstalker Gauntlets	db2 recipe item 234297 (no name in the data): not on the Wowhead Forever recipe lists	spell page not read
+1213723	165	Sandstalker Breastplate	db2 recipe item 234299 (no name in the data): not on the Wowhead Forever recipe lists	spell page not read
+1213726	165	Spitfire Bracers	db2 recipe item 234301 (no name in the data): not on the Wowhead Forever recipe lists	spell page not read
+1213728	165	Spitfire Gauntlets	db2 recipe item 234303 (no name in the data): not on the Wowhead Forever recipe lists	spell page not read
+1213731	165	Spitfire Breastplate	db2 recipe item 234305 (no name in the data): not on the Wowhead Forever recipe lists	spell page not read
+1213734	165	Bramblewood Belt	db2 recipe item 234307 (no name in the data): not on the Wowhead Forever recipe lists	spell page not read
+1213736	165	Bramblewood Boots	db2 recipe item 234309 (no name in the data): not on the Wowhead Forever recipe lists	spell page not read
+1213738	165	Bramblewood Helm	db2 recipe item 234311 (no name in the data): not on the Wowhead Forever recipe lists	spell page not read
+1213740	197	Sylvan Shoulders	db2 recipe item 234314 (no name in the data): not on the Wowhead Forever recipe lists	spell page not read
+1213742	197	Sylvan Crown	db2 recipe item 234316 (no name in the data): not on the Wowhead Forever recipe lists	spell page not read
+1213744	197	Sylvan Vest	db2 recipe item 234318 (no name in the data): not on the Wowhead Forever recipe lists	spell page not read
+1213746	164	Heavy Obsidian Belt	db2 recipe item 234320 (no name in the data): not on the Wowhead Forever recipe lists	spell page not read
+1213748	164	Light Obsidian Belt	db2 recipe item 234322 (no name in the data): not on the Wowhead Forever recipe lists	spell page: no teacher, recipe item or other source
+1213751	165	Dreamscale Breastplate	db2 recipe item 234325 (no name in the data): not on the Wowhead Forever recipe lists	spell page not read
+1214137	164	Obsidian Heartseeker	db2 recipe item 234429 (no name in the data): not on the Wowhead Forever recipe lists	spell page not read
+1214145	202	Obsidian Shotgun	db2 recipe item 234435 (no name in the data): not on the Wowhead Forever recipe lists	spell page not read
+1214173	197	Bolt of Qiraji Silk	db2 recipe item 234445 (no name in the data): not on the Wowhead Forever recipe lists	spell page not read
+1214257	164	Black Grasp of the Destroyer	db2 recipe item 234085 (no name in the data): not on the Wowhead Forever recipe lists	spell page not read
+1214270	164	Jagged Obsidian Shield	db2 recipe item 234458 (no name in the data): not on the Wowhead Forever recipe lists	spell page not read
+1214274	164	Obsidian Mail Tunic	db2 recipe item 234461 (no name in the data): not on the Wowhead Forever recipe lists	spell page not read
+1214303	165	Dreamscale Kilt	db2 recipe item 234481 (no name in the data): not on the Wowhead Forever recipe lists	spell page not read
+1214306	197	Dreamscale Bracers	db2 recipe item 234483 (no name in the data): not on the Wowhead Forever recipe lists	spell page not read
+1214307	197	Dreamscale Mitts	db2 recipe item 234486 (no name in the data): not on the Wowhead Forever recipe lists	spell page not read
+1214309	164	Dreamscale Visor	db2 recipe item 234488 (no name in the data): not on the Wowhead Forever recipe lists	spell page not read
+1215507	164	Thick Obsidian Breastplate	db2 recipe item 235039 (no name in the data): not on the Wowhead Forever recipe lists	spell page not read
+1216005	333	Libram of Righteousness	db2 recipe item 235133 (no name in the data): not on the Wowhead Forever recipe lists	spell page not read
+1216007	333	Libram of the Exorcist	db2 recipe item 235134 (no name in the data): not on the Wowhead Forever recipe lists	spell page not read
+1216010	333	Libram of Sanctity	db2 recipe item 235135 (no name in the data): not on the Wowhead Forever recipe lists	spell page not read
+1216014	333	Totem of Pyroclastic Thunder	db2 recipe item 235136 (no name in the data): not on the Wowhead Forever recipe lists	spell page not read
+1216016	333	Totem of Thunderous Strikes	db2 recipe item 235137 (no name in the data): not on the Wowhead Forever recipe lists	spell page not read
+1216018	333	Totem of Flowing Magma	db2 recipe item 235138 (no name in the data): not on the Wowhead Forever recipe lists	spell page not read
+1216020	333	Idol of Sidereal Wrath	db2 recipe item 235139 (no name in the data): not on the Wowhead Forever recipe lists	spell page: no teacher, recipe item or other source
+1216022	333	Idol of Feline Ferocity	db2 recipe item 235140 (no name in the data): not on the Wowhead Forever recipe lists	spell page not read
+1216024	333	Idol of Ursin Power	db2 recipe item 235141 (no name in the data): not on the Wowhead Forever recipe lists	spell page not read
+1217207	202	Obsidian Scope	db2 recipe item 235530 (no name in the data): not on the Wowhead Forever recipe lists	spell page not read
+1221012	202	Creepy Censor Sensors	db2 recipe item 236872 Schematic: Creepy Censor Sensors: not on the Wowhead Forever recipe lists	spell page not read
+1223760	197	Glacial Vest	no db2 recipe item	spell page not read
+1223762	197	Glacial Cloak	no db2 recipe item	spell page not read
+1223764	197	Glacial Gloves	no db2 recipe item	spell page not read
+1223766	197	Glacial Wrists	no db2 recipe item	spell page not read
+1223768	197	Frosty Vest	no db2 recipe item	spell page not read
+1223770	197	Frosty Gloves	no db2 recipe item	spell page not read
+1223772	197	Frosty Wrists	no db2 recipe item	spell page not read
+1223774	165	Icy Scale Breastplate	no db2 recipe item	spell page not read
+1223776	165	Icy Scale Gauntlets	no db2 recipe item	spell page not read
+1223778	165	Icy Scale Bracers	no db2 recipe item	spell page not read
+1223780	165	Polar Tunic	no db2 recipe item	spell page not read
+1223782	165	Polar Gloves	no db2 recipe item	spell page not read
+1223784	165	Polar Bracers	no db2 recipe item	spell page not read
+1223787	164	Icebane Breastplate	no db2 recipe item	spell page not read
+1223789	164	Icebane Gauntlets	no db2 recipe item	spell page not read
+1223791	164	Icebane Bracers	no db2 recipe item	spell page not read
+1224607	197	Scarlet Augur's Hood	db2 recipe item 238298 Pattern: Scarlet Augur's Hood: not on the Wowhead Forever recipe lists	spell page not read
+1224608	197	Scarlet Augur's Mantle	db2 recipe item 238299 Pattern: Scarlet Augur's Mantle: not on the Wowhead Forever recipe lists	spell page not read
+1224610	197	Scarlet Augur's Cuffs	db2 recipe item 238301 Pattern: Scarlet Augur's Cuffs: not on the Wowhead Forever recipe lists	spell page not read
+1224611	197	Scarlet Augur's Mitts	db2 recipe item 238302 Pattern: Scarlet Augur's Mitts: not on the Wowhead Forever recipe lists	spell page not read
+1224612	197	Scarlet Augur's Strap	db2 recipe item 238303 Pattern: Scarlet Augur's Strap: not on the Wowhead Forever recipe lists	spell page not read
+1224613	197	Scarlet Augur's Leggings	db2 recipe item 238304 Pattern: Scarlet Augur's Leggings: not on the Wowhead Forever recipe lists	spell page not read
+1224614	197	Scarlet Augur's Soles	db2 recipe item 238305 Pattern: Scarlet Augur's Soles: not on the Wowhead Forever recipe lists	spell page not read
+1224615	165	Scarlet Infiltrator's Bandana	db2 recipe item 238306 Pattern: Scarlet Infiltrator's Bandana: not on the Wowhead Forever recipe lists	spell page not read
+1224616	165	Scarlet Infiltrator's Shoulderpads	db2 recipe item 238307 Pattern: Scarlet Infiltrator's Shoulderpads: not on the Wowhead Forever recipe lists	spell page not read
+1224617	165	Scarlet Infiltrator's Vest	db2 recipe item 238308 Pattern: Scarlet Infiltrator's Vest: not on the Wowhead Forever recipe lists	spell page not read
+1224618	165	Scarlet Infiltrator's Bracers	db2 recipe item 238309 Pattern: Scarlet Infiltrator's Bracers: not on the Wowhead Forever recipe lists	spell page not read
+1224619	165	Scarlet Infiltrator's Gloves	db2 recipe item 238310 Pattern: Scarlet Infiltrator's Gloves: not on the Wowhead Forever recipe lists	spell page not read
+1224620	165	Scarlet Infiltrator's Belt	db2 recipe item 238311 Pattern: Scarlet Infiltrator's Belt: not on the Wowhead Forever recipe lists	spell page not read
+1224621	165	Scarlet Infiltrator's Trousers	db2 recipe item 238312 Pattern: Scarlet Infiltrator's Trousers: not on the Wowhead Forever recipe lists	spell page not read
+1224622	165	Scarlet Infiltrator's Shoes	db2 recipe item 238313 Pattern: Scarlet Infiltrator's Shoes: not on the Wowhead Forever recipe lists	spell page not read
+1224623	165	Scarlet Huntsman's Coif	db2 recipe item 238314 Pattern: Scarlet Huntsman's Coif: not on the Wowhead Forever recipe lists	spell page not read
+1224624	165	Scarlet Huntsman's Pauldrons	db2 recipe item 238315 Pattern: Scarlet Huntsman's Pauldrons: not on the Wowhead Forever recipe lists	spell page not read
+1224625	165	Scarlet Huntsman's Chain	db2 recipe item 238316 Pattern: Scarlet Huntsman's Chain: not on the Wowhead Forever recipe lists	spell page not read
+1224626	165	Scarlet Huntsman's Wristguards	db2 recipe item 238317 Pattern: Scarlet Huntsman's Wristguards: not on the Wowhead Forever recipe lists	spell page not read
+1224627	165	Scarlet Huntsman's Handguards	db2 recipe item 238318 Pattern: Scarlet Huntsman's Handguards: not on the Wowhead Forever recipe lists	spell page not read
+1224628	165	Scarlet Huntsman's Clasp	db2 recipe item 238319 Pattern: Scarlet Huntsman's Clasp: not on the Wowhead Forever recipe lists	spell page not read
+1224629	165	Scarlet Huntsman's Legguards	db2 recipe item 238320 Pattern: Scarlet Huntsman's Legguards: not on the Wowhead Forever recipe lists	spell page not read
+1224630	165	Scarlet Huntsman's Boots	db2 recipe item 238321 Pattern: Scarlet Huntsman's Boots: not on the Wowhead Forever recipe lists	spell page not read
+1224631	164	Scarlet Soldier's Helmet	db2 recipe item 238322 Plans: Scarlet Soldier's Helmet: not on the Wowhead Forever recipe lists	spell page not read
+1224632	164	Scarlet Soldier's Spaulders	db2 recipe item 238323 Plans: Scarlet Soldier's Spaulders: not on the Wowhead Forever recipe lists	spell page not read
+1224633	164	Scarlet Soldier's Chestplate	db2 recipe item 238324 Plans: Scarlet Soldier's Chestplate: not on the Wowhead Forever recipe lists	spell page not read
+1224635	164	Scarlet Soldier's Protectors	db2 recipe item 238325 Plans: Scarlet Soldier's Protectors: not on the Wowhead Forever recipe lists	spell page not read
+1226689	165	Scarlet Quiver	db2 recipe item 238927 Pattern: Scarlet Quiver: not on the Wowhead Forever recipe lists	spell page not read
+1226690	165	Scarlet Ammo Pouch	db2 recipe item 238928 Pattern: Scarlet Ammo Pouch: not on the Wowhead Forever recipe lists	spell page not read
+1255241	185	Cleansing Stew (learnedat 9999)	db2 recipe item 252949 (no name in the data): not on the Wowhead Forever recipe lists	spell page not read
