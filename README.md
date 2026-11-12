@@ -22,11 +22,11 @@ Download the newest zip from [Releases](https://github.com/oskar-v-karlsson/fore
    - **Zip:** or run `make zip` and use `dist/ForeverCrafter-v<version>.zip`.
    - **Copy:** or copy the `ForeverCrafter` folder from this repo.
 2. In the **Battle.net** app, choose **World of Warcraft**, then the **Forever** version in the version drop-down. Click the gear next to Play → **Show in Explorer**.
-3. Open the game folder for Forever (most likely `_classic_beta_`), then `Interface\AddOns`. If `AddOns` (or `Interface`) is missing, create it.
-4. Put the `ForeverCrafter` folder there. The result must be `...\Interface\AddOns\ForeverCrafter\ForeverCrafter.toc`. The folder must keep exactly this name and not be nested twice (`ForeverCrafter\ForeverCrafter\...`), which happens easily with Extract All.
+3. Open the Forever game folder, `_forever_`, then `Interface\AddOns`. If `AddOns` (or `Interface`) is missing, create it.
+4. Put the `ForeverCrafter` folder there. The result must be `_forever_\Interface\AddOns\ForeverCrafter\ForeverCrafter.toc`. The folder must keep exactly this name and not be nested twice (`ForeverCrafter\ForeverCrafter\...`), which happens easily with Extract All.
 5. Start the game. At character select, open **AddOns** (bottom left), make sure **ForeverCrafter** is ticked, and turn on **Load out of date AddOns** if the game asks.
 
-To update, delete the old `ForeverCrafter` folder and put the new one in its place. Prices, merchant data and recipe lists are kept, because they are stored in `WTF\Account\...\SavedVariables\ForeverCrafter.lua`.
+To update, delete the old `ForeverCrafter` folder and put the new one in its place. Prices, merchant data and recipe lists are kept, because they are stored in `_forever_\WTF\Account\<account>\SavedVariables\ForeverCrafter.lua`.
 
 ## Usage
 
@@ -90,7 +90,7 @@ These cannot be tested outside the game. Please go through them once and report 
 9. [ ] `/crafter debug` lists no missing APIs or events.
 10. [ ] **What-if** mode (Mode button) with Max primaries **3**: the game does not stutter while "Calculating..." runs, and the results look sane (e.g. a Mining + Blacksmithing chain).
 11. [ ] If your trainer or a vendor teaches a recipe listed in [`research/open_sources.txt`](research/open_sources.txt) (recipes, reagents and vendors that Wowhead Forever has no source for), or you can learn one of the left-out recipes in [`research/excluded_recipes.txt`](research/excluded_recipes.txt), please report it.
-12. [ ] **Help the recipe data:** open each profession window and type `/crafter dump` (on each character, for each profession, both factions if you can). Then `/reload` or log out, and send `WTF\Account\<account>\SavedVariables\ForeverCrafter.lua` (the file also holds your character names, skills and saved prices; the import reads only its `dump` part and keeps the recipes, items, faction and date, and which recipes some character knows, but not which character). A recipe a character knows counts as existing even if Wowhead Forever lists it nowhere, and the game's reagents come before the DB2 ones. The game's recipe list itself holds every recipe in the client data, learnable or not, so it is not used to add recipes. The dump also notes items the game knows nothing about.
+12. [ ] **Help the recipe data:** open each profession window and type `/crafter dump` (on each character, for each profession, both factions if you can). Then `/reload` or log out, and send `_forever_\WTF\Account\<account>\SavedVariables\ForeverCrafter.lua` (the file also holds your character names, skills and saved prices; the import reads only its `dump` part and keeps the recipes, items, faction and date, and which recipes some character knows, but not which character). A recipe a character knows counts as existing even if Wowhead Forever lists it nowhere, and the game's reagents come before the DB2 ones. The game's recipe list itself holds every recipe in the client data, learnable or not, so it is not used to add recipes. The dump also notes items the game knows nothing about.
 
 ## Development
 

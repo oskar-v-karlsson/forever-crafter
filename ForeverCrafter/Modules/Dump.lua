@@ -137,7 +137,7 @@ local function finish(d, line, n, unlearned, withText)
     table.sort(lines)
     ns.Print(string.format("dump: item data for %d of %d items. Saved so far: %s", found, asked,
       #lines > 0 and table.concat(lines, ", ") or "no professions"))
-    ns.Print("dump: log out or /reload to write it to WTF\\Account\\<account>\\SavedVariables\\ForeverCrafter.lua")
+    ns.Print("dump: log out or /reload to write it to _forever_\\WTF\\Account\\<account>\\SavedVariables\\ForeverCrafter.lua")
   end)
 end
 
