@@ -183,7 +183,9 @@ function PL.Acquire(r, spell)
       -- the game's text says it all
     elseif r.acquire == 1 then
       table.insert(parts, "no source on Wowhead Forever; game data marks it AcquireMethod 1 (may be learned "
-        .. "automatically - check your trainer)")
+        .. "automatically - check your trainer)" .. (r.known and "; a character knew it in a client dump" or ""))
+    elseif r.known then
+      table.insert(parts, "no source on Wowhead Forever; a character knew it in a client dump (check your trainer)")
     else
       table.insert(parts, "source unknown (check Wowhead Forever or your trainer)")
     end

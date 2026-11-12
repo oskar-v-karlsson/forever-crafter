@@ -50,7 +50,7 @@ Prices are only as fresh as your last scan, and other players buy and post all t
 | `/crafter status` | Your professions and skill, snapshot age, the AH cut in use |
 | `/crafter cut <pct>` | Set the AH cut in percent; blank goes back to the measured or assumed cut |
 | `/crafter minimap` | Show or hide the minimap button |
-| `/crafter dump` | Save the open profession window's full recipe list (learned and unlearned), reagents, outputs, the game's "how to learn" text and item info, for the data in this addon (see below); `/crafter dump clear` removes it |
+| `/crafter dump` | Save the open profession window's full recipe list (learned and unlearned), reagents, outputs, the game's "how to learn" text (empty in Forever so far) and item info, for the data in this addon (see below); `/crafter dump clear` removes it |
 | `/crafter reset` | Forget prices, merchant data and this character's recipe data |
 | `/crafter debug` | Toggle debug output (also prints any API the client lacks) |
 
@@ -70,7 +70,7 @@ These cannot be tested outside the game. Please go through them once and report 
 8. [ ] The minimap button and the compartment entry show a coin icon.
 9. [ ] `/crafter debug` lists no missing APIs or events.
 10. [ ] If your trainer or a vendor teaches a recipe listed in [`research/open_sources.txt`](research/open_sources.txt) (recipes, reagents and vendors that Wowhead Forever has no source for), or you can learn one of the left-out recipes in [`research/excluded_recipes.txt`](research/excluded_recipes.txt), please report it.
-11. [ ] **Help the recipe data:** open each profession window and type `/crafter dump` (on each character, for each profession, both factions if you can). Then `/reload` or log out, and send `WTF\Account\<account>\SavedVariables\ForeverCrafter.lua` (the file also holds your character names, skills and saved prices; the import reads only its `dump` part and keeps the recipes, items, faction and date, nothing about your characters). The game's own list then decides which recipes exist, and its reagents and "how to learn" text come before Wowhead Forever.
+11. [ ] **Help the recipe data:** open each profession window and type `/crafter dump` (on each character, for each profession, both factions if you can). Then `/reload` or log out, and send `WTF\Account\<account>\SavedVariables\ForeverCrafter.lua` (the file also holds your character names, skills and saved prices; the import reads only its `dump` part and keeps the recipes, items, faction and date, and which recipes some character knows, but not which character). A recipe a character knows counts as existing even if Wowhead Forever lists it nowhere, and the game's reagents come before the DB2 ones. The game's recipe list itself holds every recipe in the client data, learnable or not, so it is not used to add recipes. The dump also notes items the game knows nothing about.
 
 ## Development
 

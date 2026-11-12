@@ -18,6 +18,7 @@ local function store()
     d = { v = D.VERSION, lines = {}, items = {} }
     ns.db.dump = d
   end
+  d.noItem = d.noItem or {}  -- items the client gave no info for after every pass → time asked
   local ok, version, build, _, toc = ns.Call("GetBuildInfo")
   if ok then d.client = { version = version, build = build, toc = toc } end
   return d
@@ -99,6 +100,7 @@ function D.Items(d, done)
       if e then
         e.time = time()
         d.items[id] = e
+        d.noItem[id] = nil
         want[id] = nil
       else
         ns.Call("C_Item.RequestLoadItemDataByID", id)
@@ -110,7 +112,10 @@ function D.Items(d, done)
     end
     itemsRunning = false
     local left = 0
-    for _ in pairs(want) do left = left + 1 end
+    for id in pairs(want) do
+      left = left + 1
+      d.noItem[id] = time()
+    end
     if done then done(asked - left, asked) end
   end
   pass(1)

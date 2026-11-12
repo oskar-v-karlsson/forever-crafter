@@ -1,0 +1,13863 @@
+{
+ "items": {
+  "11811": {
+   "bind": 1,
+   "captured": "2026-11-12",
+   "class": 4,
+   "client": "1.60.1.70888",
+   "name": "Smoking Heart of the Mountain",
+   "q": 3,
+   "sell": 15152,
+   "stack": 1,
+   "sub": 0,
+   "time": 1794488304
+  },
+  "12628": {
+   "bind": 2,
+   "captured": "2026-11-12",
+   "class": 4,
+   "client": "1.60.1.70888",
+   "name": "Demon Forged Breastplate",
+   "q": 3,
+   "sell": 16640,
+   "stack": 1,
+   "sub": 4,
+   "time": 1794488304
+  },
+  "12764": {
+   "bind": 2,
+   "captured": "2026-11-12",
+   "class": 2,
+   "client": "1.60.1.70888",
+   "name": "Thorium Greatsword",
+   "q": 2,
+   "sell": 23534,
+   "stack": 1,
+   "sub": 8,
+   "time": 1794488304
+  },
+  "12769": {
+   "bind": 2,
+   "captured": "2026-11-12",
+   "class": 2,
+   "client": "1.60.1.70888",
+   "name": "Bleakwood Hew",
+   "q": 3,
+   "sell": 46154,
+   "stack": 1,
+   "sub": 1,
+   "time": 1794488304
+  },
+  "12772": {
+   "bind": 2,
+   "captured": "2026-11-12",
+   "class": 2,
+   "client": "1.60.1.70888",
+   "name": "Inlaid Thorium Hammer",
+   "q": 2,
+   "sell": 38871,
+   "stack": 1,
+   "sub": 5,
+   "time": 1794488304
+  },
+  "12795": {
+   "bind": 1,
+   "captured": "2026-11-12",
+   "class": 2,
+   "client": "1.60.1.70888",
+   "name": "Blood Talon",
+   "q": 3,
+   "sell": 48821,
+   "stack": 1,
+   "sub": 13,
+   "time": 1794488304
+  },
+  "12802": {
+   "bind": 2,
+   "captured": "2026-11-12",
+   "class": 2,
+   "client": "1.60.1.70888",
+   "name": "Darkspear",
+   "q": 3,
+   "sell": 62177,
+   "stack": 1,
+   "sub": 6,
+   "time": 1794488304
+  },
+  "20867": {
+   "bind": 0,
+   "captured": "2026-11-12",
+   "class": 12,
+   "client": "1.60.1.70888",
+   "name": "Onyx Idol",
+   "q": 3,
+   "sell": 0,
+   "stack": 250,
+   "sub": 0,
+   "time": 1794488304
+  },
+  "20871": {
+   "bind": 0,
+   "captured": "2026-11-12",
+   "class": 12,
+   "client": "1.60.1.70888",
+   "name": "Obsidian Idol",
+   "q": 3,
+   "sell": 0,
+   "stack": 250,
+   "sub": 0,
+   "time": 1794488304
+  },
+  "20872": {
+   "bind": 0,
+   "captured": "2026-11-12",
+   "class": 12,
+   "client": "1.60.1.70888",
+   "name": "Vermillion Idol",
+   "q": 3,
+   "sell": 0,
+   "stack": 250,
+   "sub": 0,
+   "time": 1794488304
+  },
+  "20873": {
+   "bind": 0,
+   "captured": "2026-11-12",
+   "class": 12,
+   "client": "1.60.1.70888",
+   "name": "Alabaster Idol",
+   "q": 3,
+   "sell": 0,
+   "stack": 250,
+   "sub": 0,
+   "time": 1794488304
+  },
+  "20874": {
+   "bind": 0,
+   "captured": "2026-11-12",
+   "class": 12,
+   "client": "1.60.1.70888",
+   "name": "Idol of the Sun",
+   "q": 3,
+   "sell": 0,
+   "stack": 250,
+   "sub": 0,
+   "time": 1794488304
+  },
+  "20875": {
+   "bind": 0,
+   "captured": "2026-11-12",
+   "class": 12,
+   "client": "1.60.1.70888",
+   "name": "Idol of Night",
+   "q": 3,
+   "sell": 0,
+   "stack": 250,
+   "sub": 0,
+   "time": 1794488304
+  },
+  "20876": {
+   "bind": 0,
+   "captured": "2026-11-12",
+   "class": 12,
+   "client": "1.60.1.70888",
+   "name": "Idol of Death",
+   "q": 3,
+   "sell": 0,
+   "stack": 250,
+   "sub": 0,
+   "time": 1794488304
+  },
+  "20877": {
+   "bind": 0,
+   "captured": "2026-11-12",
+   "class": 12,
+   "client": "1.60.1.70888",
+   "name": "Idol of the Sage",
+   "q": 3,
+   "sell": 0,
+   "stack": 250,
+   "sub": 0,
+   "time": 1794488304
+  },
+  "20878": {
+   "bind": 0,
+   "captured": "2026-11-12",
+   "class": 12,
+   "client": "1.60.1.70888",
+   "name": "Idol of Rebirth",
+   "q": 3,
+   "sell": 0,
+   "stack": 250,
+   "sub": 0,
+   "time": 1794488304
+  },
+  "20879": {
+   "bind": 0,
+   "captured": "2026-11-12",
+   "class": 12,
+   "client": "1.60.1.70888",
+   "name": "Idol of Life",
+   "q": 3,
+   "sell": 0,
+   "stack": 250,
+   "sub": 0,
+   "time": 1794488304
+  },
+  "20882": {
+   "bind": 0,
+   "captured": "2026-11-12",
+   "class": 12,
+   "client": "1.60.1.70888",
+   "name": "Idol of War",
+   "q": 3,
+   "sell": 0,
+   "stack": 250,
+   "sub": 0,
+   "time": 1794488304
+  },
+  "211845": {
+   "bind": 0,
+   "captured": "2026-11-12",
+   "class": 7,
+   "client": "1.60.1.70888",
+   "name": "Blackfathom Sharpening Stone",
+   "q": 2,
+   "sell": 125,
+   "stack": 20,
+   "sub": 11,
+   "time": 1794488304
+  },
+  "215127": {
+   "bind": 0,
+   "captured": "2026-11-12",
+   "class": 7,
+   "client": "1.60.1.70888",
+   "name": "High-Yield Radiation Bomb",
+   "q": 2,
+   "sell": 600,
+   "stack": 10,
+   "sub": 2,
+   "time": 1794488304
+  },
+  "215168": {
+   "bind": 0,
+   "captured": "2026-11-12",
+   "class": 7,
+   "client": "1.60.1.70888",
+   "name": "Ez-Thro Radiation Bomb",
+   "q": 2,
+   "sell": 600,
+   "stack": 10,
+   "sub": 2,
+   "time": 1794488304
+  },
+  "217273": {
+   "bind": 2,
+   "captured": "2026-11-12",
+   "class": 4,
+   "client": "1.60.1.70888",
+   "name": "Golden Scale Gauntlets",
+   "q": 2,
+   "sell": 3689,
+   "stack": 1,
+   "sub": 3,
+   "time": 1794488304
+  },
+  "273884": {
+   "bind": 2,
+   "captured": "2026-11-12",
+   "class": 4,
+   "client": "1.60.1.70888",
+   "name": "Grovekeeper Trousers",
+   "q": 4,
+   "sell": 33238,
+   "stack": 1,
+   "sub": 2,
+   "time": 1794488304
+  },
+  "273885": {
+   "bind": 2,
+   "captured": "2026-11-12",
+   "class": 4,
+   "client": "1.60.1.70888",
+   "name": "Grovekeeper Grips",
+   "q": 4,
+   "sell": 16817,
+   "stack": 1,
+   "sub": 2,
+   "time": 1794488304
+  },
+  "273886": {
+   "bind": 2,
+   "captured": "2026-11-12",
+   "class": 4,
+   "client": "1.60.1.70888",
+   "name": "Grovekeeper Shoulderpads",
+   "q": 4,
+   "sell": 25189,
+   "stack": 1,
+   "sub": 2,
+   "time": 1794488304
+  },
+  "273887": {
+   "bind": 2,
+   "captured": "2026-11-12",
+   "class": 4,
+   "client": "1.60.1.70888",
+   "name": "Grovekeeper Stompers",
+   "q": 4,
+   "sell": 25283,
+   "stack": 1,
+   "sub": 2,
+   "time": 1794488304
+  },
+  "273888": {
+   "bind": 2,
+   "captured": "2026-11-12",
+   "class": 4,
+   "client": "1.60.1.70888",
+   "name": "Grovekeeper Kilt",
+   "q": 4,
+   "sell": 33750,
+   "stack": 1,
+   "sub": 2,
+   "time": 1794488304
+  },
+  "273889": {
+   "bind": 2,
+   "captured": "2026-11-12",
+   "class": 4,
+   "client": "1.60.1.70888",
+   "name": "Grovekeeper Mitts",
+   "q": 4,
+   "sell": 17075,
+   "stack": 1,
+   "sub": 2,
+   "time": 1794488304
+  },
+  "273890": {
+   "bind": 2,
+   "captured": "2026-11-12",
+   "class": 4,
+   "client": "1.60.1.70888",
+   "name": "Grovekeeper Mantle",
+   "q": 4,
+   "sell": 25574,
+   "stack": 1,
+   "sub": 2,
+   "time": 1794488304
+  },
+  "273891": {
+   "bind": 2,
+   "captured": "2026-11-12",
+   "class": 4,
+   "client": "1.60.1.70888",
+   "name": "Grovekeeper Sandals",
+   "q": 4,
+   "sell": 25668,
+   "stack": 1,
+   "sub": 2,
+   "time": 1794488304
+  },
+  "273892": {
+   "bind": 2,
+   "captured": "2026-11-12",
+   "class": 4,
+   "client": "1.60.1.70888",
+   "name": "Grovekeeper Legguards",
+   "q": 4,
+   "sell": 34262,
+   "stack": 1,
+   "sub": 2,
+   "time": 1794488304
+  },
+  "273893": {
+   "bind": 2,
+   "captured": "2026-11-12",
+   "class": 4,
+   "client": "1.60.1.70888",
+   "name": "Grovekeeper Handguards",
+   "q": 4,
+   "sell": 17333,
+   "stack": 1,
+   "sub": 2,
+   "time": 1794488304
+  },
+  "273894": {
+   "bind": 2,
+   "captured": "2026-11-12",
+   "class": 4,
+   "client": "1.60.1.70888",
+   "name": "Grovekeeper Pauldrons",
+   "q": 4,
+   "sell": 25959,
+   "stack": 1,
+   "sub": 2,
+   "time": 1794488304
+  },
+  "273895": {
+   "bind": 2,
+   "captured": "2026-11-12",
+   "class": 4,
+   "client": "1.60.1.70888",
+   "name": "Grovekeeper Boots",
+   "q": 4,
+   "sell": 26053,
+   "stack": 1,
+   "sub": 2,
+   "time": 1794488304
+  },
+  "273896": {
+   "bind": 2,
+   "captured": "2026-11-12",
+   "class": 4,
+   "client": "1.60.1.70888",
+   "name": "Grovekeeper Leggings",
+   "q": 4,
+   "sell": 35696,
+   "stack": 1,
+   "sub": 2,
+   "time": 1794488304
+  },
+  "273897": {
+   "bind": 2,
+   "captured": "2026-11-12",
+   "class": 4,
+   "client": "1.60.1.70888",
+   "name": "Grovekeeper Gauntlets",
+   "q": 4,
+   "sell": 18056,
+   "stack": 1,
+   "sub": 2,
+   "time": 1794488304
+  },
+  "273898": {
+   "bind": 2,
+   "captured": "2026-11-12",
+   "class": 4,
+   "client": "1.60.1.70888",
+   "name": "Grovekeeper Spaulders",
+   "q": 4,
+   "sell": 27037,
+   "stack": 1,
+   "sub": 2,
+   "time": 1794488304
+  },
+  "273899": {
+   "bind": 2,
+   "captured": "2026-11-12",
+   "class": 4,
+   "client": "1.60.1.70888",
+   "name": "Grovekeeper Treads",
+   "q": 4,
+   "sell": 27132,
+   "stack": 1,
+   "sub": 2,
+   "time": 1794488304
+  },
+  "273900": {
+   "bind": 2,
+   "captured": "2026-11-12",
+   "class": 4,
+   "client": "1.60.1.70888",
+   "name": "Wildstalker's Legguards",
+   "q": 4,
+   "sell": 43450,
+   "stack": 1,
+   "sub": 3,
+   "time": 1794488304
+  },
+  "273901": {
+   "bind": 2,
+   "captured": "2026-11-12",
+   "class": 4,
+   "client": "1.60.1.70888",
+   "name": "Wildstalker's Gauntlets",
+   "q": 4,
+   "sell": 21802,
+   "stack": 1,
+   "sub": 3,
+   "time": 1794488304
+  },
+  "273902": {
+   "bind": 2,
+   "captured": "2026-11-12",
+   "class": 4,
+   "client": "1.60.1.70888",
+   "name": "Wildstalker's Spaulders",
+   "q": 4,
+   "sell": 32962,
+   "stack": 1,
+   "sub": 3,
+   "time": 1794488304
+  },
+  "273903": {
+   "bind": 2,
+   "captured": "2026-11-12",
+   "class": 4,
+   "client": "1.60.1.70888",
+   "name": "Wildstalker's Greaves",
+   "q": 4,
+   "sell": 29928,
+   "stack": 1,
+   "sub": 3,
+   "time": 1794488304
+  },
+  "273904": {
+   "bind": 2,
+   "captured": "2026-11-12",
+   "class": 4,
+   "client": "1.60.1.70888",
+   "name": "Manaflare Pants",
+   "q": 4,
+   "sell": 26588,
+   "stack": 1,
+   "sub": 1,
+   "time": 1794488304
+  },
+  "273905": {
+   "bind": 2,
+   "captured": "2026-11-12",
+   "class": 4,
+   "client": "1.60.1.70888",
+   "name": "Manaflare Gloves",
+   "q": 4,
+   "sell": 13345,
+   "stack": 1,
+   "sub": 1,
+   "time": 1794488304
+  },
+  "273906": {
+   "bind": 2,
+   "captured": "2026-11-12",
+   "class": 4,
+   "client": "1.60.1.70888",
+   "name": "Manaflare Mantle",
+   "q": 4,
+   "sell": 20093,
+   "stack": 1,
+   "sub": 1,
+   "time": 1794488304
+  },
+  "273907": {
+   "bind": 2,
+   "captured": "2026-11-12",
+   "class": 4,
+   "client": "1.60.1.70888",
+   "name": "Manaflare Boots",
+   "q": 4,
+   "sell": 20170,
+   "stack": 1,
+   "sub": 1,
+   "time": 1794488304
+  },
+  "273908": {
+   "bind": 2,
+   "captured": "2026-11-12",
+   "class": 4,
+   "client": "1.60.1.70888",
+   "name": "Justice Leggings",
+   "q": 4,
+   "sell": 47245,
+   "stack": 1,
+   "sub": 4,
+   "time": 1794488304
+  },
+  "273909": {
+   "bind": 2,
+   "captured": "2026-11-12",
+   "class": 4,
+   "client": "1.60.1.70888",
+   "name": "Justice Gauntlets",
+   "q": 4,
+   "sell": 23848,
+   "stack": 1,
+   "sub": 4,
+   "time": 1794488304
+  },
+  "273910": {
+   "bind": 2,
+   "captured": "2026-11-12",
+   "class": 4,
+   "client": "1.60.1.70888",
+   "name": "Justice Spaulders",
+   "q": 4,
+   "sell": 35633,
+   "stack": 1,
+   "sub": 4,
+   "time": 1794488304
+  },
+  "273911": {
+   "bind": 2,
+   "captured": "2026-11-12",
+   "class": 4,
+   "client": "1.60.1.70888",
+   "name": "Justice Greaves",
+   "q": 4,
+   "sell": 35768,
+   "stack": 1,
+   "sub": 4,
+   "time": 1794488304
+  },
+  "273912": {
+   "bind": 2,
+   "captured": "2026-11-12",
+   "class": 4,
+   "client": "1.60.1.70888",
+   "name": "Justice Legplates",
+   "q": 4,
+   "sell": 49254,
+   "stack": 1,
+   "sub": 4,
+   "time": 1794488304
+  },
+  "273913": {
+   "bind": 2,
+   "captured": "2026-11-12",
+   "class": 4,
+   "client": "1.60.1.70888",
+   "name": "Justice Gloves",
+   "q": 4,
+   "sell": 24858,
+   "stack": 1,
+   "sub": 4,
+   "time": 1794488304
+  },
+  "273914": {
+   "bind": 2,
+   "captured": "2026-11-12",
+   "class": 4,
+   "client": "1.60.1.70888",
+   "name": "Justice Epaulets",
+   "q": 4,
+   "sell": 37136,
+   "stack": 1,
+   "sub": 4,
+   "time": 1794488304
+  },
+  "273915": {
+   "bind": 2,
+   "captured": "2026-11-12",
+   "class": 4,
+   "client": "1.60.1.70888",
+   "name": "Justice Treads",
+   "q": 4,
+   "sell": 37271,
+   "stack": 1,
+   "sub": 4,
+   "time": 1794488304
+  },
+  "273916": {
+   "bind": 2,
+   "captured": "2026-11-12",
+   "class": 4,
+   "client": "1.60.1.70888",
+   "name": "Justice Legguards",
+   "q": 4,
+   "sell": 49970,
+   "stack": 1,
+   "sub": 4,
+   "time": 1794488304
+  },
+  "273917": {
+   "bind": 2,
+   "captured": "2026-11-12",
+   "class": 4,
+   "client": "1.60.1.70888",
+   "name": "Justice Handguards",
+   "q": 4,
+   "sell": 25216,
+   "stack": 1,
+   "sub": 4,
+   "time": 1794488304
+  },
+  "273918": {
+   "bind": 2,
+   "captured": "2026-11-12",
+   "class": 4,
+   "client": "1.60.1.70888",
+   "name": "Justice Pauldrons",
+   "q": 4,
+   "sell": 37673,
+   "stack": 1,
+   "sub": 4,
+   "time": 1794488304
+  },
+  "273919": {
+   "bind": 2,
+   "captured": "2026-11-12",
+   "class": 4,
+   "client": "1.60.1.70888",
+   "name": "Justice Sabatons",
+   "q": 4,
+   "sell": 37808,
+   "stack": 1,
+   "sub": 4,
+   "time": 1794488304
+  },
+  "273920": {
+   "bind": 2,
+   "captured": "2026-11-12",
+   "class": 4,
+   "client": "1.60.1.70888",
+   "name": "Pants of Conviction",
+   "q": 4,
+   "sell": 28964,
+   "stack": 1,
+   "sub": 1,
+   "time": 1794488304
+  },
+  "273921": {
+   "bind": 2,
+   "captured": "2026-11-12",
+   "class": 4,
+   "client": "1.60.1.70888",
+   "name": "Gloves of Conviction",
+   "q": 4,
+   "sell": 14532,
+   "stack": 1,
+   "sub": 1,
+   "time": 1794488304
+  },
+  "273922": {
+   "bind": 2,
+   "captured": "2026-11-12",
+   "class": 4,
+   "client": "1.60.1.70888",
+   "name": "Mantle of Conviction",
+   "q": 4,
+   "sell": 21875,
+   "stack": 1,
+   "sub": 1,
+   "time": 1794488304
+  },
+  "273923": {
+   "bind": 2,
+   "captured": "2026-11-12",
+   "class": 4,
+   "client": "1.60.1.70888",
+   "name": "Treads of Conviction",
+   "q": 4,
+   "sell": 19861,
+   "stack": 1,
+   "sub": 1,
+   "time": 1794488304
+  },
+  "273924": {
+   "bind": 2,
+   "captured": "2026-11-12",
+   "class": 4,
+   "client": "1.60.1.70888",
+   "name": "Leggings of Conviction",
+   "q": 4,
+   "sell": 26585,
+   "stack": 1,
+   "sub": 1,
+   "time": 1794488304
+  },
+  "273925": {
+   "bind": 2,
+   "captured": "2026-11-12",
+   "class": 4,
+   "client": "1.60.1.70888",
+   "name": "Handguards of Conviction",
+   "q": 4,
+   "sell": 13342,
+   "stack": 1,
+   "sub": 1,
+   "time": 1794488304
+  },
+  "273926": {
+   "bind": 2,
+   "captured": "2026-11-12",
+   "class": 4,
+   "client": "1.60.1.70888",
+   "name": "Pauldrons of Conviction",
+   "q": 4,
+   "sell": 20091,
+   "stack": 1,
+   "sub": 1,
+   "time": 1794488304
+  },
+  "273927": {
+   "bind": 2,
+   "captured": "2026-11-12",
+   "class": 4,
+   "client": "1.60.1.70888",
+   "name": "Boots of Conviction",
+   "q": 4,
+   "sell": 20168,
+   "stack": 1,
+   "sub": 1,
+   "time": 1794488304
+  },
+  "273928": {
+   "bind": 2,
+   "captured": "2026-11-12",
+   "class": 4,
+   "client": "1.60.1.70888",
+   "name": "Grimstitch Pants",
+   "q": 4,
+   "sell": 34666,
+   "stack": 1,
+   "sub": 2,
+   "time": 1794488304
+  },
+  "273929": {
+   "bind": 2,
+   "captured": "2026-11-12",
+   "class": 4,
+   "client": "1.60.1.70888",
+   "name": "Grimstitch Gloves",
+   "q": 4,
+   "sell": 17534,
+   "stack": 1,
+   "sub": 2,
+   "time": 1794488304
+  },
+  "273930": {
+   "bind": 2,
+   "captured": "2026-11-12",
+   "class": 4,
+   "client": "1.60.1.70888",
+   "name": "Grimstitch Spaulders",
+   "q": 4,
+   "sell": 26260,
+   "stack": 1,
+   "sub": 2,
+   "time": 1794488304
+  },
+  "273931": {
+   "bind": 2,
+   "captured": "2026-11-12",
+   "class": 4,
+   "client": "1.60.1.70888",
+   "name": "Grimstitch Boots",
+   "q": 4,
+   "sell": 26357,
+   "stack": 1,
+   "sub": 2,
+   "time": 1794488304
+  },
+  "273932": {
+   "bind": 2,
+   "captured": "2026-11-12",
+   "class": 4,
+   "client": "1.60.1.70888",
+   "name": "Spiritcaller Leggings",
+   "q": 4,
+   "sell": 42209,
+   "stack": 1,
+   "sub": 3,
+   "time": 1794488304
+  },
+  "273933": {
+   "bind": 2,
+   "captured": "2026-11-12",
+   "class": 4,
+   "client": "1.60.1.70888",
+   "name": "Spiritcaller Grips",
+   "q": 4,
+   "sell": 21182,
+   "stack": 1,
+   "sub": 3,
+   "time": 1794488304
+  },
+  "273934": {
+   "bind": 2,
+   "captured": "2026-11-12",
+   "class": 4,
+   "client": "1.60.1.70888",
+   "name": "Spiritcaller Spaulders",
+   "q": 4,
+   "sell": 32030,
+   "stack": 1,
+   "sub": 3,
+   "time": 1794488304
+  },
+  "273935": {
+   "bind": 2,
+   "captured": "2026-11-12",
+   "class": 4,
+   "client": "1.60.1.70888",
+   "name": "Spiritcaller Treads",
+   "q": 4,
+   "sell": 32147,
+   "stack": 1,
+   "sub": 3,
+   "time": 1794488304
+  },
+  "273936": {
+   "bind": 2,
+   "captured": "2026-11-12",
+   "class": 4,
+   "client": "1.60.1.70888",
+   "name": "Spiritcaller Pants",
+   "q": 4,
+   "sell": 42823,
+   "stack": 1,
+   "sub": 3,
+   "time": 1794488304
+  },
+  "273937": {
+   "bind": 2,
+   "captured": "2026-11-12",
+   "class": 4,
+   "client": "1.60.1.70888",
+   "name": "Spiritcaller Gauntlets",
+   "q": 4,
+   "sell": 21489,
+   "stack": 1,
+   "sub": 3,
+   "time": 1794488304
+  },
+  "273938": {
+   "bind": 2,
+   "captured": "2026-11-12",
+   "class": 4,
+   "client": "1.60.1.70888",
+   "name": "Spiritcaller Epaulets",
+   "q": 4,
+   "sell": 32493,
+   "stack": 1,
+   "sub": 3,
+   "time": 1794488304
+  },
+  "273939": {
+   "bind": 2,
+   "captured": "2026-11-12",
+   "class": 4,
+   "client": "1.60.1.70888",
+   "name": "Spiritcaller Greaves",
+   "q": 4,
+   "sell": 32609,
+   "stack": 1,
+   "sub": 3,
+   "time": 1794488304
+  },
+  "273940": {
+   "bind": 2,
+   "captured": "2026-11-12",
+   "class": 4,
+   "client": "1.60.1.70888",
+   "name": "Demonheart Leggings",
+   "q": 4,
+   "sell": 28958,
+   "stack": 1,
+   "sub": 1,
+   "time": 1794488304
+  },
+  "273941": {
+   "bind": 2,
+   "captured": "2026-11-12",
+   "class": 4,
+   "client": "1.60.1.70888",
+   "name": "Demonheart Gloves",
+   "q": 4,
+   "sell": 14530,
+   "stack": 1,
+   "sub": 1,
+   "time": 1794488304
+  },
+  "273942": {
+   "bind": 2,
+   "captured": "2026-11-12",
+   "class": 4,
+   "client": "1.60.1.70888",
+   "name": "Demonheart Spaulders",
+   "q": 4,
+   "sell": 21873,
+   "stack": 1,
+   "sub": 1,
+   "time": 1794488304
+  },
+  "273943": {
+   "bind": 2,
+   "captured": "2026-11-12",
+   "class": 4,
+   "client": "1.60.1.70888",
+   "name": "Demonheart Boots",
+   "q": 4,
+   "sell": 19859,
+   "stack": 1,
+   "sub": 1,
+   "time": 1794488304
+  },
+  "273944": {
+   "bind": 2,
+   "captured": "2026-11-12",
+   "class": 4,
+   "client": "1.60.1.70888",
+   "name": "Legplates of Glory",
+   "q": 4,
+   "sell": 47806,
+   "stack": 1,
+   "sub": 4,
+   "time": 1794488304
+  },
+  "273945": {
+   "bind": 2,
+   "captured": "2026-11-12",
+   "class": 4,
+   "client": "1.60.1.70888",
+   "name": "Gauntlets of Glory",
+   "q": 4,
+   "sell": 24130,
+   "stack": 1,
+   "sub": 4,
+   "time": 1794488304
+  },
+  "273946": {
+   "bind": 2,
+   "captured": "2026-11-12",
+   "class": 4,
+   "client": "1.60.1.70888",
+   "name": "Shoulders of Glory",
+   "q": 4,
+   "sell": 36056,
+   "stack": 1,
+   "sub": 4,
+   "time": 1794488304
+  },
+  "273947": {
+   "bind": 2,
+   "captured": "2026-11-12",
+   "class": 4,
+   "client": "1.60.1.70888",
+   "name": "Greaves of Glory",
+   "q": 4,
+   "sell": 36187,
+   "stack": 1,
+   "sub": 4,
+   "time": 1794488304
+  },
+  "273948": {
+   "bind": 2,
+   "captured": "2026-11-12",
+   "class": 4,
+   "client": "1.60.1.70888",
+   "name": "Legguards of Glory",
+   "q": 4,
+   "sell": 48523,
+   "stack": 1,
+   "sub": 4,
+   "time": 1794488304
+  },
+  "273949": {
+   "bind": 2,
+   "captured": "2026-11-12",
+   "class": 4,
+   "client": "1.60.1.70888",
+   "name": "Handguards of Glory",
+   "q": 4,
+   "sell": 24490,
+   "stack": 1,
+   "sub": 4,
+   "time": 1794488304
+  },
+  "273950": {
+   "bind": 2,
+   "captured": "2026-11-12",
+   "class": 4,
+   "client": "1.60.1.70888",
+   "name": "Pauldrons of Glory",
+   "q": 4,
+   "sell": 36593,
+   "stack": 1,
+   "sub": 4,
+   "time": 1794488304
+  },
+  "273951": {
+   "bind": 2,
+   "captured": "2026-11-12",
+   "class": 4,
+   "client": "1.60.1.70888",
+   "name": "Sabatons of Glory",
+   "q": 4,
+   "sell": 36724,
+   "stack": 1,
+   "sub": 4,
+   "time": 1794488304
+  },
+  "274048": {
+   "bind": 0,
+   "captured": "2026-11-12",
+   "class": 0,
+   "client": "1.60.1.70888",
+   "name": "9-60 Battery Pack",
+   "q": 2,
+   "sell": 1000,
+   "stack": 5,
+   "sub": 8,
+   "time": 1794488304
+  },
+  "274049": {
+   "bind": 1,
+   "captured": "2026-11-12",
+   "class": 9,
+   "client": "1.60.1.70888",
+   "name": "Schematic: 9-60 Battery Pack",
+   "q": 2,
+   "sell": 0,
+   "stack": 1,
+   "sub": 3,
+   "time": 1794488304
+  },
+  "2867": {
+   "bind": 2,
+   "captured": "2026-11-12",
+   "class": 4,
+   "client": "1.60.1.70888",
+   "name": "Rough Bronze Bracers",
+   "q": 2,
+   "sell": 317,
+   "stack": 1,
+   "sub": 3,
+   "time": 1794488304
+  },
+  "6730": {
+   "bind": 2,
+   "captured": "2026-11-12",
+   "class": 4,
+   "client": "1.60.1.70888",
+   "name": "Ironforge Chain",
+   "q": 2,
+   "sell": 298,
+   "stack": 1,
+   "sub": 3,
+   "time": 1794488304
+  },
+  "6733": {
+   "bind": 2,
+   "captured": "2026-11-12",
+   "class": 4,
+   "client": "1.60.1.70888",
+   "name": "Ironforge Gauntlets",
+   "q": 2,
+   "sell": 1145,
+   "stack": 1,
+   "sub": 3,
+   "time": 1794488304
+  },
+  "7925": {
+   "bind": 2,
+   "captured": "2026-11-12",
+   "class": 4,
+   "client": "1.60.1.70888",
+   "name": "Mithril Plate Gloves",
+   "q": 2,
+   "sell": 4447,
+   "stack": 1,
+   "sub": 3,
+   "time": 1794488304
+  }
+ },
+ "known": {
+  "12259": "2026-11-12",
+  "12260": "2026-11-12",
+  "1230161": "2026-11-12",
+  "1230171": "2026-11-12",
+  "1245287": "2026-11-12",
+  "1252229": "2026-11-12",
+  "1252230": "2026-11-12",
+  "1252231": "2026-11-12",
+  "1252237": "2026-11-12",
+  "1252250": "2026-11-12",
+  "1252271": "2026-11-12",
+  "1252281": "2026-11-12",
+  "14379": "2026-11-12",
+  "19666": "2026-11-12",
+  "19667": "2026-11-12",
+  "2657": "2026-11-12",
+  "2658": "2026-11-12",
+  "2659": "2026-11-12",
+  "2660": "2026-11-12",
+  "2661": "2026-11-12",
+  "2662": "2026-11-12",
+  "2663": "2026-11-12",
+  "2664": "2026-11-12",
+  "2665": "2026-11-12",
+  "2666": "2026-11-12",
+  "2667": "2026-11-12",
+  "2668": "2026-11-12",
+  "2670": "2026-11-12",
+  "2672": "2026-11-12",
+  "2674": "2026-11-12",
+  "2675": "2026-11-12",
+  "2737": "2026-11-12",
+  "2738": "2026-11-12",
+  "2739": "2026-11-12",
+  "2740": "2026-11-12",
+  "2741": "2026-11-12",
+  "2742": "2026-11-12",
+  "3115": "2026-11-12",
+  "3116": "2026-11-12",
+  "3117": "2026-11-12",
+  "3292": "2026-11-12",
+  "3293": "2026-11-12",
+  "3294": "2026-11-12",
+  "3296": "2026-11-12",
+  "3297": "2026-11-12",
+  "3304": "2026-11-12",
+  "3307": "2026-11-12",
+  "3319": "2026-11-12",
+  "3320": "2026-11-12",
+  "3323": "2026-11-12",
+  "3324": "2026-11-12",
+  "3326": "2026-11-12",
+  "3328": "2026-11-12",
+  "3331": "2026-11-12",
+  "3333": "2026-11-12",
+  "3334": "2026-11-12",
+  "3337": "2026-11-12",
+  "3491": "2026-11-12",
+  "6517": "2026-11-12",
+  "7408": "2026-11-12",
+  "7817": "2026-11-12",
+  "7818": "2026-11-12",
+  "8768": "2026-11-12",
+  "8880": "2026-11-12",
+  "9983": "2026-11-12",
+  "9985": "2026-11-12",
+  "9986": "2026-11-12",
+  "9987": "2026-11-12"
+ },
+ "lines": {
+  "164": {
+   "captured": "2026-11-12",
+   "client": "1.60.1.70888",
+   "complete": true,
+   "faction": "Horde",
+   "recipes": {
+    "10001": {
+     "name": "Big Black Mace",
+     "out": [
+      7945,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3860,
+       16
+      ],
+      [
+       7971,
+       1
+      ],
+      [
+       1210,
+       4
+      ],
+      [
+       7966,
+       1
+      ],
+      [
+       4304,
+       2
+      ]
+     ]
+    },
+    "10003": {
+     "name": "The Shatterer",
+     "out": [
+      7954,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3860,
+       24
+      ],
+      [
+       7075,
+       4
+      ],
+      [
+       6037,
+       6
+      ],
+      [
+       3864,
+       5
+      ],
+      [
+       1529,
+       5
+      ],
+      [
+       7966,
+       4
+      ],
+      [
+       4304,
+       4
+      ]
+     ]
+    },
+    "10005": {
+     "name": "Dazzling Mithril Rapier",
+     "out": [
+      7944,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3860,
+       14
+      ],
+      [
+       7909,
+       1
+      ],
+      [
+       1705,
+       2
+      ],
+      [
+       1206,
+       2
+      ],
+      [
+       7966,
+       1
+      ],
+      [
+       4338,
+       2
+      ]
+     ]
+    },
+    "10007": {
+     "name": "Phantom Blade",
+     "out": [
+      7961,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3860,
+       28
+      ],
+      [
+       7081,
+       6
+      ],
+      [
+       6037,
+       8
+      ],
+      [
+       3823,
+       2
+      ],
+      [
+       7909,
+       6
+      ],
+      [
+       7966,
+       4
+      ],
+      [
+       4304,
+       2
+      ]
+     ]
+    },
+    "10009": {
+     "name": "Runed Mithril Hammer",
+     "out": [
+      7946,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3860,
+       18
+      ],
+      [
+       7075,
+       2
+      ],
+      [
+       7966,
+       1
+      ],
+      [
+       4304,
+       4
+      ]
+     ]
+    },
+    "10011": {
+     "name": "Blight",
+     "out": [
+      7959,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3860,
+       28
+      ],
+      [
+       7972,
+       10
+      ],
+      [
+       6037,
+       10
+      ],
+      [
+       7966,
+       6
+      ],
+      [
+       4304,
+       6
+      ]
+     ]
+    },
+    "10013": {
+     "name": "Ebon Shiv",
+     "out": [
+      7947,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3860,
+       12
+      ],
+      [
+       6037,
+       6
+      ],
+      [
+       7910,
+       2
+      ],
+      [
+       7966,
+       1
+      ],
+      [
+       4304,
+       2
+      ]
+     ]
+    },
+    "10015": {
+     "name": "Truesilver Champion",
+     "out": [
+      7960,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3860,
+       30
+      ],
+      [
+       6037,
+       16
+      ],
+      [
+       7910,
+       6
+      ],
+      [
+       7081,
+       4
+      ],
+      [
+       7966,
+       8
+      ],
+      [
+       4304,
+       6
+      ]
+     ]
+    },
+    "11454": {
+     "name": "Inlaid Mithril Cylinder",
+     "out": [
+      9060,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3860,
+       5
+      ],
+      [
+       3577,
+       1
+      ],
+      [
+       6037,
+       1
+      ]
+     ]
+    },
+    "11643": {
+     "name": "Golden Scale Gauntlets",
+     "out": [
+      9366,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3859,
+       10
+      ],
+      [
+       3577,
+       4
+      ],
+      [
+       3486,
+       4
+      ],
+      [
+       3864,
+       1
+      ]
+     ]
+    },
+    "1213481": {
+     "name": "Razorspike Headcage",
+     "out": [
+      233795,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12360,
+       15
+      ],
+      [
+       234003,
+       3
+      ],
+      [
+       12810,
+       4
+      ],
+      [
+       8146,
+       10
+      ],
+      [
+       234006,
+       4
+      ]
+     ]
+    },
+    "1213484": {
+     "name": "Razorspike Shoulderplate",
+     "out": [
+      233793,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12360,
+       15
+      ],
+      [
+       234003,
+       3
+      ],
+      [
+       12810,
+       4
+      ],
+      [
+       8146,
+       10
+      ],
+      [
+       234006,
+       4
+      ]
+     ]
+    },
+    "1213490": {
+     "name": "Razorspike Battleplate",
+     "out": [
+      233492,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12360,
+       20
+      ],
+      [
+       234003,
+       4
+      ],
+      [
+       12810,
+       4
+      ],
+      [
+       8146,
+       10
+      ],
+      [
+       234006,
+       8
+      ]
+     ]
+    },
+    "1213492": {
+     "name": "Obsidian Reaver",
+     "out": [
+      233491,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12360,
+       40
+      ],
+      [
+       234003,
+       10
+      ],
+      [
+       12810,
+       8
+      ],
+      [
+       234004,
+       6
+      ],
+      [
+       20873,
+       4
+      ],
+      [
+       20882,
+       2
+      ]
+     ]
+    },
+    "1213498": {
+     "name": "Obsidian Champion",
+     "out": [
+      233490,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12360,
+       40
+      ],
+      [
+       234003,
+       10
+      ],
+      [
+       12810,
+       8
+      ],
+      [
+       234004,
+       6
+      ],
+      [
+       20872,
+       4
+      ],
+      [
+       20879,
+       2
+      ]
+     ]
+    },
+    "1213500": {
+     "name": "Obsidian Destroyer",
+     "out": [
+      233796,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12360,
+       40
+      ],
+      [
+       234003,
+       10
+      ],
+      [
+       234004,
+       8
+      ],
+      [
+       20873,
+       4
+      ],
+      [
+       20872,
+       4
+      ],
+      [
+       20875,
+       2
+      ]
+     ]
+    },
+    "1213502": {
+     "name": "Obsidian Stormhammer",
+     "out": [
+      233797,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12360,
+       30
+      ],
+      [
+       234003,
+       8
+      ],
+      [
+       12810,
+       5
+      ],
+      [
+       234004,
+       6
+      ],
+      [
+       20871,
+       3
+      ],
+      [
+       20878,
+       2
+      ]
+     ]
+    },
+    "1213504": {
+     "name": "Obsidian Sageblade",
+     "out": [
+      233798,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12360,
+       30
+      ],
+      [
+       234003,
+       8
+      ],
+      [
+       20725,
+       3
+      ],
+      [
+       234004,
+       3
+      ],
+      [
+       20871,
+       3
+      ],
+      [
+       20877,
+       2
+      ]
+     ]
+    },
+    "1213506": {
+     "name": "Obsidian Defender",
+     "out": [
+      233801,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12360,
+       30
+      ],
+      [
+       234003,
+       8
+      ],
+      [
+       234004,
+       6
+      ],
+      [
+       20872,
+       3
+      ],
+      [
+       20871,
+       3
+      ],
+      [
+       20874,
+       2
+      ]
+     ]
+    },
+    "1213643": {
+     "name": "Obsidian Grinding Stone",
+     "out": [
+      234004,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       22202,
+       5
+      ]
+     ]
+    },
+    "1213709": {
+     "name": "Ironvine Belt",
+     "out": [
+      234288,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12655,
+       8
+      ],
+      [
+       12803,
+       4
+      ],
+      [
+       19726,
+       4
+      ]
+     ]
+    },
+    "1213711": {
+     "name": "Ironvine Gloves",
+     "out": [
+      234290,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12655,
+       12
+      ],
+      [
+       19726,
+       4
+      ],
+      [
+       12803,
+       2
+      ]
+     ]
+    },
+    "1213715": {
+     "name": "Ironvine Breastplate",
+     "out": [
+      234292,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12655,
+       14
+      ],
+      [
+       19726,
+       8
+      ],
+      [
+       12360,
+       8
+      ],
+      [
+       12803,
+       4
+      ]
+     ]
+    },
+    "1213746": {
+     "name": "Heavy Obsidian Belt",
+     "out": [
+      234319,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       22202,
+       14
+      ],
+      [
+       12655,
+       4
+      ],
+      [
+       7076,
+       2
+      ],
+      [
+       19726,
+       4
+      ]
+     ]
+    },
+    "1213748": {
+     "name": "Light Obsidian Belt",
+     "out": [
+      234321,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       22202,
+       14
+      ],
+      [
+       12810,
+       6
+      ],
+      [
+       19726,
+       4
+      ]
+     ]
+    },
+    "1214137": {
+     "name": "Obsidian Heartseeker",
+     "out": [
+      234428,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12360,
+       30
+      ],
+      [
+       234003,
+       8
+      ],
+      [
+       234004,
+       6
+      ],
+      [
+       20871,
+       3
+      ],
+      [
+       20867,
+       3
+      ],
+      [
+       20876,
+       2
+      ]
+     ]
+    },
+    "1214257": {
+     "name": "Black Grasp of the Destroyer",
+     "out": [
+      234086,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       22203,
+       8
+      ],
+      [
+       22202,
+       24
+      ],
+      [
+       12810,
+       8
+      ],
+      [
+       13512,
+       1
+      ]
+     ]
+    },
+    "1214270": {
+     "name": "Jagged Obsidian Shield",
+     "out": [
+      234459,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       22203,
+       8
+      ],
+      [
+       22202,
+       24
+      ],
+      [
+       12655,
+       8
+      ],
+      [
+       7076,
+       4
+      ]
+     ]
+    },
+    "1214274": {
+     "name": "Obsidian Mail Tunic",
+     "out": [
+      234460,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       22203,
+       15
+      ],
+      [
+       22202,
+       36
+      ],
+      [
+       12810,
+       12
+      ],
+      [
+       12809,
+       10
+      ],
+      [
+       12800,
+       4
+      ]
+     ]
+    },
+    "1214309": {
+     "name": "Dreamscale Visor",
+     "out": [
+      234487,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12360,
+       20
+      ],
+      [
+       12810,
+       4
+      ],
+      [
+       8146,
+       8
+      ],
+      [
+       20381,
+       8
+      ],
+      [
+       12803,
+       4
+      ]
+     ]
+    },
+    "1215507": {
+     "name": "Thick Obsidian Breastplate",
+     "out": [
+      235040,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       22203,
+       18
+      ],
+      [
+       22202,
+       40
+      ],
+      [
+       12655,
+       12
+      ],
+      [
+       7076,
+       10
+      ],
+      [
+       12364,
+       4
+      ]
+     ]
+    },
+    "1223787": {
+     "name": "Icebane Breastplate",
+     "out": [
+      236695,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       236656,
+       7
+      ],
+      [
+       12359,
+       16
+      ],
+      [
+       12360,
+       2
+      ],
+      [
+       7080,
+       4
+      ]
+     ]
+    },
+    "1223789": {
+     "name": "Icebane Gauntlets",
+     "out": [
+      236697,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       236656,
+       5
+      ],
+      [
+       12359,
+       12
+      ],
+      [
+       12360,
+       2
+      ],
+      [
+       7080,
+       2
+      ]
+     ]
+    },
+    "1223791": {
+     "name": "Icebane Bracers",
+     "out": [
+      236696,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       236656,
+       4
+      ],
+      [
+       12359,
+       12
+      ],
+      [
+       12360,
+       2
+      ],
+      [
+       7080,
+       2
+      ]
+     ]
+    },
+    "1224631": {
+     "name": "Scarlet Soldier's Helmet",
+     "out": [
+      238288,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12938,
+       1
+      ],
+      [
+       12811,
+       2
+      ],
+      [
+       12359,
+       24
+      ]
+     ]
+    },
+    "1224632": {
+     "name": "Scarlet Soldier's Spaulders",
+     "out": [
+      238289,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12811,
+       1
+      ],
+      [
+       12359,
+       20
+      ]
+     ]
+    },
+    "1224633": {
+     "name": "Scarlet Soldier's Chestplate",
+     "out": [
+      238290,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12938,
+       1
+      ],
+      [
+       12811,
+       1
+      ],
+      [
+       12359,
+       24
+      ]
+     ]
+    },
+    "1224635": {
+     "name": "Scarlet Soldier's Protectors",
+     "out": [
+      238291,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12359,
+       16
+      ]
+     ]
+    },
+    "1224636": {
+     "name": "Scarlet Soldier's Grips",
+     "out": [
+      238292,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12811,
+       1
+      ],
+      [
+       12359,
+       20
+      ]
+     ]
+    },
+    "1224637": {
+     "name": "Scarlet Soldier's Waistguard",
+     "out": [
+      238293,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12811,
+       1
+      ],
+      [
+       12359,
+       20
+      ]
+     ]
+    },
+    "1224638": {
+     "name": "Scarlet Soldier's Legplates",
+     "out": [
+      238294,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12938,
+       1
+      ],
+      [
+       12811,
+       1
+      ],
+      [
+       12359,
+       20
+      ]
+     ]
+    },
+    "1224639": {
+     "name": "Scarlet Soldier's Stompers",
+     "out": [
+      238295,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12811,
+       1
+      ],
+      [
+       12359,
+       20
+      ]
+     ]
+    },
+    "12259": {
+     "name": "Silvered Bronze Leggings",
+     "out": [
+      10423,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2841,
+       12
+      ],
+      [
+       2842,
+       4
+      ],
+      [
+       3478,
+       2
+      ]
+     ]
+    },
+    "12260": {
+     "name": "Rough Copper Vest",
+     "out": [
+      10421,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2840,
+       4
+      ]
+     ]
+    },
+    "1230171": {
+     "name": "Sharpening Wheel",
+     "out": [
+      279944,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2835,
+       1
+      ],
+      [
+       2840,
+       1
+      ]
+     ]
+    },
+    "1245287": {
+     "name": "Copper Rod",
+     "out": [
+      6217,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2840,
+       1
+      ]
+     ]
+    },
+    "1252229": {
+     "name": "Gemmed Copper Boots",
+     "out": [
+      250620,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2840,
+       2
+      ],
+      [
+       818,
+       2
+      ],
+      [
+       774,
+       2
+      ],
+      [
+       2318,
+       4
+      ]
+     ]
+    },
+    "1252230": {
+     "name": "Strange Copper Boots",
+     "out": [
+      250621,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2840,
+       2
+      ],
+      [
+       10940,
+       4
+      ],
+      [
+       2318,
+       2
+      ]
+     ]
+    },
+    "1252231": {
+     "name": "Glowing Copper Boots",
+     "out": [
+      250482,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2840,
+       2
+      ],
+      [
+       10938,
+       4
+      ],
+      [
+       2318,
+       2
+      ]
+     ]
+    },
+    "1252232": {
+     "name": "Sterling Silver Boots",
+     "out": [
+      250483,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2842,
+       6
+      ],
+      [
+       2840,
+       2
+      ],
+      [
+       3478,
+       2
+      ],
+      [
+       2319,
+       2
+      ]
+     ]
+    },
+    "1252233": {
+     "name": "Sterling Silver Leggings",
+     "out": [
+      250484,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2842,
+       10
+      ],
+      [
+       2840,
+       3
+      ],
+      [
+       3478,
+       3
+      ]
+     ]
+    },
+    "1252234": {
+     "name": "Sterling Silver Gauntlet",
+     "out": [
+      250485,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2842,
+       6
+      ],
+      [
+       2840,
+       2
+      ],
+      [
+       3478,
+       2
+      ]
+     ]
+    },
+    "1252235": {
+     "name": "Sterling Silver Shoulders",
+     "out": [
+      250486,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2842,
+       6
+      ],
+      [
+       2840,
+       2
+      ],
+      [
+       3478,
+       2
+      ]
+     ]
+    },
+    "1252236": {
+     "name": "Sterling Silver Breastplate",
+     "out": [
+      250487,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2842,
+       12
+      ],
+      [
+       2840,
+       4
+      ],
+      [
+       3478,
+       3
+      ]
+     ]
+    },
+    "1252237": {
+     "name": "Veteran's Chain Shirt",
+     "out": [
+      250488,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2841,
+       4
+      ],
+      [
+       3470,
+       2
+      ],
+      [
+       5498,
+       2
+      ]
+     ]
+    },
+    "1252238": {
+     "name": "Guard's Chain Shirt",
+     "out": [
+      250489,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2841,
+       4
+      ],
+      [
+       3470,
+       2
+      ],
+      [
+       1210,
+       2
+      ]
+     ]
+    },
+    "1252239": {
+     "name": "Protector's Chain Shirt",
+     "out": [
+      250490,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2841,
+       4
+      ],
+      [
+       3470,
+       2
+      ],
+      [
+       818,
+       2
+      ]
+     ]
+    },
+    "1252240": {
+     "name": "Acolyte's Chain Shirt",
+     "out": [
+      250491,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2841,
+       4
+      ],
+      [
+       3470,
+       2
+      ],
+      [
+       10940,
+       2
+      ]
+     ]
+    },
+    "1252241": {
+     "name": "Crusader's Chain Shirt",
+     "out": [
+      250492,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2841,
+       4
+      ],
+      [
+       3470,
+       2
+      ],
+      [
+       10938,
+       2
+      ]
+     ]
+    },
+    "1252242": {
+     "name": "Veteran's Chain Leggings",
+     "out": [
+      250493,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2841,
+       6
+      ],
+      [
+       3478,
+       2
+      ],
+      [
+       5498,
+       4
+      ]
+     ]
+    },
+    "1252243": {
+     "name": "Guard's Chain Leggings",
+     "out": [
+      250494,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2841,
+       6
+      ],
+      [
+       3478,
+       2
+      ],
+      [
+       1210,
+       4
+      ]
+     ]
+    },
+    "1252244": {
+     "name": "Protector's Chain Leggings",
+     "out": [
+      250495,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2841,
+       6
+      ],
+      [
+       3478,
+       2
+      ],
+      [
+       818,
+       4
+      ]
+     ]
+    },
+    "1252245": {
+     "name": "Acolyte's Chain Leggings",
+     "out": [
+      250496,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2841,
+       6
+      ],
+      [
+       3478,
+       2
+      ],
+      [
+       10940,
+       4
+      ]
+     ]
+    },
+    "1252246": {
+     "name": "Crusader's Chain Leggings",
+     "out": [
+      250497,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2841,
+       6
+      ],
+      [
+       3478,
+       2
+      ],
+      [
+       10938,
+       4
+      ]
+     ]
+    },
+    "1252247": {
+     "name": "Veteran's Chain Helm",
+     "out": [
+      250498,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2841,
+       8
+      ],
+      [
+       3478,
+       2
+      ],
+      [
+       5498,
+       6
+      ]
+     ]
+    },
+    "1252248": {
+     "name": "Guard's Chain Helm",
+     "out": [
+      250499,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2841,
+       8
+      ],
+      [
+       3478,
+       2
+      ],
+      [
+       1210,
+       6
+      ]
+     ]
+    },
+    "1252249": {
+     "name": "Protector's Chain Helm",
+     "out": [
+      250500,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2841,
+       8
+      ],
+      [
+       3478,
+       2
+      ],
+      [
+       818,
+       6
+      ]
+     ]
+    },
+    "1252250": {
+     "name": "Acolyte's Chain Helm",
+     "out": [
+      250501,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2841,
+       8
+      ],
+      [
+       3478,
+       2
+      ],
+      [
+       10940,
+       6
+      ]
+     ]
+    },
+    "1252251": {
+     "name": "Crusader's Chain Helm",
+     "out": [
+      250502,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2841,
+       8
+      ],
+      [
+       3478,
+       2
+      ],
+      [
+       10938,
+       6
+      ]
+     ]
+    },
+    "1252252": {
+     "name": "Veteran's Boots",
+     "out": [
+      250503,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2841,
+       12
+      ],
+      [
+       3478,
+       2
+      ],
+      [
+       249427,
+       4
+      ],
+      [
+       5498,
+       5
+      ]
+     ]
+    },
+    "1252253": {
+     "name": "Guard's Boots",
+     "out": [
+      250504,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2841,
+       12
+      ],
+      [
+       3478,
+       2
+      ],
+      [
+       249427,
+       4
+      ],
+      [
+       1210,
+       5
+      ]
+     ]
+    },
+    "1252254": {
+     "name": "Protector's Boots",
+     "out": [
+      250505,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2841,
+       12
+      ],
+      [
+       3478,
+       2
+      ],
+      [
+       249427,
+       4
+      ],
+      [
+       818,
+       5
+      ]
+     ]
+    },
+    "1252255": {
+     "name": "Acolyte's Boots",
+     "out": [
+      250506,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2841,
+       12
+      ],
+      [
+       3478,
+       2
+      ],
+      [
+       249427,
+       4
+      ],
+      [
+       10940,
+       5
+      ]
+     ]
+    },
+    "1252256": {
+     "name": "Crusader's Boots",
+     "out": [
+      250507,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2841,
+       12
+      ],
+      [
+       3478,
+       2
+      ],
+      [
+       249427,
+       4
+      ],
+      [
+       10938,
+       5
+      ]
+     ]
+    },
+    "1252257": {
+     "name": "Veteran's Gloves",
+     "out": [
+      250508,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2841,
+       10
+      ],
+      [
+       3470,
+       4
+      ],
+      [
+       249410,
+       2
+      ],
+      [
+       5498,
+       3
+      ]
+     ]
+    },
+    "1252258": {
+     "name": "Guard's Gloves",
+     "out": [
+      250509,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2841,
+       10
+      ],
+      [
+       3470,
+       4
+      ],
+      [
+       249410,
+       2
+      ],
+      [
+       1210,
+       3
+      ]
+     ]
+    },
+    "1252259": {
+     "name": "Protector's Gloves",
+     "out": [
+      250510,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2841,
+       10
+      ],
+      [
+       3470,
+       4
+      ],
+      [
+       249410,
+       2
+      ],
+      [
+       818,
+       3
+      ]
+     ]
+    },
+    "1252260": {
+     "name": "Acolyte's Gloves",
+     "out": [
+      250511,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2841,
+       10
+      ],
+      [
+       3470,
+       4
+      ],
+      [
+       249410,
+       2
+      ],
+      [
+       10940,
+       3
+      ]
+     ]
+    },
+    "1252261": {
+     "name": "Crusader's Gloves",
+     "out": [
+      250512,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2841,
+       10
+      ],
+      [
+       3470,
+       4
+      ],
+      [
+       249410,
+       2
+      ],
+      [
+       10938,
+       3
+      ]
+     ]
+    },
+    "1252262": {
+     "name": "Veteran's Chain Belt",
+     "out": [
+      250513,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2840,
+       12
+      ],
+      [
+       3470,
+       4
+      ],
+      [
+       249427,
+       2
+      ],
+      [
+       5498,
+       2
+      ]
+     ]
+    },
+    "1252263": {
+     "name": "Guard's Chain Belt",
+     "out": [
+      250514,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2840,
+       12
+      ],
+      [
+       3470,
+       4
+      ],
+      [
+       249427,
+       2
+      ],
+      [
+       1210,
+       2
+      ]
+     ]
+    },
+    "1252264": {
+     "name": "Protector's Chain Belt",
+     "out": [
+      250515,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2840,
+       12
+      ],
+      [
+       3470,
+       4
+      ],
+      [
+       249427,
+       2
+      ],
+      [
+       818,
+       2
+      ]
+     ]
+    },
+    "1252265": {
+     "name": "Acolyte's Chain Belt",
+     "out": [
+      250516,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2840,
+       12
+      ],
+      [
+       3470,
+       4
+      ],
+      [
+       249427,
+       2
+      ],
+      [
+       10940,
+       2
+      ]
+     ]
+    },
+    "1252266": {
+     "name": "Crusader's Chain Belt",
+     "out": [
+      250517,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2840,
+       12
+      ],
+      [
+       3470,
+       4
+      ],
+      [
+       249427,
+       2
+      ],
+      [
+       10938,
+       2
+      ]
+     ]
+    },
+    "1252267": {
+     "name": "Veteran's Silvered Chain Shirt",
+     "out": [
+      250518,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2841,
+       20
+      ],
+      [
+       3478,
+       6
+      ],
+      [
+       2842,
+       5
+      ],
+      [
+       249427,
+       6
+      ],
+      [
+       5498,
+       8
+      ]
+     ]
+    },
+    "1252268": {
+     "name": "Guard's Silvered Chain Shirt",
+     "out": [
+      250519,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2841,
+       20
+      ],
+      [
+       3478,
+       6
+      ],
+      [
+       2842,
+       5
+      ],
+      [
+       249427,
+       6
+      ],
+      [
+       1210,
+       8
+      ]
+     ]
+    },
+    "1252269": {
+     "name": "Protector's Silvered Chain Shirt",
+     "out": [
+      250520,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2841,
+       20
+      ],
+      [
+       3478,
+       6
+      ],
+      [
+       2842,
+       5
+      ],
+      [
+       249427,
+       6
+      ],
+      [
+       818,
+       8
+      ]
+     ]
+    },
+    "1252270": {
+     "name": "Acolyte's Silvered Chain Shirt",
+     "out": [
+      250521,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2841,
+       20
+      ],
+      [
+       3478,
+       6
+      ],
+      [
+       2842,
+       5
+      ],
+      [
+       249427,
+       6
+      ],
+      [
+       10940,
+       8
+      ]
+     ]
+    },
+    "1252271": {
+     "name": "Crusader's Silvered Chain Shirt",
+     "out": [
+      250522,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2841,
+       20
+      ],
+      [
+       3478,
+       6
+      ],
+      [
+       2842,
+       5
+      ],
+      [
+       249427,
+       6
+      ],
+      [
+       10938,
+       8
+      ]
+     ]
+    },
+    "1252272": {
+     "name": "Veteran's Silvered Chain Leggings",
+     "out": [
+      250523,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2841,
+       20
+      ],
+      [
+       3478,
+       8
+      ],
+      [
+       2842,
+       6
+      ],
+      [
+       249427,
+       6
+      ],
+      [
+       5498,
+       8
+      ]
+     ]
+    },
+    "1252273": {
+     "name": "Guard's Silvered Chain Leggings",
+     "out": [
+      250524,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2841,
+       20
+      ],
+      [
+       3478,
+       8
+      ],
+      [
+       2842,
+       6
+      ],
+      [
+       249427,
+       6
+      ],
+      [
+       1210,
+       8
+      ]
+     ]
+    },
+    "1252274": {
+     "name": "Protector's Silvered Chain Leggings",
+     "out": [
+      250525,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2841,
+       20
+      ],
+      [
+       3478,
+       8
+      ],
+      [
+       2842,
+       6
+      ],
+      [
+       249427,
+       6
+      ],
+      [
+       818,
+       8
+      ]
+     ]
+    },
+    "1252275": {
+     "name": "Acolyte's Silvered Chain Leggings",
+     "out": [
+      250526,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2841,
+       20
+      ],
+      [
+       3478,
+       8
+      ],
+      [
+       2842,
+       6
+      ],
+      [
+       249427,
+       6
+      ],
+      [
+       10940,
+       8
+      ]
+     ]
+    },
+    "1252276": {
+     "name": "Crusader's Silvered Chain Leggings",
+     "out": [
+      250527,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2841,
+       20
+      ],
+      [
+       3478,
+       8
+      ],
+      [
+       2842,
+       6
+      ],
+      [
+       249427,
+       6
+      ],
+      [
+       10938,
+       8
+      ]
+     ]
+    },
+    "1252277": {
+     "name": "Veteran's Silvered Chain Helm",
+     "out": [
+      250528,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2841,
+       15
+      ],
+      [
+       3478,
+       6
+      ],
+      [
+       2842,
+       4
+      ],
+      [
+       249427,
+       4
+      ],
+      [
+       5498,
+       6
+      ]
+     ]
+    },
+    "1252278": {
+     "name": "Guard's Silvered Chain Helm",
+     "out": [
+      250529,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2841,
+       15
+      ],
+      [
+       3478,
+       6
+      ],
+      [
+       2842,
+       4
+      ],
+      [
+       249427,
+       4
+      ],
+      [
+       1210,
+       6
+      ]
+     ]
+    },
+    "1252279": {
+     "name": "Protector's Silvered Chain Helm",
+     "out": [
+      250530,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2841,
+       15
+      ],
+      [
+       3478,
+       6
+      ],
+      [
+       2842,
+       4
+      ],
+      [
+       249427,
+       4
+      ],
+      [
+       818,
+       6
+      ]
+     ]
+    },
+    "1252280": {
+     "name": "Acolyte's Silvered Chain Helm",
+     "out": [
+      250531,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2841,
+       15
+      ],
+      [
+       3478,
+       6
+      ],
+      [
+       2842,
+       4
+      ],
+      [
+       249427,
+       4
+      ],
+      [
+       10940,
+       6
+      ]
+     ]
+    },
+    "1252281": {
+     "name": "Crusader's Silvered Chain Helm",
+     "out": [
+      250532,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2841,
+       15
+      ],
+      [
+       3478,
+       6
+      ],
+      [
+       2842,
+       4
+      ],
+      [
+       249427,
+       4
+      ],
+      [
+       10938,
+       6
+      ]
+     ]
+    },
+    "1252282": {
+     "name": "Hard Gold Cuirass",
+     "out": [
+      250533,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3577,
+       12
+      ],
+      [
+       3859,
+       3
+      ],
+      [
+       3486,
+       2
+      ]
+     ]
+    },
+    "1252283": {
+     "name": "Hard Gold Boots",
+     "out": [
+      250534,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3577,
+       6
+      ],
+      [
+       3859,
+       2
+      ],
+      [
+       3486,
+       2
+      ],
+      [
+       4234,
+       2
+      ]
+     ]
+    },
+    "1252284": {
+     "name": "Hard Gold Bracers",
+     "out": [
+      250535,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3577,
+       6
+      ],
+      [
+       3859,
+       1
+      ],
+      [
+       3486,
+       2
+      ]
+     ]
+    },
+    "1252285": {
+     "name": "Hard Gold Leggings",
+     "out": [
+      250536,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3577,
+       10
+      ],
+      [
+       3859,
+       2
+      ],
+      [
+       3486,
+       2
+      ]
+     ]
+    },
+    "1252286": {
+     "name": "Hard Gold Coif",
+     "out": [
+      250537,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3577,
+       10
+      ],
+      [
+       3859,
+       2
+      ],
+      [
+       3486,
+       2
+      ]
+     ]
+    },
+    "1252287": {
+     "name": "Hard Gold Gauntlet",
+     "out": [
+      250538,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3577,
+       8
+      ],
+      [
+       3859,
+       2
+      ],
+      [
+       3486,
+       2
+      ]
+     ]
+    },
+    "1252288": {
+     "name": "Hard Gold Pauldrons",
+     "out": [
+      250539,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3577,
+       8
+      ],
+      [
+       3859,
+       2
+      ],
+      [
+       3486,
+       2
+      ]
+     ]
+    },
+    "1252289": {
+     "name": "Shining Mithril Breastplate",
+     "out": [
+      250540,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3860,
+       8
+      ],
+      [
+       6037,
+       9
+      ],
+      [
+       3486,
+       2
+      ],
+      [
+       7971,
+       2
+      ]
+     ]
+    },
+    "1252290": {
+     "name": "Shining Mithril Pauldrons",
+     "out": [
+      250541,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3860,
+       6
+      ],
+      [
+       6037,
+       3
+      ],
+      [
+       3486,
+       2
+      ],
+      [
+       4304,
+       2
+      ]
+     ]
+    },
+    "1252291": {
+     "name": "Shining Mithril Boots",
+     "out": [
+      250542,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3860,
+       4
+      ],
+      [
+       6037,
+       3
+      ],
+      [
+       3486,
+       2
+      ],
+      [
+       4304,
+       4
+      ]
+     ]
+    },
+    "1252292": {
+     "name": "Shining Mithril Helm",
+     "out": [
+      250543,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3860,
+       8
+      ],
+      [
+       6037,
+       9
+      ],
+      [
+       3486,
+       2
+      ],
+      [
+       7075,
+       1
+      ]
+     ]
+    },
+    "1252293": {
+     "name": "Shining Mithril Pants",
+     "out": [
+      250544,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3860,
+       6
+      ],
+      [
+       6037,
+       9
+      ],
+      [
+       3486,
+       2
+      ],
+      [
+       7075,
+       1
+      ]
+     ]
+    },
+    "1252294": {
+     "name": "Shining Mithril Gauntlet",
+     "out": [
+      250545,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3860,
+       5
+      ],
+      [
+       6037,
+       6
+      ],
+      [
+       3486,
+       2
+      ],
+      [
+       7909,
+       2
+      ]
+     ]
+    },
+    "1252295": {
+     "name": "Officer's Boots",
+     "out": [
+      250546,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3859,
+       4
+      ],
+      [
+       3486,
+       4
+      ],
+      [
+       1529,
+       4
+      ]
+     ]
+    },
+    "1252296": {
+     "name": "Sentinel's Boots",
+     "out": [
+      250547,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3859,
+       4
+      ],
+      [
+       3486,
+       4
+      ],
+      [
+       8831,
+       4
+      ]
+     ]
+    },
+    "1252297": {
+     "name": "Warder's Boots",
+     "out": [
+      250548,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3859,
+       4
+      ],
+      [
+       3486,
+       4
+      ],
+      [
+       7971,
+       4
+      ]
+     ]
+    },
+    "1252298": {
+     "name": "Prefect's Boots",
+     "out": [
+      250549,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3859,
+       4
+      ],
+      [
+       3486,
+       4
+      ],
+      [
+       13926,
+       4
+      ]
+     ]
+    },
+    "1252299": {
+     "name": "Justicar's Boots",
+     "out": [
+      250550,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3859,
+       4
+      ],
+      [
+       3486,
+       4
+      ],
+      [
+       7079,
+       4
+      ]
+     ]
+    },
+    "1252300": {
+     "name": "Officer's Gloves",
+     "out": [
+      250551,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12359,
+       8
+      ],
+      [
+       7966,
+       4
+      ],
+      [
+       1529,
+       4
+      ]
+     ]
+    },
+    "1252301": {
+     "name": "Sentinel's Gloves",
+     "out": [
+      250552,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12359,
+       8
+      ],
+      [
+       7966,
+       4
+      ],
+      [
+       8831,
+       4
+      ]
+     ]
+    },
+    "1252302": {
+     "name": "Warder's Gloves",
+     "out": [
+      250553,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12359,
+       8
+      ],
+      [
+       7966,
+       4
+      ],
+      [
+       7971,
+       4
+      ]
+     ]
+    },
+    "1252303": {
+     "name": "Prefect's Gloves",
+     "out": [
+      250554,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12359,
+       8
+      ],
+      [
+       7966,
+       4
+      ],
+      [
+       13926,
+       4
+      ]
+     ]
+    },
+    "1252304": {
+     "name": "Justicar's Gloves",
+     "out": [
+      250555,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12359,
+       8
+      ],
+      [
+       7966,
+       4
+      ],
+      [
+       7079,
+       4
+      ]
+     ]
+    },
+    "1252305": {
+     "name": "Officer's Belt",
+     "out": [
+      250556,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3575,
+       6
+      ],
+      [
+       3486,
+       2
+      ],
+      [
+       1529,
+       2
+      ]
+     ]
+    },
+    "1252306": {
+     "name": "Sentinel's Belt",
+     "out": [
+      250557,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3575,
+       6
+      ],
+      [
+       3486,
+       2
+      ],
+      [
+       8831,
+       2
+      ]
+     ]
+    },
+    "1252307": {
+     "name": "Warder's Belt",
+     "out": [
+      250558,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3575,
+       6
+      ],
+      [
+       3486,
+       2
+      ],
+      [
+       7971,
+       2
+      ]
+     ]
+    },
+    "1252308": {
+     "name": "Prefect's Belt",
+     "out": [
+      250559,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3575,
+       6
+      ],
+      [
+       3486,
+       2
+      ],
+      [
+       13926,
+       2
+      ]
+     ]
+    },
+    "1252309": {
+     "name": "Justicar's Belt",
+     "out": [
+      250560,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3575,
+       6
+      ],
+      [
+       3486,
+       2
+      ],
+      [
+       7079,
+       2
+      ]
+     ]
+    },
+    "1252310": {
+     "name": "Officer's Sabatons",
+     "out": [
+      250561,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12359,
+       20
+      ],
+      [
+       7966,
+       3
+      ],
+      [
+       249432,
+       4
+      ],
+      [
+       249410,
+       4
+      ],
+      [
+       1529,
+       6
+      ],
+      [
+       249427,
+       4
+      ]
+     ]
+    },
+    "1252311": {
+     "name": "Sentinel's Sabatons",
+     "out": [
+      250562,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12359,
+       20
+      ],
+      [
+       7966,
+       3
+      ],
+      [
+       249432,
+       4
+      ],
+      [
+       249410,
+       4
+      ],
+      [
+       8831,
+       6
+      ],
+      [
+       249427,
+       4
+      ]
+     ]
+    },
+    "1252312": {
+     "name": "Warder's Sabatons",
+     "out": [
+      250563,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12359,
+       20
+      ],
+      [
+       7966,
+       3
+      ],
+      [
+       249432,
+       4
+      ],
+      [
+       249410,
+       4
+      ],
+      [
+       7971,
+       6
+      ],
+      [
+       249427,
+       4
+      ]
+     ]
+    },
+    "1252313": {
+     "name": "Prefect's Sabatons",
+     "out": [
+      250564,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12359,
+       20
+      ],
+      [
+       7966,
+       3
+      ],
+      [
+       249432,
+       4
+      ],
+      [
+       249410,
+       4
+      ],
+      [
+       13926,
+       6
+      ],
+      [
+       249427,
+       4
+      ]
+     ]
+    },
+    "1252314": {
+     "name": "Justicar's Sabatons",
+     "out": [
+      250565,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12359,
+       20
+      ],
+      [
+       7966,
+       3
+      ],
+      [
+       249432,
+       4
+      ],
+      [
+       249410,
+       4
+      ],
+      [
+       7079,
+       6
+      ],
+      [
+       249427,
+       4
+      ]
+     ]
+    },
+    "1252315": {
+     "name": "Officer's Gauntlet",
+     "out": [
+      250566,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3859,
+       10
+      ],
+      [
+       3486,
+       4
+      ],
+      [
+       249432,
+       4
+      ],
+      [
+       249410,
+       2
+      ],
+      [
+       1529,
+       4
+      ]
+     ]
+    },
+    "1252316": {
+     "name": "Sentinel's Gauntlet",
+     "out": [
+      250567,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3859,
+       10
+      ],
+      [
+       3486,
+       4
+      ],
+      [
+       249432,
+       4
+      ],
+      [
+       249410,
+       2
+      ],
+      [
+       8831,
+       4
+      ]
+     ]
+    },
+    "1252317": {
+     "name": "Warder's Gauntlet",
+     "out": [
+      250568,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3859,
+       10
+      ],
+      [
+       3486,
+       4
+      ],
+      [
+       249432,
+       4
+      ],
+      [
+       249410,
+       2
+      ],
+      [
+       7971,
+       4
+      ]
+     ]
+    },
+    "1252318": {
+     "name": "Prefect's Gauntlet",
+     "out": [
+      250569,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3859,
+       10
+      ],
+      [
+       3486,
+       4
+      ],
+      [
+       249432,
+       4
+      ],
+      [
+       249410,
+       2
+      ],
+      [
+       13926,
+       4
+      ]
+     ]
+    },
+    "1252319": {
+     "name": "Justicar's Gauntlet",
+     "out": [
+      250570,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3859,
+       10
+      ],
+      [
+       3486,
+       4
+      ],
+      [
+       249432,
+       4
+      ],
+      [
+       249410,
+       2
+      ],
+      [
+       7079,
+       4
+      ]
+     ]
+    },
+    "1252320": {
+     "name": "Officer's Waistguard",
+     "out": [
+      250571,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12359,
+       24
+      ],
+      [
+       7966,
+       4
+      ],
+      [
+       249432,
+       6
+      ],
+      [
+       249410,
+       6
+      ],
+      [
+       1529,
+       10
+      ]
+     ]
+    },
+    "1252321": {
+     "name": "Sentinel's Waistguard",
+     "out": [
+      250572,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12359,
+       24
+      ],
+      [
+       7966,
+       4
+      ],
+      [
+       249432,
+       6
+      ],
+      [
+       249410,
+       6
+      ],
+      [
+       8831,
+       10
+      ]
+     ]
+    },
+    "1252322": {
+     "name": "Warder's Waistguard",
+     "out": [
+      250573,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12359,
+       24
+      ],
+      [
+       7966,
+       4
+      ],
+      [
+       249432,
+       6
+      ],
+      [
+       249410,
+       6
+      ],
+      [
+       7971,
+       10
+      ]
+     ]
+    },
+    "1252323": {
+     "name": "Prefect's Waistguard",
+     "out": [
+      250574,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12359,
+       24
+      ],
+      [
+       7966,
+       4
+      ],
+      [
+       249432,
+       6
+      ],
+      [
+       249410,
+       6
+      ],
+      [
+       13926,
+       10
+      ]
+     ]
+    },
+    "1252324": {
+     "name": "Justicar's Waistguard",
+     "out": [
+      250575,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12359,
+       24
+      ],
+      [
+       7966,
+       4
+      ],
+      [
+       249432,
+       6
+      ],
+      [
+       249410,
+       6
+      ],
+      [
+       7079,
+       10
+      ]
+     ]
+    },
+    "1252325": {
+     "name": "Officer's Pauldrons",
+     "out": [
+      250576,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3860,
+       20
+      ],
+      [
+       7966,
+       2
+      ],
+      [
+       249432,
+       6
+      ],
+      [
+       249410,
+       4
+      ],
+      [
+       1529,
+       8
+      ],
+      [
+       11139,
+       1
+      ]
+     ]
+    },
+    "1252326": {
+     "name": "Sentinel's Pauldrons",
+     "out": [
+      250577,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3860,
+       20
+      ],
+      [
+       7966,
+       2
+      ],
+      [
+       249432,
+       6
+      ],
+      [
+       249410,
+       4
+      ],
+      [
+       8831,
+       8
+      ],
+      [
+       11139,
+       1
+      ]
+     ]
+    },
+    "1252327": {
+     "name": "Warder's Pauldrons",
+     "out": [
+      250578,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3860,
+       20
+      ],
+      [
+       7966,
+       2
+      ],
+      [
+       249432,
+       6
+      ],
+      [
+       249410,
+       4
+      ],
+      [
+       7971,
+       8
+      ],
+      [
+       11139,
+       1
+      ]
+     ]
+    },
+    "1252328": {
+     "name": "Prefect's Pauldrons",
+     "out": [
+      250579,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3860,
+       20
+      ],
+      [
+       7966,
+       2
+      ],
+      [
+       249432,
+       6
+      ],
+      [
+       249410,
+       4
+      ],
+      [
+       13926,
+       8
+      ],
+      [
+       11139,
+       1
+      ]
+     ]
+    },
+    "1252329": {
+     "name": "Justicar's Pauldrons",
+     "out": [
+      250580,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3860,
+       20
+      ],
+      [
+       7966,
+       2
+      ],
+      [
+       249432,
+       6
+      ],
+      [
+       249410,
+       4
+      ],
+      [
+       7079,
+       8
+      ],
+      [
+       11139,
+       1
+      ]
+     ]
+    },
+    "1252330": {
+     "name": "Officer's Wristguards",
+     "out": [
+      250581,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12359,
+       16
+      ],
+      [
+       7966,
+       2
+      ],
+      [
+       249432,
+       6
+      ],
+      [
+       249410,
+       4
+      ],
+      [
+       1529,
+       6
+      ],
+      [
+       11139,
+       1
+      ]
+     ]
+    },
+    "1252331": {
+     "name": "Sentinel's Wristguards",
+     "out": [
+      250582,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12359,
+       16
+      ],
+      [
+       7966,
+       2
+      ],
+      [
+       249432,
+       6
+      ],
+      [
+       249410,
+       4
+      ],
+      [
+       8831,
+       6
+      ],
+      [
+       11139,
+       1
+      ]
+     ]
+    },
+    "1252332": {
+     "name": "Warder's Wristguards",
+     "out": [
+      250583,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12359,
+       16
+      ],
+      [
+       7966,
+       2
+      ],
+      [
+       249432,
+       6
+      ],
+      [
+       249410,
+       4
+      ],
+      [
+       7971,
+       6
+      ],
+      [
+       11139,
+       1
+      ]
+     ]
+    },
+    "1252333": {
+     "name": "Prefect's Wristguards",
+     "out": [
+      250584,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12359,
+       16
+      ],
+      [
+       7966,
+       2
+      ],
+      [
+       249432,
+       6
+      ],
+      [
+       249410,
+       4
+      ],
+      [
+       13926,
+       6
+      ],
+      [
+       11139,
+       1
+      ]
+     ]
+    },
+    "1252334": {
+     "name": "Justicar's Wristguards",
+     "out": [
+      250585,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12359,
+       16
+      ],
+      [
+       7966,
+       2
+      ],
+      [
+       249432,
+       6
+      ],
+      [
+       249410,
+       4
+      ],
+      [
+       7079,
+       6
+      ],
+      [
+       11139,
+       1
+      ]
+     ]
+    },
+    "1252335": {
+     "name": "Blessed Plate Pauldrons",
+     "out": [
+      250586,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12359,
+       20
+      ],
+      [
+       12361,
+       1
+      ],
+      [
+       8170,
+       6
+      ]
+     ]
+    },
+    "1252336": {
+     "name": "Blessed Plate Boots",
+     "out": [
+      250587,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12359,
+       24
+      ],
+      [
+       12361,
+       1
+      ],
+      [
+       8170,
+       6
+      ]
+     ]
+    },
+    "1252337": {
+     "name": "Blessed Plate Gauntlet",
+     "out": [
+      250588,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12359,
+       20
+      ],
+      [
+       12361,
+       2
+      ]
+     ]
+    },
+    "1252338": {
+     "name": "Imperial Plate Gauntlets",
+     "out": [
+      250589,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12359,
+       24
+      ],
+      [
+       7910,
+       1
+      ]
+     ]
+    },
+    "1252339": {
+     "name": "Blessed Plate Bracers",
+     "out": [
+      250590,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12359,
+       16
+      ],
+      [
+       12361,
+       1
+      ]
+     ]
+    },
+    "1252340": {
+     "name": "Blessed Plate Leggings",
+     "out": [
+      250591,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12359,
+       40
+      ],
+      [
+       12361,
+       2
+      ]
+     ]
+    },
+    "1252341": {
+     "name": "Blessed Plate Belt",
+     "out": [
+      250592,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12359,
+       18
+      ],
+      [
+       12361,
+       1
+      ],
+      [
+       7071,
+       1
+      ],
+      [
+       8170,
+       6
+      ]
+     ]
+    },
+    "1252342": {
+     "name": "Blessed Plate Helm",
+     "out": [
+      250593,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12359,
+       30
+      ],
+      [
+       12361,
+       2
+      ]
+     ]
+    },
+    "1252343": {
+     "name": "Blessed Plate Chest",
+     "out": [
+      250594,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12359,
+       36
+      ],
+      [
+       12361,
+       2
+      ]
+     ]
+    },
+    "1252344": {
+     "name": "Enriched Thorium Breastplate",
+     "out": [
+      250595,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       251290,
+       8
+      ],
+      [
+       251291,
+       24
+      ],
+      [
+       7082,
+       4
+      ],
+      [
+       7078,
+       4
+      ],
+      [
+       249726,
+       4
+      ]
+     ]
+    },
+    "1252345": {
+     "name": "Enriched Thorium Leggings",
+     "out": [
+      250596,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       251290,
+       10
+      ],
+      [
+       251291,
+       20
+      ],
+      [
+       7082,
+       6
+      ],
+      [
+       249726,
+       3
+      ]
+     ]
+    },
+    "1252346": {
+     "name": "Enriched Thorium Helm",
+     "out": [
+      250597,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       251290,
+       6
+      ],
+      [
+       251291,
+       16
+      ],
+      [
+       7078,
+       6
+      ],
+      [
+       249726,
+       3
+      ]
+     ]
+    },
+    "1252347": {
+     "name": "Champion's Legplates",
+     "out": [
+      250598,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       251290,
+       12
+      ],
+      [
+       251291,
+       20
+      ],
+      [
+       7082,
+       10
+      ],
+      [
+       13512,
+       2
+      ]
+     ]
+    },
+    "1252348": {
+     "name": "Stalwart Helm",
+     "out": [
+      250599,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       251290,
+       12
+      ],
+      [
+       12359,
+       80
+      ],
+      [
+       7910,
+       10
+      ],
+      [
+       12800,
+       4
+      ],
+      [
+       7971,
+       20
+      ]
+     ]
+    },
+    "1252349": {
+     "name": "Martyr's Legplates",
+     "out": [
+      250600,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       251290,
+       12
+      ],
+      [
+       251291,
+       20
+      ],
+      [
+       7078,
+       10
+      ],
+      [
+       13511,
+       2
+      ]
+     ]
+    },
+    "1252350": {
+     "name": "Breastplate of Salvation",
+     "out": [
+      250601,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       251290,
+       12
+      ],
+      [
+       12359,
+       80
+      ],
+      [
+       12361,
+       10
+      ],
+      [
+       12800,
+       4
+      ],
+      [
+       12662,
+       20
+      ]
+     ]
+    },
+    "1252351": {
+     "name": "Brass Knuckles",
+     "out": [
+      250602,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2841,
+       6
+      ],
+      [
+       2880,
+       4
+      ],
+      [
+       3470,
+       2
+      ],
+      [
+       1210,
+       2
+      ],
+      [
+       2319,
+       1
+      ]
+     ]
+    },
+    "1252352": {
+     "name": "Bronze Dory",
+     "out": [
+      250603,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2841,
+       8
+      ],
+      [
+       2880,
+       4
+      ],
+      [
+       2319,
+       1
+      ]
+     ]
+    },
+    "1252353": {
+     "name": "Iron Fists",
+     "out": [
+      250604,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3575,
+       6
+      ],
+      [
+       3466,
+       2
+      ],
+      [
+       3486,
+       1
+      ],
+      [
+       2842,
+       2
+      ],
+      [
+       4234,
+       2
+      ]
+     ]
+    },
+    "1252354": {
+     "name": "Steel Spear",
+     "out": [
+      250605,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3859,
+       10
+      ],
+      [
+       3466,
+       2
+      ],
+      [
+       7069,
+       1
+      ],
+      [
+       3486,
+       4
+      ],
+      [
+       4234,
+       1
+      ]
+     ]
+    },
+    "1252355": {
+     "name": "Iron Morningstar",
+     "out": [
+      250606,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3575,
+       14
+      ],
+      [
+       3466,
+       2
+      ],
+      [
+       3486,
+       2
+      ],
+      [
+       3864,
+       4
+      ],
+      [
+       4234,
+       2
+      ]
+     ]
+    },
+    "1252356": {
+     "name": "Mithril Shortsword",
+     "out": [
+      250607,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3860,
+       8
+      ],
+      [
+       3466,
+       2
+      ],
+      [
+       3486,
+       2
+      ],
+      [
+       1705,
+       4
+      ],
+      [
+       4234,
+       2
+      ]
+     ]
+    },
+    "1252357": {
+     "name": "Mithril Warhammer",
+     "out": [
+      250608,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3860,
+       12
+      ],
+      [
+       3864,
+       2
+      ],
+      [
+       7966,
+       1
+      ],
+      [
+       4234,
+       4
+      ]
+     ]
+    },
+    "1252358": {
+     "name": "Mithril Claws",
+     "out": [
+      250609,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3860,
+       8
+      ],
+      [
+       1529,
+       1
+      ],
+      [
+       7966,
+       1
+      ],
+      [
+       4234,
+       2
+      ]
+     ]
+    },
+    "1252359": {
+     "name": "Mithril Claymore",
+     "out": [
+      250610,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3860,
+       16
+      ],
+      [
+       3577,
+       6
+      ],
+      [
+       7966,
+       2
+      ],
+      [
+       4234,
+       4
+      ]
+     ]
+    },
+    "1252360": {
+     "name": "Mithril Stiletto",
+     "out": [
+      250611,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3860,
+       16
+      ],
+      [
+       1210,
+       6
+      ],
+      [
+       3577,
+       2
+      ],
+      [
+       7966,
+       1
+      ]
+     ]
+    },
+    "1252361": {
+     "name": "Charged Mithril Battleaxe",
+     "out": [
+      250612,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3860,
+       20
+      ],
+      [
+       7082,
+       6
+      ],
+      [
+       7966,
+       4
+      ],
+      [
+       4234,
+       4
+      ]
+     ]
+    },
+    "1252362": {
+     "name": "Thorium Greatmace",
+     "out": [
+      250613,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12359,
+       30
+      ],
+      [
+       251291,
+       4
+      ],
+      [
+       7076,
+       4
+      ],
+      [
+       249726,
+       10
+      ],
+      [
+       12644,
+       2
+      ]
+     ]
+    },
+    "1252363": {
+     "name": "Thorium Cestus",
+     "out": [
+      250614,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12359,
+       20
+      ],
+      [
+       251291,
+       8
+      ],
+      [
+       7082,
+       4
+      ],
+      [
+       249726,
+       10
+      ],
+      [
+       12644,
+       1
+      ]
+     ]
+    },
+    "1252364": {
+     "name": "Thorium Poleaxe",
+     "out": [
+      250615,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12359,
+       20
+      ],
+      [
+       251291,
+       6
+      ],
+      [
+       249726,
+       10
+      ],
+      [
+       12803,
+       4
+      ],
+      [
+       8170,
+       4
+      ]
+     ]
+    },
+    "1252365": {
+     "name": "Bold Dirk",
+     "out": [
+      250616,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12359,
+       30
+      ],
+      [
+       7082,
+       4
+      ],
+      [
+       249726,
+       10
+      ],
+      [
+       8170,
+       4
+      ]
+     ]
+    },
+    "1252366": {
+     "name": "Stormcarver",
+     "out": [
+      250617,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       251290,
+       20
+      ],
+      [
+       249726,
+       10
+      ],
+      [
+       12644,
+       2
+      ]
+     ]
+    },
+    "1252367": {
+     "name": "Bagh Nakh",
+     "out": [
+      250618,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       251290,
+       10
+      ],
+      [
+       251291,
+       10
+      ],
+      [
+       249726,
+       10
+      ],
+      [
+       7910,
+       4
+      ],
+      [
+       12361,
+       4
+      ]
+     ]
+    },
+    "1252368": {
+     "name": "Legionite Glaive",
+     "out": [
+      250619,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       251290,
+       15
+      ],
+      [
+       251291,
+       8
+      ],
+      [
+       249726,
+       10
+      ],
+      [
+       248820,
+       4
+      ],
+      [
+       248822,
+       1
+      ]
+     ]
+    },
+    "1263041": {
+     "name": "Anvil",
+     "out": [
+      279988,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2841,
+       5
+      ],
+      [
+       3478,
+       2
+      ],
+      [
+       2319,
+       2
+      ]
+     ]
+    },
+    "1263073": {
+     "name": "Master Forge",
+     "out": [
+      279955,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       273127,
+       1
+      ],
+      [
+       12359,
+       5
+      ],
+      [
+       8170,
+       2
+      ]
+     ]
+    },
+    "1292945": {
+     "name": "Justice Leggings",
+     "out": [
+      273908,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       274030,
+       5
+      ],
+      [
+       12360,
+       4
+      ],
+      [
+       251291,
+       18
+      ],
+      [
+       18567,
+       1
+      ]
+     ]
+    },
+    "1292946": {
+     "name": "Justice Gauntlets",
+     "out": [
+      273909,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       274030,
+       3
+      ],
+      [
+       12360,
+       2
+      ],
+      [
+       251291,
+       12
+      ],
+      [
+       18567,
+       1
+      ]
+     ]
+    },
+    "1292947": {
+     "name": "Justice Spaulders",
+     "out": [
+      273910,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       274030,
+       3
+      ],
+      [
+       12360,
+       2
+      ],
+      [
+       251291,
+       12
+      ],
+      [
+       18567,
+       1
+      ]
+     ]
+    },
+    "1292948": {
+     "name": "Justice Greaves",
+     "out": [
+      273911,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       274030,
+       3
+      ],
+      [
+       12360,
+       2
+      ],
+      [
+       251291,
+       12
+      ],
+      [
+       18567,
+       1
+      ]
+     ]
+    },
+    "1292949": {
+     "name": "Justice Legplates",
+     "out": [
+      273912,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       274030,
+       5
+      ],
+      [
+       12360,
+       4
+      ],
+      [
+       251291,
+       18
+      ],
+      [
+       18567,
+       1
+      ]
+     ]
+    },
+    "1292950": {
+     "name": "Justice Gloves",
+     "out": [
+      273913,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       274030,
+       3
+      ],
+      [
+       12360,
+       2
+      ],
+      [
+       251291,
+       12
+      ],
+      [
+       18567,
+       1
+      ]
+     ]
+    },
+    "1292951": {
+     "name": "Justice Epaulets",
+     "out": [
+      273914,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       274030,
+       3
+      ],
+      [
+       12360,
+       2
+      ],
+      [
+       251291,
+       12
+      ],
+      [
+       18567,
+       1
+      ]
+     ]
+    },
+    "1292952": {
+     "name": "Justice Treads",
+     "out": [
+      273915,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       274030,
+       3
+      ],
+      [
+       12360,
+       2
+      ],
+      [
+       251291,
+       12
+      ],
+      [
+       18567,
+       1
+      ]
+     ]
+    },
+    "1292953": {
+     "name": "Justice Legguards",
+     "out": [
+      273916,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       274030,
+       5
+      ],
+      [
+       12360,
+       4
+      ],
+      [
+       251291,
+       18
+      ],
+      [
+       18567,
+       1
+      ]
+     ]
+    },
+    "1292954": {
+     "name": "Justice Handguards",
+     "out": [
+      273917,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       274030,
+       3
+      ],
+      [
+       12360,
+       2
+      ],
+      [
+       251291,
+       12
+      ],
+      [
+       18567,
+       1
+      ]
+     ]
+    },
+    "1292955": {
+     "name": "Justice Pauldrons",
+     "out": [
+      273918,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       274030,
+       3
+      ],
+      [
+       12360,
+       2
+      ],
+      [
+       251291,
+       12
+      ],
+      [
+       18567,
+       1
+      ]
+     ]
+    },
+    "1292956": {
+     "name": "Justice Sabatons",
+     "out": [
+      273919,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       274030,
+       3
+      ],
+      [
+       12360,
+       2
+      ],
+      [
+       251291,
+       12
+      ],
+      [
+       18567,
+       1
+      ]
+     ]
+    },
+    "1292981": {
+     "name": "Legplates of Glory",
+     "out": [
+      273944,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       274030,
+       5
+      ],
+      [
+       12360,
+       4
+      ],
+      [
+       251291,
+       18
+      ],
+      [
+       18567,
+       1
+      ]
+     ]
+    },
+    "1292982": {
+     "name": "Gauntlets of Glory",
+     "out": [
+      273945,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       274030,
+       3
+      ],
+      [
+       12360,
+       2
+      ],
+      [
+       251291,
+       12
+      ],
+      [
+       18567,
+       1
+      ]
+     ]
+    },
+    "1292983": {
+     "name": "Shoulders of Glory",
+     "out": [
+      273946,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       274030,
+       3
+      ],
+      [
+       12360,
+       2
+      ],
+      [
+       251291,
+       12
+      ],
+      [
+       18567,
+       1
+      ]
+     ]
+    },
+    "1292984": {
+     "name": "Greaves of Glory",
+     "out": [
+      273947,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       274030,
+       3
+      ],
+      [
+       12360,
+       2
+      ],
+      [
+       251291,
+       12
+      ],
+      [
+       18567,
+       1
+      ]
+     ]
+    },
+    "1292985": {
+     "name": "Legguards of Glory",
+     "out": [
+      273948,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       274030,
+       5
+      ],
+      [
+       12360,
+       4
+      ],
+      [
+       251291,
+       18
+      ],
+      [
+       18567,
+       1
+      ]
+     ]
+    },
+    "1292986": {
+     "name": "Handguards of Glory",
+     "out": [
+      273949,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       274030,
+       3
+      ],
+      [
+       12360,
+       2
+      ],
+      [
+       251291,
+       12
+      ],
+      [
+       18567,
+       1
+      ]
+     ]
+    },
+    "1292987": {
+     "name": "Pauldrons of Glory",
+     "out": [
+      273950,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       274030,
+       3
+      ],
+      [
+       12360,
+       2
+      ],
+      [
+       251291,
+       12
+      ],
+      [
+       18567,
+       1
+      ]
+     ]
+    },
+    "1292988": {
+     "name": "Sabatons of Glory",
+     "out": [
+      273951,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       274030,
+       3
+      ],
+      [
+       12360,
+       2
+      ],
+      [
+       251291,
+       12
+      ],
+      [
+       18567,
+       1
+      ]
+     ]
+    },
+    "1297138": {
+     "name": "Goregasher Grips",
+     "out": [
+      275622,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12359,
+       7
+      ],
+      [
+       12655,
+       5
+      ],
+      [
+       7078,
+       3
+      ],
+      [
+       18567,
+       1
+      ]
+     ]
+    },
+    "1297139": {
+     "name": "Goregasher Support",
+     "out": [
+      275623,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12359,
+       11
+      ],
+      [
+       12655,
+       5
+      ],
+      [
+       7078,
+       3
+      ],
+      [
+       18567,
+       1
+      ]
+     ]
+    },
+    "1297140": {
+     "name": "Goregasher Stompers",
+     "out": [
+      275624,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12359,
+       9
+      ],
+      [
+       12655,
+       5
+      ],
+      [
+       7078,
+       3
+      ],
+      [
+       18567,
+       1
+      ]
+     ]
+    },
+    "1297141": {
+     "name": "Clutchlord's Grips",
+     "out": [
+      275625,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12359,
+       7
+      ],
+      [
+       12655,
+       5
+      ],
+      [
+       7076,
+       3
+      ],
+      [
+       18567,
+       1
+      ]
+     ]
+    },
+    "1297142": {
+     "name": "Clutchlord's Support",
+     "out": [
+      275626,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12359,
+       11
+      ],
+      [
+       12655,
+       5
+      ],
+      [
+       7076,
+       3
+      ],
+      [
+       18567,
+       1
+      ]
+     ]
+    },
+    "1297143": {
+     "name": "Clutchlord's Stompers",
+     "out": [
+      275627,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12359,
+       9
+      ],
+      [
+       12655,
+       5
+      ],
+      [
+       7076,
+       3
+      ],
+      [
+       18567,
+       1
+      ]
+     ]
+    },
+    "1301421": {
+     "name": "Cloudy Skyforged Chainmail",
+     "out": [
+      276992,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2840,
+       8
+      ],
+      [
+       2880,
+       1
+      ]
+     ]
+    },
+    "1301422": {
+     "name": "Cloudy Skyforged Wristguards",
+     "out": [
+      276993,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2840,
+       5
+      ]
+     ]
+    },
+    "1301423": {
+     "name": "Cloudy Skyforged Gauntlets",
+     "out": [
+      276994,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2840,
+       7
+      ]
+     ]
+    },
+    "1301424": {
+     "name": "Cloudy Skyforged Chain",
+     "out": [
+      276995,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2840,
+       6
+      ]
+     ]
+    },
+    "1301425": {
+     "name": "Cloudy Skyforged Legguards",
+     "out": [
+      276996,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2840,
+       8
+      ],
+      [
+       2880,
+       1
+      ]
+     ]
+    },
+    "1301426": {
+     "name": "Cloudy Skyforged Greaves",
+     "out": [
+      276997,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2840,
+       7
+      ]
+     ]
+    },
+    "1301445": {
+     "name": "Azure Skyforged Chainmail",
+     "out": [
+      277016,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2840,
+       8
+      ],
+      [
+       2880,
+       1
+      ]
+     ]
+    },
+    "1301446": {
+     "name": "Azure Skyforged Wristguards",
+     "out": [
+      277017,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2840,
+       5
+      ]
+     ]
+    },
+    "1301447": {
+     "name": "Azure Skyforged Gauntlets",
+     "out": [
+      277018,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2840,
+       7
+      ]
+     ]
+    },
+    "1301448": {
+     "name": "Azure Skyforged Chain",
+     "out": [
+      277019,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2840,
+       6
+      ]
+     ]
+    },
+    "1301449": {
+     "name": "Azure Skyforged Legguards",
+     "out": [
+      277020,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2840,
+       8
+      ],
+      [
+       2880,
+       1
+      ]
+     ]
+    },
+    "1301450": {
+     "name": "Azure Skyforged Greaves",
+     "out": [
+      277021,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2840,
+       7
+      ]
+     ]
+    },
+    "1301526": {
+     "name": "Cloudy Skyforged Helm",
+     "out": [
+      277040,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3575,
+       18
+      ],
+      [
+       3486,
+       5
+      ],
+      [
+       5498,
+       1
+      ]
+     ]
+    },
+    "1301527": {
+     "name": "Cloudy Skyforged Pauldrons",
+     "out": [
+      277041,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3575,
+       14
+      ],
+      [
+       3486,
+       3
+      ],
+      [
+       5498,
+       1
+      ]
+     ]
+    },
+    "1301534": {
+     "name": "Azure Skyforged Helm",
+     "out": [
+      277048,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3575,
+       18
+      ],
+      [
+       3486,
+       5
+      ],
+      [
+       7909,
+       1
+      ]
+     ]
+    },
+    "1301535": {
+     "name": "Azure Skyforged Pauldrons",
+     "out": [
+      277049,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3575,
+       14
+      ],
+      [
+       3486,
+       3
+      ],
+      [
+       7909,
+       1
+      ]
+     ]
+    },
+    "1302598": {
+     "name": "Rough Copper Chain Boots",
+     "out": [
+      277672,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2840,
+       9
+      ]
+     ]
+    },
+    "1306533": {
+     "name": "Ironwood Blade",
+     "out": [
+      279259,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       274030,
+       2
+      ],
+      [
+       251290,
+       1
+      ],
+      [
+       251291,
+       14
+      ]
+     ]
+    },
+    "1306534": {
+     "name": "Forest Defender's Axe",
+     "out": [
+      279260,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       274030,
+       4
+      ],
+      [
+       251290,
+       1
+      ],
+      [
+       251291,
+       20
+      ]
+     ]
+    },
+    "1306535": {
+     "name": "Greenhammer",
+     "out": [
+      279261,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       274030,
+       2
+      ],
+      [
+       251290,
+       1
+      ],
+      [
+       251291,
+       16
+      ]
+     ]
+    },
+    "1306536": {
+     "name": "Evergreen Shield",
+     "out": [
+      279262,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       274030,
+       2
+      ],
+      [
+       251290,
+       1
+      ],
+      [
+       251291,
+       10
+      ]
+     ]
+    },
+    "1306537": {
+     "name": "Depleted Thorium Sabatons",
+     "out": [
+      279263,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       274030,
+       2
+      ],
+      [
+       251290,
+       1
+      ],
+      [
+       251291,
+       12
+      ]
+     ]
+    },
+    "1306538": {
+     "name": "Heavy Thorium Gauntlets",
+     "out": [
+      279264,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       274030,
+       2
+      ],
+      [
+       251290,
+       1
+      ],
+      [
+       251291,
+       14
+      ]
+     ]
+    },
+    "1306539": {
+     "name": "Azerothium Legplates",
+     "out": [
+      279265,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       274030,
+       3
+      ],
+      [
+       251290,
+       1
+      ],
+      [
+       251291,
+       18
+      ]
+     ]
+    },
+    "1317962": {
+     "name": "Cracked Blacksmith Hammer",
+     "out": [
+      285279,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2841,
+       18
+      ],
+      [
+       2842,
+       2
+      ],
+      [
+       818,
+       1
+      ]
+     ]
+    },
+    "1317963": {
+     "name": "Mithril Blacksmith Hammer",
+     "out": [
+      285280,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3860,
+       10
+      ],
+      [
+       3577,
+       2
+      ],
+      [
+       7910,
+       1
+      ]
+     ]
+    },
+    "1317964": {
+     "name": "Arcanite Blacksmith Hammer",
+     "out": [
+      285281,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       11371,
+       4
+      ],
+      [
+       12360,
+       1
+      ],
+      [
+       12361,
+       1
+      ]
+     ]
+    },
+    "14379": {
+     "name": "Golden Rod",
+     "out": [
+      11128,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3577,
+       1
+      ],
+      [
+       3478,
+       2
+      ]
+     ]
+    },
+    "14380": {
+     "name": "Truesilver Rod",
+     "out": [
+      11144,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       6037,
+       1
+      ],
+      [
+       3486,
+       1
+      ]
+     ]
+    },
+    "15292": {
+     "name": "Dark Iron Pulverizer",
+     "out": [
+      11608,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       11371,
+       18
+      ],
+      [
+       7077,
+       4
+      ]
+     ]
+    },
+    "15293": {
+     "name": "Dark Iron Mail",
+     "out": [
+      11606,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       11371,
+       10
+      ],
+      [
+       7077,
+       2
+      ]
+     ]
+    },
+    "15294": {
+     "name": "Dark Iron Sunderer",
+     "out": [
+      11607,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       11371,
+       26
+      ],
+      [
+       7077,
+       4
+      ]
+     ]
+    },
+    "15295": {
+     "name": "Dark Iron Shoulders",
+     "out": [
+      11605,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       11371,
+       6
+      ],
+      [
+       7077,
+       1
+      ]
+     ]
+    },
+    "15296": {
+     "name": "Dark Iron Plate",
+     "out": [
+      11604,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       11371,
+       20
+      ],
+      [
+       7077,
+       8
+      ]
+     ]
+    },
+    "15972": {
+     "name": "Glinting Steel Dagger",
+     "out": [
+      12259,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3859,
+       10
+      ],
+      [
+       3466,
+       2
+      ],
+      [
+       1206,
+       1
+      ],
+      [
+       7067,
+       1
+      ],
+      [
+       4234,
+       1
+      ]
+     ]
+    },
+    "15973": {
+     "name": "Searing Golden Blade",
+     "out": [
+      12260,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3859,
+       10
+      ],
+      [
+       3577,
+       4
+      ],
+      [
+       7068,
+       2
+      ],
+      [
+       4234,
+       2
+      ]
+     ]
+    },
+    "16639": {
+     "name": "Dense Grinding Stone",
+     "out": [
+      12644,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12365,
+       4
+      ]
+     ]
+    },
+    "16640": {
+     "name": "Dense Weightstone",
+     "out": [
+      12643,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12365,
+       1
+      ]
+     ]
+    },
+    "16641": {
+     "name": "Dense Sharpening Stone",
+     "out": [
+      12404,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12365,
+       1
+      ]
+     ]
+    },
+    "16642": {
+     "name": "Thorium Armor",
+     "out": [
+      12405,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12359,
+       16
+      ],
+      [
+       12361,
+       1
+      ],
+      [
+       11188,
+       4
+      ]
+     ]
+    },
+    "16643": {
+     "name": "Thorium Belt",
+     "out": [
+      12406,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12359,
+       12
+      ],
+      [
+       11186,
+       4
+      ]
+     ]
+    },
+    "16644": {
+     "name": "Thorium Bracers",
+     "out": [
+      12408,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12359,
+       12
+      ],
+      [
+       11184,
+       4
+      ]
+     ]
+    },
+    "16645": {
+     "name": "Radiant Belt",
+     "out": [
+      12416,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12359,
+       10
+      ],
+      [
+       7077,
+       2
+      ]
+     ]
+    },
+    "16646": {
+     "name": "Imperial Plate Shoulders",
+     "out": [
+      12428,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12359,
+       24
+      ],
+      [
+       8170,
+       6
+      ],
+      [
+       3864,
+       2
+      ]
+     ]
+    },
+    "16647": {
+     "name": "Imperial Plate Belt",
+     "out": [
+      12424,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12359,
+       22
+      ],
+      [
+       8170,
+       6
+      ],
+      [
+       7909,
+       1
+      ]
+     ]
+    },
+    "16648": {
+     "name": "Radiant Breastplate",
+     "out": [
+      12415,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12359,
+       18
+      ],
+      [
+       7077,
+       2
+      ],
+      [
+       7910,
+       1
+      ]
+     ]
+    },
+    "16649": {
+     "name": "Imperial Plate Bracers",
+     "out": [
+      12425,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12359,
+       20
+      ],
+      [
+       7910,
+       1
+      ]
+     ]
+    },
+    "16651": {
+     "name": "Thorium Shield Spike",
+     "out": [
+      12645,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12359,
+       4
+      ],
+      [
+       12644,
+       4
+      ],
+      [
+       7076,
+       2
+      ]
+     ]
+    },
+    "16652": {
+     "name": "Thorium Boots",
+     "out": [
+      12409,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12359,
+       20
+      ],
+      [
+       8170,
+       8
+      ],
+      [
+       11185,
+       4
+      ]
+     ]
+    },
+    "16653": {
+     "name": "Thorium Helm",
+     "out": [
+      12410,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12359,
+       24
+      ],
+      [
+       7910,
+       1
+      ],
+      [
+       11188,
+       4
+      ]
+     ]
+    },
+    "16654": {
+     "name": "Radiant Gloves",
+     "out": [
+      12418,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12359,
+       18
+      ],
+      [
+       7077,
+       4
+      ]
+     ]
+    },
+    "16655": {
+     "name": "Fiery Plate Gauntlets",
+     "out": [
+      12631,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12359,
+       20
+      ],
+      [
+       12655,
+       6
+      ],
+      [
+       7078,
+       2
+      ],
+      [
+       7910,
+       4
+      ]
+     ]
+    },
+    "16656": {
+     "name": "Radiant Boots",
+     "out": [
+      12419,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12359,
+       14
+      ],
+      [
+       7077,
+       4
+      ]
+     ]
+    },
+    "16657": {
+     "name": "Imperial Plate Boots",
+     "out": [
+      12426,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12359,
+       34
+      ],
+      [
+       7910,
+       1
+      ],
+      [
+       7909,
+       1
+      ]
+     ]
+    },
+    "16658": {
+     "name": "Imperial Plate Helm",
+     "out": [
+      12427,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12359,
+       34
+      ],
+      [
+       7910,
+       2
+      ]
+     ]
+    },
+    "16659": {
+     "name": "Radiant Circlet",
+     "out": [
+      12417,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12359,
+       18
+      ],
+      [
+       7077,
+       4
+      ]
+     ]
+    },
+    "16660": {
+     "name": "Dawnbringer Shoulders",
+     "out": [
+      12625,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12359,
+       20
+      ],
+      [
+       12360,
+       4
+      ],
+      [
+       12364,
+       2
+      ],
+      [
+       7080,
+       2
+      ]
+     ]
+    },
+    "16662": {
+     "name": "Thorium Leggings",
+     "out": [
+      12414,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12359,
+       26
+      ],
+      [
+       11186,
+       4
+      ]
+     ]
+    },
+    "16663": {
+     "name": "Imperial Plate Chest",
+     "out": [
+      12422,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12359,
+       40
+      ],
+      [
+       7910,
+       2
+      ]
+     ]
+    },
+    "16664": {
+     "name": "Runic Plate Shoulders",
+     "out": [
+      12610,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12359,
+       20
+      ],
+      [
+       12360,
+       2
+      ],
+      [
+       3577,
+       6
+      ]
+     ]
+    },
+    "16665": {
+     "name": "Runic Plate Boots",
+     "out": [
+      12611,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12359,
+       20
+      ],
+      [
+       12360,
+       2
+      ],
+      [
+       2842,
+       10
+      ]
+     ]
+    },
+    "16667": {
+     "name": "Demon Forged Breastplate",
+     "out": [
+      12628,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12359,
+       40
+      ],
+      [
+       12662,
+       10
+      ],
+      [
+       12361,
+       4
+      ],
+      [
+       7910,
+       4
+      ]
+     ]
+    },
+    "16724": {
+     "name": "Whitesoul Helm",
+     "out": [
+      12633,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12359,
+       20
+      ],
+      [
+       12655,
+       4
+      ],
+      [
+       6037,
+       6
+      ],
+      [
+       3577,
+       6
+      ],
+      [
+       12800,
+       2
+      ]
+     ]
+    },
+    "16725": {
+     "name": "Radiant Leggings",
+     "out": [
+      12420,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12359,
+       20
+      ],
+      [
+       7077,
+       4
+      ]
+     ]
+    },
+    "16726": {
+     "name": "Runic Plate Helm",
+     "out": [
+      12612,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12359,
+       30
+      ],
+      [
+       12360,
+       2
+      ],
+      [
+       6037,
+       2
+      ],
+      [
+       12364,
+       1
+      ]
+     ]
+    },
+    "16729": {
+     "name": "Lionheart Helm",
+     "out": [
+      12640,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12359,
+       80
+      ],
+      [
+       12360,
+       12
+      ],
+      [
+       8146,
+       40
+      ],
+      [
+       12361,
+       10
+      ],
+      [
+       12800,
+       4
+      ]
+     ]
+    },
+    "16730": {
+     "name": "Imperial Plate Leggings",
+     "out": [
+      12429,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12359,
+       44
+      ],
+      [
+       7910,
+       2
+      ]
+     ]
+    },
+    "16731": {
+     "name": "Runic Breastplate",
+     "out": [
+      12613,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12359,
+       40
+      ],
+      [
+       12360,
+       2
+      ],
+      [
+       7910,
+       1
+      ]
+     ]
+    },
+    "16732": {
+     "name": "Runic Plate Leggings",
+     "out": [
+      12614,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12359,
+       40
+      ],
+      [
+       12360,
+       2
+      ],
+      [
+       7910,
+       1
+      ]
+     ]
+    },
+    "16741": {
+     "name": "Stronghold Gauntlets",
+     "out": [
+      12639,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12360,
+       15
+      ],
+      [
+       12655,
+       20
+      ],
+      [
+       7076,
+       10
+      ],
+      [
+       12361,
+       4
+      ],
+      [
+       12799,
+       4
+      ]
+     ]
+    },
+    "16742": {
+     "name": "Enchanted Thorium Helm",
+     "out": [
+      12620,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12360,
+       6
+      ],
+      [
+       12655,
+       16
+      ],
+      [
+       7076,
+       6
+      ],
+      [
+       12799,
+       2
+      ],
+      [
+       12800,
+       1
+      ]
+     ]
+    },
+    "16744": {
+     "name": "Enchanted Thorium Leggings",
+     "out": [
+      12619,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12360,
+       10
+      ],
+      [
+       12655,
+       20
+      ],
+      [
+       7080,
+       6
+      ],
+      [
+       12361,
+       2
+      ],
+      [
+       12364,
+       1
+      ]
+     ]
+    },
+    "16745": {
+     "name": "Enchanted Thorium Breastplate",
+     "out": [
+      12618,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12360,
+       8
+      ],
+      [
+       12655,
+       24
+      ],
+      [
+       7076,
+       4
+      ],
+      [
+       7080,
+       4
+      ],
+      [
+       12364,
+       2
+      ],
+      [
+       12800,
+       2
+      ]
+     ]
+    },
+    "16960": {
+     "name": "Thorium Greatsword",
+     "out": [
+      12764,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12359,
+       16
+      ],
+      [
+       12644,
+       2
+      ],
+      [
+       8170,
+       4
+      ]
+     ]
+    },
+    "16965": {
+     "name": "Bleakwood Hew",
+     "out": [
+      12769,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12359,
+       30
+      ],
+      [
+       12803,
+       6
+      ],
+      [
+       8153,
+       6
+      ],
+      [
+       12799,
+       6
+      ],
+      [
+       12644,
+       2
+      ],
+      [
+       8170,
+       8
+      ]
+     ]
+    },
+    "16967": {
+     "name": "Inlaid Thorium Hammer",
+     "out": [
+      12772,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12359,
+       30
+      ],
+      [
+       3577,
+       4
+      ],
+      [
+       6037,
+       2
+      ],
+      [
+       12361,
+       2
+      ],
+      [
+       8170,
+       4
+      ]
+     ]
+    },
+    "16969": {
+     "name": "Ornate Thorium Handaxe",
+     "out": [
+      12773,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12359,
+       20
+      ],
+      [
+       12799,
+       2
+      ],
+      [
+       12644,
+       2
+      ],
+      [
+       8170,
+       4
+      ]
+     ]
+    },
+    "16970": {
+     "name": "Dawn's Edge",
+     "out": [
+      12774,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12359,
+       30
+      ],
+      [
+       12655,
+       4
+      ],
+      [
+       7910,
+       4
+      ],
+      [
+       12361,
+       4
+      ],
+      [
+       12644,
+       2
+      ],
+      [
+       8170,
+       4
+      ]
+     ]
+    },
+    "16971": {
+     "name": "Huge Thorium Battleaxe",
+     "out": [
+      12775,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12359,
+       40
+      ],
+      [
+       12644,
+       6
+      ],
+      [
+       8170,
+       6
+      ]
+     ]
+    },
+    "16973": {
+     "name": "Enchanted Battlehammer",
+     "out": [
+      12776,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12359,
+       20
+      ],
+      [
+       12655,
+       6
+      ],
+      [
+       12364,
+       2
+      ],
+      [
+       12804,
+       4
+      ],
+      [
+       8170,
+       4
+      ]
+     ]
+    },
+    "16978": {
+     "name": "Blazing Rapier",
+     "out": [
+      12777,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12655,
+       10
+      ],
+      [
+       7078,
+       4
+      ],
+      [
+       7077,
+       4
+      ],
+      [
+       12800,
+       2
+      ],
+      [
+       12644,
+       2
+      ]
+     ]
+    },
+    "16980": {
+     "name": "Rune Edge",
+     "out": [
+      12779,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12359,
+       30
+      ],
+      [
+       12799,
+       2
+      ],
+      [
+       12644,
+       2
+      ],
+      [
+       8170,
+       4
+      ]
+     ]
+    },
+    "16983": {
+     "name": "Serenity",
+     "out": [
+      12781,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12655,
+       6
+      ],
+      [
+       12360,
+       2
+      ],
+      [
+       12804,
+       4
+      ],
+      [
+       12799,
+       2
+      ],
+      [
+       12361,
+       2
+      ],
+      [
+       12364,
+       1
+      ]
+     ]
+    },
+    "16984": {
+     "name": "Volcanic Hammer",
+     "out": [
+      12792,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12359,
+       30
+      ],
+      [
+       7077,
+       4
+      ],
+      [
+       7910,
+       4
+      ],
+      [
+       8170,
+       4
+      ]
+     ]
+    },
+    "16985": {
+     "name": "Corruption",
+     "out": [
+      12782,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12359,
+       40
+      ],
+      [
+       12360,
+       2
+      ],
+      [
+       12662,
+       16
+      ],
+      [
+       12808,
+       8
+      ],
+      [
+       12361,
+       2
+      ],
+      [
+       12644,
+       2
+      ],
+      [
+       8170,
+       4
+      ]
+     ]
+    },
+    "16986": {
+     "name": "Blood Talon",
+     "out": [
+      12795,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12655,
+       10
+      ],
+      [
+       12360,
+       10
+      ],
+      [
+       12662,
+       8
+      ],
+      [
+       7910,
+       10
+      ],
+      [
+       12644,
+       2
+      ]
+     ]
+    },
+    "16987": {
+     "name": "Darkspear",
+     "out": [
+      12802,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12655,
+       20
+      ],
+      [
+       12804,
+       20
+      ],
+      [
+       12364,
+       2
+      ],
+      [
+       12800,
+       2
+      ],
+      [
+       12644,
+       2
+      ]
+     ]
+    },
+    "16988": {
+     "name": "Hammer of the Titans",
+     "out": [
+      12796,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12359,
+       50
+      ],
+      [
+       12360,
+       15
+      ],
+      [
+       12809,
+       4
+      ],
+      [
+       12810,
+       6
+      ],
+      [
+       7076,
+       10
+      ]
+     ]
+    },
+    "16990": {
+     "name": "Arcanite Champion",
+     "out": [
+      12790,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12360,
+       15
+      ],
+      [
+       12800,
+       8
+      ],
+      [
+       12811,
+       1
+      ],
+      [
+       12799,
+       4
+      ],
+      [
+       12810,
+       8
+      ],
+      [
+       12644,
+       2
+      ]
+     ]
+    },
+    "16991": {
+     "name": "Annihilator",
+     "out": [
+      12798,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12359,
+       40
+      ],
+      [
+       12360,
+       12
+      ],
+      [
+       12808,
+       10
+      ],
+      [
+       12364,
+       8
+      ],
+      [
+       12644,
+       2
+      ],
+      [
+       12810,
+       4
+      ]
+     ]
+    },
+    "16992": {
+     "name": "Frostguard",
+     "out": [
+      12797,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12360,
+       18
+      ],
+      [
+       12361,
+       8
+      ],
+      [
+       12800,
+       8
+      ],
+      [
+       7080,
+       4
+      ],
+      [
+       12644,
+       2
+      ],
+      [
+       12810,
+       4
+      ]
+     ]
+    },
+    "16993": {
+     "name": "Masterwork Stormhammer",
+     "out": [
+      12794,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12655,
+       20
+      ],
+      [
+       12364,
+       8
+      ],
+      [
+       12799,
+       8
+      ],
+      [
+       7076,
+       6
+      ],
+      [
+       12810,
+       4
+      ]
+     ]
+    },
+    "16994": {
+     "name": "Arcanite Reaper",
+     "out": [
+      12784,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12360,
+       20
+      ],
+      [
+       12810,
+       6
+      ],
+      [
+       12644,
+       2
+      ]
+     ]
+    },
+    "16995": {
+     "name": "Heartseeker",
+     "out": [
+      12783,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12360,
+       10
+      ],
+      [
+       12655,
+       10
+      ],
+      [
+       12810,
+       2
+      ],
+      [
+       7910,
+       6
+      ],
+      [
+       12800,
+       6
+      ],
+      [
+       12799,
+       6
+      ],
+      [
+       12644,
+       4
+      ]
+     ]
+    },
+    "19666": {
+     "name": "Silver Skeleton Key",
+     "out": [
+      15869,
+      2,
+      2
+     ],
+     "reagents": [
+      [
+       2842,
+       1
+      ],
+      [
+       3470,
+       1
+      ]
+     ]
+    },
+    "19667": {
+     "name": "Golden Skeleton Key",
+     "out": [
+      15870,
+      2,
+      2
+     ],
+     "reagents": [
+      [
+       3577,
+       1
+      ],
+      [
+       3486,
+       1
+      ]
+     ]
+    },
+    "19668": {
+     "name": "Truesilver Skeleton Key",
+     "out": [
+      15871,
+      2,
+      2
+     ],
+     "reagents": [
+      [
+       6037,
+       1
+      ],
+      [
+       7966,
+       1
+      ]
+     ]
+    },
+    "19669": {
+     "name": "Arcanite Skeleton Key",
+     "out": [
+      15872,
+      2,
+      2
+     ],
+     "reagents": [
+      [
+       12360,
+       1
+      ],
+      [
+       12644,
+       1
+      ]
+     ]
+    },
+    "20201": {
+     "name": "Arcanite Rod",
+     "out": [
+      16206,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12360,
+       3
+      ],
+      [
+       12644,
+       1
+      ]
+     ]
+    },
+    "20872": {
+     "name": "Fiery Chain Girdle",
+     "out": [
+      16989,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       11371,
+       6
+      ],
+      [
+       17010,
+       3
+      ],
+      [
+       17011,
+       3
+      ]
+     ]
+    },
+    "20873": {
+     "name": "Fiery Chain Shoulders",
+     "out": [
+      16988,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       11371,
+       16
+      ],
+      [
+       17010,
+       4
+      ],
+      [
+       17011,
+       5
+      ]
+     ]
+    },
+    "20874": {
+     "name": "Dark Iron Bracers",
+     "out": [
+      17014,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       11371,
+       4
+      ],
+      [
+       17010,
+       2
+      ],
+      [
+       17011,
+       2
+      ]
+     ]
+    },
+    "20876": {
+     "name": "Dark Iron Leggings",
+     "out": [
+      17013,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       11371,
+       16
+      ],
+      [
+       17010,
+       4
+      ],
+      [
+       17011,
+       6
+      ]
+     ]
+    },
+    "20890": {
+     "name": "Dark Iron Reaver",
+     "out": [
+      17015,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       11371,
+       16
+      ],
+      [
+       17010,
+       12
+      ],
+      [
+       11382,
+       2
+      ],
+      [
+       12810,
+       2
+      ]
+     ]
+    },
+    "20897": {
+     "name": "Dark Iron Destroyer",
+     "out": [
+      17016,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       11371,
+       18
+      ],
+      [
+       17011,
+       12
+      ],
+      [
+       11382,
+       2
+      ],
+      [
+       12810,
+       2
+      ]
+     ]
+    },
+    "21161": {
+     "name": "Sulfuron Hammer",
+     "out": [
+      17193,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       17203,
+       8
+      ],
+      [
+       11371,
+       20
+      ],
+      [
+       12360,
+       50
+      ],
+      [
+       7078,
+       25
+      ],
+      [
+       11382,
+       10
+      ],
+      [
+       17011,
+       10
+      ],
+      [
+       17010,
+       10
+      ]
+     ]
+    },
+    "21913": {
+     "name": "Edge of Winter",
+     "out": [
+      17704,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3859,
+       10
+      ],
+      [
+       3829,
+       1
+      ],
+      [
+       7070,
+       2
+      ],
+      [
+       7069,
+       2
+      ],
+      [
+       4234,
+       2
+      ]
+     ]
+    },
+    "22757": {
+     "name": "Elemental Sharpening Stone",
+     "out": [
+      18262,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       7067,
+       2
+      ],
+      [
+       12365,
+       3
+      ]
+     ]
+    },
+    "23632": {
+     "name": "Girdle of the Dawn",
+     "out": [
+      19051,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12359,
+       8
+      ],
+      [
+       6037,
+       6
+      ],
+      [
+       12811,
+       1
+      ]
+     ]
+    },
+    "23633": {
+     "name": "Gloves of the Dawn",
+     "out": [
+      19057,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12360,
+       2
+      ],
+      [
+       6037,
+       10
+      ],
+      [
+       12811,
+       1
+      ]
+     ]
+    },
+    "23636": {
+     "name": "Dark Iron Helm",
+     "out": [
+      19148,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       17011,
+       4
+      ],
+      [
+       17010,
+       2
+      ],
+      [
+       11371,
+       4
+      ]
+     ]
+    },
+    "23637": {
+     "name": "Dark Iron Gauntlets",
+     "out": [
+      19164,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       17011,
+       3
+      ],
+      [
+       17010,
+       5
+      ],
+      [
+       17012,
+       4
+      ],
+      [
+       11371,
+       4
+      ],
+      [
+       11382,
+       2
+      ]
+     ]
+    },
+    "23638": {
+     "name": "Black Amnesty",
+     "out": [
+      19166,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       17011,
+       3
+      ],
+      [
+       17010,
+       6
+      ],
+      [
+       12360,
+       12
+      ],
+      [
+       11382,
+       1
+      ],
+      [
+       11371,
+       4
+      ]
+     ]
+    },
+    "23639": {
+     "name": "Blackfury",
+     "out": [
+      19167,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       17011,
+       5
+      ],
+      [
+       17010,
+       2
+      ],
+      [
+       12360,
+       16
+      ],
+      [
+       11371,
+       6
+      ]
+     ]
+    },
+    "23650": {
+     "name": "Ebon Hand",
+     "out": [
+      19170,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       17011,
+       4
+      ],
+      [
+       17010,
+       7
+      ],
+      [
+       12360,
+       12
+      ],
+      [
+       11371,
+       8
+      ],
+      [
+       12800,
+       4
+      ]
+     ]
+    },
+    "23652": {
+     "name": "Blackguard",
+     "out": [
+      19168,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       17011,
+       6
+      ],
+      [
+       17010,
+       6
+      ],
+      [
+       12360,
+       10
+      ],
+      [
+       11371,
+       6
+      ],
+      [
+       12809,
+       12
+      ]
+     ]
+    },
+    "23653": {
+     "name": "Nightfall",
+     "out": [
+      19169,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       17011,
+       8
+      ],
+      [
+       17010,
+       5
+      ],
+      [
+       12360,
+       10
+      ],
+      [
+       11371,
+       12
+      ],
+      [
+       12364,
+       4
+      ]
+     ]
+    },
+    "24136": {
+     "name": "Bloodsoul Breastplate",
+     "out": [
+      19690,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12359,
+       20
+      ],
+      [
+       19774,
+       10
+      ],
+      [
+       19726,
+       2
+      ],
+      [
+       7910,
+       2
+      ]
+     ]
+    },
+    "24137": {
+     "name": "Bloodsoul Shoulders",
+     "out": [
+      19691,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12359,
+       16
+      ],
+      [
+       19774,
+       8
+      ],
+      [
+       19726,
+       2
+      ],
+      [
+       7910,
+       1
+      ]
+     ]
+    },
+    "24138": {
+     "name": "Bloodsoul Gauntlets",
+     "out": [
+      19692,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12359,
+       12
+      ],
+      [
+       19774,
+       6
+      ],
+      [
+       19726,
+       2
+      ],
+      [
+       12810,
+       4
+      ]
+     ]
+    },
+    "24139": {
+     "name": "Darksoul Breastplate",
+     "out": [
+      19693,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12359,
+       20
+      ],
+      [
+       19774,
+       14
+      ],
+      [
+       12799,
+       2
+      ]
+     ]
+    },
+    "24140": {
+     "name": "Darksoul Leggings",
+     "out": [
+      19694,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12359,
+       18
+      ],
+      [
+       19774,
+       12
+      ],
+      [
+       12799,
+       2
+      ]
+     ]
+    },
+    "24141": {
+     "name": "Darksoul Shoulders",
+     "out": [
+      19695,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12359,
+       16
+      ],
+      [
+       19774,
+       10
+      ],
+      [
+       12799,
+       1
+      ]
+     ]
+    },
+    "24399": {
+     "name": "Dark Iron Boots",
+     "out": [
+      20039,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       17011,
+       3
+      ],
+      [
+       17010,
+       3
+      ],
+      [
+       17012,
+       4
+      ],
+      [
+       11371,
+       6
+      ]
+     ]
+    },
+    "24912": {
+     "name": "Darkrune Gauntlets",
+     "out": [
+      20549,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12359,
+       12
+      ],
+      [
+       20520,
+       6
+      ],
+      [
+       6037,
+       6
+      ],
+      [
+       12810,
+       2
+      ]
+     ]
+    },
+    "24913": {
+     "name": "Darkrune Helm",
+     "out": [
+      20551,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12359,
+       16
+      ],
+      [
+       20520,
+       8
+      ],
+      [
+       6037,
+       8
+      ],
+      [
+       11754,
+       1
+      ]
+     ]
+    },
+    "24914": {
+     "name": "Darkrune Breastplate",
+     "out": [
+      20550,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12359,
+       20
+      ],
+      [
+       20520,
+       10
+      ],
+      [
+       6037,
+       10
+      ]
+     ]
+    },
+    "2660": {
+     "name": "Rough Sharpening Stone",
+     "out": [
+      2862,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2835,
+       1
+      ]
+     ]
+    },
+    "2661": {
+     "name": "Copper Chain Belt",
+     "out": [
+      2851,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2840,
+       6
+      ]
+     ]
+    },
+    "2662": {
+     "name": "Copper Chain Pants",
+     "out": [
+      2852,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2840,
+       4
+      ]
+     ]
+    },
+    "2663": {
+     "name": "Copper Bracers",
+     "out": [
+      2853,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2840,
+       2
+      ]
+     ]
+    },
+    "2664": {
+     "name": "Runed Copper Bracers",
+     "out": [
+      2854,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2840,
+       10
+      ],
+      [
+       3470,
+       3
+      ]
+     ]
+    },
+    "2665": {
+     "name": "Coarse Sharpening Stone",
+     "out": [
+      2863,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2836,
+       1
+      ]
+     ]
+    },
+    "2666": {
+     "name": "Runed Copper Belt",
+     "out": [
+      2857,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2840,
+       10
+      ]
+     ]
+    },
+    "2667": {
+     "name": "Runed Copper Breastplate",
+     "out": [
+      2864,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2840,
+       12
+      ],
+      [
+       1210,
+       1
+      ],
+      [
+       3470,
+       2
+      ]
+     ]
+    },
+    "2668": {
+     "name": "Rough Bronze Leggings",
+     "out": [
+      2865,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2841,
+       6
+      ]
+     ]
+    },
+    "2670": {
+     "name": "Rough Bronze Cuirass",
+     "out": [
+      2866,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2841,
+       7
+      ]
+     ]
+    },
+    "2671": {
+     "name": "Rough Bronze Bracers",
+     "out": [
+      2867,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2841,
+       4
+      ]
+     ]
+    },
+    "2672": {
+     "name": "Patterned Bronze Bracers",
+     "out": [
+      2868,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2841,
+       5
+      ],
+      [
+       3478,
+       2
+      ]
+     ]
+    },
+    "2673": {
+     "name": "Silvered Bronze Breastplate",
+     "out": [
+      2869,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2841,
+       10
+      ],
+      [
+       2842,
+       2
+      ],
+      [
+       3478,
+       2
+      ],
+      [
+       1705,
+       1
+      ]
+     ]
+    },
+    "2674": {
+     "name": "Heavy Sharpening Stone",
+     "out": [
+      2871,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2838,
+       1
+      ]
+     ]
+    },
+    "2675": {
+     "name": "Shining Silver Breastplate",
+     "out": [
+      2870,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2841,
+       20
+      ],
+      [
+       1206,
+       2
+      ],
+      [
+       1705,
+       2
+      ],
+      [
+       5500,
+       2
+      ],
+      [
+       2842,
+       4
+      ]
+     ]
+    },
+    "2737": {
+     "name": "Copper Mace",
+     "out": [
+      2844,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2840,
+       6
+      ],
+      [
+       2880,
+       1
+      ],
+      [
+       2589,
+       2
+      ]
+     ]
+    },
+    "2738": {
+     "name": "Copper Axe",
+     "out": [
+      2845,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2840,
+       6
+      ],
+      [
+       2880,
+       1
+      ],
+      [
+       2589,
+       2
+      ]
+     ]
+    },
+    "2739": {
+     "name": "Copper Shortsword",
+     "out": [
+      2847,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2840,
+       6
+      ],
+      [
+       2880,
+       1
+      ],
+      [
+       2589,
+       2
+      ]
+     ]
+    },
+    "2740": {
+     "name": "Bronze Mace",
+     "out": [
+      2848,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2841,
+       6
+      ],
+      [
+       2880,
+       4
+      ],
+      [
+       2319,
+       1
+      ]
+     ]
+    },
+    "2741": {
+     "name": "Bronze Axe",
+     "out": [
+      2849,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2841,
+       7
+      ],
+      [
+       2880,
+       4
+      ],
+      [
+       2319,
+       1
+      ]
+     ]
+    },
+    "2742": {
+     "name": "Bronze Shortsword",
+     "out": [
+      2850,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2841,
+       5
+      ],
+      [
+       2880,
+       4
+      ],
+      [
+       2319,
+       2
+      ]
+     ]
+    },
+    "27585": {
+     "name": "Heavy Obsidian Belt",
+     "out": [
+      22197,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       22202,
+       14
+      ],
+      [
+       12655,
+       4
+      ],
+      [
+       7076,
+       2
+      ]
+     ]
+    },
+    "27586": {
+     "name": "Jagged Obsidian Shield",
+     "out": [
+      22198,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       22203,
+       8
+      ],
+      [
+       22202,
+       24
+      ],
+      [
+       12655,
+       8
+      ],
+      [
+       7076,
+       4
+      ]
+     ]
+    },
+    "27587": {
+     "name": "Thick Obsidian Breastplate",
+     "out": [
+      22196,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       22203,
+       18
+      ],
+      [
+       22202,
+       40
+      ],
+      [
+       12655,
+       12
+      ],
+      [
+       7076,
+       10
+      ],
+      [
+       12364,
+       4
+      ]
+     ]
+    },
+    "27588": {
+     "name": "Light Obsidian Belt",
+     "out": [
+      22195,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       22202,
+       14
+      ],
+      [
+       12810,
+       4
+      ]
+     ]
+    },
+    "27589": {
+     "name": "Black Grasp of the Destroyer",
+     "out": [
+      22194,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       22203,
+       8
+      ],
+      [
+       22202,
+       24
+      ],
+      [
+       12810,
+       8
+      ],
+      [
+       13512,
+       1
+      ]
+     ]
+    },
+    "27590": {
+     "name": "Obsidian Mail Tunic",
+     "out": [
+      22191,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       22203,
+       15
+      ],
+      [
+       22202,
+       36
+      ],
+      [
+       12810,
+       12
+      ],
+      [
+       12809,
+       10
+      ],
+      [
+       12800,
+       4
+      ]
+     ]
+    },
+    "27829": {
+     "name": "Titanic Leggings",
+     "out": [
+      22385,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12360,
+       12
+      ],
+      [
+       12655,
+       20
+      ],
+      [
+       7076,
+       10
+      ],
+      [
+       13510,
+       2
+      ]
+     ]
+    },
+    "27830": {
+     "name": "Persuader",
+     "out": [
+      22384,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12360,
+       15
+      ],
+      [
+       11371,
+       10
+      ],
+      [
+       12808,
+       20
+      ],
+      [
+       20520,
+       20
+      ],
+      [
+       15417,
+       10
+      ],
+      [
+       12753,
+       2
+      ]
+     ]
+    },
+    "27832": {
+     "name": "Sageblade",
+     "out": [
+      22383,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12360,
+       12
+      ],
+      [
+       20725,
+       2
+      ],
+      [
+       13512,
+       2
+      ],
+      [
+       12810,
+       4
+      ]
+     ]
+    },
+    "28242": {
+     "name": "Icebane Breastplate",
+     "out": [
+      22669,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       22682,
+       7
+      ],
+      [
+       12359,
+       16
+      ],
+      [
+       12360,
+       2
+      ],
+      [
+       7080,
+       4
+      ]
+     ]
+    },
+    "28243": {
+     "name": "Icebane Gauntlets",
+     "out": [
+      22670,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       22682,
+       5
+      ],
+      [
+       12359,
+       12
+      ],
+      [
+       12360,
+       2
+      ],
+      [
+       7080,
+       2
+      ]
+     ]
+    },
+    "28244": {
+     "name": "Icebane Bracers",
+     "out": [
+      22671,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       22682,
+       4
+      ],
+      [
+       12359,
+       12
+      ],
+      [
+       12360,
+       2
+      ],
+      [
+       7080,
+       2
+      ]
+     ]
+    },
+    "28461": {
+     "name": "Ironvine Breastplate",
+     "out": [
+      22762,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12655,
+       12
+      ],
+      [
+       19726,
+       2
+      ],
+      [
+       12360,
+       2
+      ],
+      [
+       12803,
+       2
+      ]
+     ]
+    },
+    "28462": {
+     "name": "Ironvine Gloves",
+     "out": [
+      22763,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12655,
+       8
+      ],
+      [
+       19726,
+       1
+      ],
+      [
+       12803,
+       2
+      ]
+     ]
+    },
+    "28463": {
+     "name": "Ironvine Belt",
+     "out": [
+      22764,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12655,
+       6
+      ],
+      [
+       12803,
+       2
+      ]
+     ]
+    },
+    "3115": {
+     "name": "Rough Weightstone",
+     "out": [
+      3239,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2835,
+       1
+      ]
+     ]
+    },
+    "3116": {
+     "name": "Coarse Weightstone",
+     "out": [
+      3240,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2836,
+       1
+      ]
+     ]
+    },
+    "3117": {
+     "name": "Heavy Weightstone",
+     "out": [
+      3241,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2838,
+       1
+      ]
+     ]
+    },
+    "3292": {
+     "name": "Heavy Copper Broadsword",
+     "out": [
+      3487,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2840,
+       14
+      ],
+      [
+       2880,
+       2
+      ],
+      [
+       818,
+       2
+      ],
+      [
+       2319,
+       2
+      ]
+     ]
+    },
+    "3293": {
+     "name": "Copper Battle Axe",
+     "out": [
+      3488,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2840,
+       12
+      ],
+      [
+       2880,
+       2
+      ],
+      [
+       774,
+       2
+      ],
+      [
+       3470,
+       2
+      ],
+      [
+       2318,
+       2
+      ]
+     ]
+    },
+    "3294": {
+     "name": "Thick War Axe",
+     "out": [
+      3489,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2840,
+       10
+      ],
+      [
+       2880,
+       2
+      ],
+      [
+       2842,
+       2
+      ],
+      [
+       3470,
+       2
+      ],
+      [
+       2318,
+       2
+      ]
+     ]
+    },
+    "3295": {
+     "name": "Deadly Bronze Poniard",
+     "out": [
+      3490,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2841,
+       4
+      ],
+      [
+       3466,
+       1
+      ],
+      [
+       2459,
+       1
+      ],
+      [
+       1210,
+       2
+      ],
+      [
+       3478,
+       2
+      ],
+      [
+       2319,
+       2
+      ]
+     ]
+    },
+    "3296": {
+     "name": "Heavy Bronze Mace",
+     "out": [
+      3491,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2841,
+       8
+      ],
+      [
+       3466,
+       1
+      ],
+      [
+       1206,
+       1
+      ],
+      [
+       1210,
+       1
+      ],
+      [
+       3478,
+       2
+      ],
+      [
+       2319,
+       2
+      ]
+     ]
+    },
+    "3297": {
+     "name": "Mighty Iron Hammer",
+     "out": [
+      3492,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3575,
+       6
+      ],
+      [
+       3466,
+       2
+      ],
+      [
+       3391,
+       1
+      ],
+      [
+       1705,
+       2
+      ],
+      [
+       3478,
+       2
+      ],
+      [
+       2319,
+       2
+      ]
+     ]
+    },
+    "3319": {
+     "name": "Copper Chain Boots",
+     "out": [
+      3469,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2840,
+       8
+      ]
+     ]
+    },
+    "3320": {
+     "name": "Rough Grinding Stone",
+     "out": [
+      3470,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2835,
+       2
+      ]
+     ]
+    },
+    "3321": {
+     "name": "Copper Chain Vest",
+     "out": [
+      3471,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2840,
+       8
+      ],
+      [
+       774,
+       1
+      ],
+      [
+       3470,
+       2
+      ]
+     ]
+    },
+    "3323": {
+     "name": "Runed Copper Gauntlets",
+     "out": [
+      3472,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2840,
+       8
+      ],
+      [
+       3470,
+       2
+      ]
+     ]
+    },
+    "3324": {
+     "name": "Runed Copper Pants",
+     "out": [
+      3473,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2840,
+       8
+      ],
+      [
+       2320,
+       3
+      ],
+      [
+       3470,
+       3
+      ]
+     ]
+    },
+    "3325": {
+     "name": "Gemmed Copper Gauntlets",
+     "out": [
+      3474,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2840,
+       8
+      ],
+      [
+       818,
+       1
+      ],
+      [
+       774,
+       1
+      ]
+     ]
+    },
+    "3326": {
+     "name": "Coarse Grinding Stone",
+     "out": [
+      3478,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2836,
+       2
+      ]
+     ]
+    },
+    "3328": {
+     "name": "Rough Bronze Shoulders",
+     "out": [
+      3480,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2841,
+       5
+      ],
+      [
+       1210,
+       1
+      ],
+      [
+       3478,
+       1
+      ]
+     ]
+    },
+    "3330": {
+     "name": "Silvered Bronze Shoulders",
+     "out": [
+      3481,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2841,
+       8
+      ],
+      [
+       2842,
+       2
+      ],
+      [
+       3478,
+       2
+      ]
+     ]
+    },
+    "3331": {
+     "name": "Silvered Bronze Boots",
+     "out": [
+      3482,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2841,
+       6
+      ],
+      [
+       2842,
+       1
+      ],
+      [
+       3478,
+       2
+      ]
+     ]
+    },
+    "3333": {
+     "name": "Silvered Bronze Gauntlets",
+     "out": [
+      3483,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2841,
+       8
+      ],
+      [
+       2842,
+       1
+      ],
+      [
+       3478,
+       2
+      ]
+     ]
+    },
+    "3334": {
+     "name": "Green Iron Boots",
+     "out": [
+      3484,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3575,
+       4
+      ],
+      [
+       1705,
+       2
+      ],
+      [
+       3478,
+       2
+      ],
+      [
+       2605,
+       1
+      ]
+     ]
+    },
+    "3336": {
+     "name": "Green Iron Gauntlets",
+     "out": [
+      3485,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3575,
+       4
+      ],
+      [
+       5498,
+       2
+      ],
+      [
+       3478,
+       2
+      ],
+      [
+       2605,
+       1
+      ]
+     ]
+    },
+    "3337": {
+     "name": "Heavy Grinding Stone",
+     "out": [
+      3486,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2838,
+       3
+      ]
+     ]
+    },
+    "3491": {
+     "name": "Big Bronze Knife",
+     "out": [
+      3848,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2841,
+       6
+      ],
+      [
+       2880,
+       4
+      ],
+      [
+       3470,
+       2
+      ],
+      [
+       818,
+       1
+      ],
+      [
+       2319,
+       1
+      ]
+     ]
+    },
+    "3492": {
+     "name": "Hardened Iron Shortsword",
+     "out": [
+      3849,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3575,
+       6
+      ],
+      [
+       3466,
+       2
+      ],
+      [
+       3486,
+       1
+      ],
+      [
+       1705,
+       2
+      ],
+      [
+       4234,
+       3
+      ]
+     ]
+    },
+    "3493": {
+     "name": "Jade Serpentblade",
+     "out": [
+      3850,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3575,
+       8
+      ],
+      [
+       3466,
+       2
+      ],
+      [
+       3486,
+       2
+      ],
+      [
+       1529,
+       2
+      ],
+      [
+       4234,
+       3
+      ]
+     ]
+    },
+    "3494": {
+     "name": "Solid Iron Maul",
+     "out": [
+      3851,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3575,
+       8
+      ],
+      [
+       3466,
+       2
+      ],
+      [
+       3486,
+       1
+      ],
+      [
+       2842,
+       4
+      ],
+      [
+       4234,
+       2
+      ]
+     ]
+    },
+    "3495": {
+     "name": "Golden Iron Destroyer",
+     "out": [
+      3852,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3575,
+       10
+      ],
+      [
+       3577,
+       4
+      ],
+      [
+       1705,
+       2
+      ],
+      [
+       3466,
+       2
+      ],
+      [
+       4234,
+       2
+      ],
+      [
+       3486,
+       2
+      ]
+     ]
+    },
+    "3496": {
+     "name": "Moonsteel Broadsword",
+     "out": [
+      3853,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3859,
+       8
+      ],
+      [
+       3466,
+       2
+      ],
+      [
+       3486,
+       2
+      ],
+      [
+       1705,
+       3
+      ],
+      [
+       4234,
+       3
+      ]
+     ]
+    },
+    "3497": {
+     "name": "Frost Tiger Blade",
+     "out": [
+      3854,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3859,
+       8
+      ],
+      [
+       3466,
+       2
+      ],
+      [
+       3486,
+       2
+      ],
+      [
+       1529,
+       2
+      ],
+      [
+       3829,
+       1
+      ],
+      [
+       4234,
+       4
+      ]
+     ]
+    },
+    "3498": {
+     "name": "Massive Iron Axe",
+     "out": [
+      3855,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3575,
+       14
+      ],
+      [
+       3466,
+       2
+      ],
+      [
+       3486,
+       2
+      ],
+      [
+       3577,
+       4
+      ],
+      [
+       4234,
+       2
+      ]
+     ]
+    },
+    "3500": {
+     "name": "Shadow Crescent Axe",
+     "out": [
+      3856,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3859,
+       10
+      ],
+      [
+       3466,
+       2
+      ],
+      [
+       3486,
+       3
+      ],
+      [
+       3864,
+       2
+      ],
+      [
+       3824,
+       1
+      ],
+      [
+       4234,
+       3
+      ]
+     ]
+    },
+    "3501": {
+     "name": "Green Iron Bracers",
+     "out": [
+      3835,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3575,
+       6
+      ],
+      [
+       2605,
+       1
+      ]
+     ]
+    },
+    "3502": {
+     "name": "Green Iron Helm",
+     "out": [
+      3836,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3575,
+       12
+      ],
+      [
+       3864,
+       1
+      ],
+      [
+       2605,
+       1
+      ]
+     ]
+    },
+    "3503": {
+     "name": "Golden Scale Coif",
+     "out": [
+      3837,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3859,
+       8
+      ],
+      [
+       3577,
+       2
+      ],
+      [
+       3486,
+       2
+      ]
+     ]
+    },
+    "3504": {
+     "name": "Green Iron Shoulders",
+     "out": [
+      3840,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3575,
+       7
+      ],
+      [
+       3486,
+       1
+      ],
+      [
+       2605,
+       1
+      ]
+     ]
+    },
+    "3505": {
+     "name": "Golden Scale Shoulders",
+     "out": [
+      3841,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3859,
+       6
+      ],
+      [
+       3577,
+       2
+      ],
+      [
+       3486,
+       1
+      ]
+     ]
+    },
+    "3506": {
+     "name": "Green Iron Leggings",
+     "out": [
+      3842,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3575,
+       8
+      ],
+      [
+       3486,
+       1
+      ],
+      [
+       2605,
+       1
+      ]
+     ]
+    },
+    "3507": {
+     "name": "Golden Scale Leggings",
+     "out": [
+      3843,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3575,
+       10
+      ],
+      [
+       3577,
+       2
+      ],
+      [
+       3486,
+       1
+      ]
+     ]
+    },
+    "3508": {
+     "name": "Green Iron Hauberk",
+     "out": [
+      3844,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3575,
+       20
+      ],
+      [
+       3486,
+       4
+      ],
+      [
+       1529,
+       2
+      ],
+      [
+       1206,
+       2
+      ],
+      [
+       4255,
+       1
+      ]
+     ]
+    },
+    "3511": {
+     "name": "Golden Scale Cuirass",
+     "out": [
+      3845,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3859,
+       12
+      ],
+      [
+       3577,
+       2
+      ],
+      [
+       3486,
+       4
+      ],
+      [
+       1529,
+       2
+      ]
+     ]
+    },
+    "3513": {
+     "name": "Polished Steel Boots",
+     "out": [
+      3846,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3859,
+       8
+      ],
+      [
+       3864,
+       1
+      ],
+      [
+       1705,
+       1
+      ],
+      [
+       3486,
+       2
+      ]
+     ]
+    },
+    "3515": {
+     "name": "Golden Scale Boots",
+     "out": [
+      3847,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3859,
+       10
+      ],
+      [
+       3577,
+       4
+      ],
+      [
+       3486,
+       4
+      ],
+      [
+       3864,
+       1
+      ]
+     ]
+    },
+    "427061": {
+     "name": "Mantle of the Second War",
+     "out": [
+      210773,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2841,
+       20
+      ],
+      [
+       1206,
+       2
+      ],
+      [
+       1705,
+       2
+      ],
+      [
+       5500,
+       2
+      ],
+      [
+       2842,
+       4
+      ]
+     ]
+    },
+    "429348": {
+     "name": "Shifting Silver Breastplate",
+     "out": [
+      210794,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2870,
+       1
+      ],
+      [
+       211422,
+       1
+      ]
+     ]
+    },
+    "430397": {
+     "name": "Blackfathom Sharpening Stone",
+     "out": [
+      211845,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2863,
+       1
+      ],
+      [
+       10938,
+       1
+      ]
+     ]
+    },
+    "435906": {
+     "name": "Reflective Truesilver Braincage",
+     "out": [
+      215167,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3860,
+       25
+      ],
+      [
+       213376,
+       4
+      ],
+      [
+       213379,
+       2
+      ],
+      [
+       213383,
+       1
+      ]
+     ]
+    },
+    "435908": {
+     "name": "Tempered Interference-Negating Helmet",
+     "out": [
+      215161,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3860,
+       25
+      ],
+      [
+       213376,
+       4
+      ],
+      [
+       213379,
+       1
+      ],
+      [
+       213369,
+       2
+      ]
+     ]
+    },
+    "435910": {
+     "name": "Low-Background Truesilver Plates",
+     "out": [
+      213376,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       6037,
+       1
+      ],
+      [
+       213373,
+       5
+      ]
+     ]
+    },
+    "439120": {
+     "name": "Golden Scale Gauntlets",
+     "out": [
+      217273,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3859,
+       10
+      ],
+      [
+       3577,
+       4
+      ],
+      [
+       3486,
+       4
+      ],
+      [
+       3864,
+       1
+      ]
+     ]
+    },
+    "439122": {
+     "name": "Golden Scale Boots",
+     "out": [
+      217275,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3859,
+       10
+      ],
+      [
+       3577,
+       4
+      ],
+      [
+       3486,
+       4
+      ],
+      [
+       3864,
+       1
+      ]
+     ]
+    },
+    "439124": {
+     "name": "Golden Scale Cuirass",
+     "out": [
+      217277,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3859,
+       12
+      ],
+      [
+       3577,
+       2
+      ],
+      [
+       3486,
+       4
+      ],
+      [
+       1529,
+       2
+      ]
+     ]
+    },
+    "439126": {
+     "name": "Golden Scale Coif",
+     "out": [
+      217279,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3859,
+       8
+      ],
+      [
+       3577,
+       2
+      ],
+      [
+       3486,
+       2
+      ]
+     ]
+    },
+    "439128": {
+     "name": "Moonsteel Broadsword",
+     "out": [
+      217281,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3859,
+       8
+      ],
+      [
+       3466,
+       2
+      ],
+      [
+       3486,
+       2
+      ],
+      [
+       1705,
+       3
+      ],
+      [
+       4234,
+       3
+      ]
+     ]
+    },
+    "439130": {
+     "name": "Golden Scale Shoulders",
+     "out": [
+      217283,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3859,
+       6
+      ],
+      [
+       3577,
+       2
+      ],
+      [
+       3486,
+       1
+      ]
+     ]
+    },
+    "439132": {
+     "name": "Golden Scale Leggings",
+     "out": [
+      217285,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3575,
+       10
+      ],
+      [
+       3577,
+       2
+      ],
+      [
+       3486,
+       1
+      ]
+     ]
+    },
+    "446179": {
+     "name": "Shoulderplates of Dread",
+     "out": [
+      220738,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       221021,
+       10
+      ],
+      [
+       220688,
+       1
+      ]
+     ]
+    },
+    "446188": {
+     "name": "Fearmonger's Shoulderguards",
+     "out": [
+      220740,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       221021,
+       10
+      ],
+      [
+       220688,
+       1
+      ]
+     ]
+    },
+    "446191": {
+     "name": "Baleful Pauldrons",
+     "out": [
+      220739,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       221021,
+       10
+      ],
+      [
+       220688,
+       1
+      ]
+     ]
+    },
+    "460460": {
+     "name": "Sulfuron Hammer",
+     "out": [
+      227684,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       17203,
+       8
+      ],
+      [
+       11371,
+       20
+      ],
+      [
+       12360,
+       50
+      ],
+      [
+       7078,
+       25
+      ],
+      [
+       11382,
+       10
+      ],
+      [
+       17011,
+       10
+      ],
+      [
+       17010,
+       10
+      ]
+     ]
+    },
+    "461647": {
+     "name": "Skyrider's Masterwork Stormhammer",
+     "out": [
+      227886,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12794,
+       1
+      ],
+      [
+       18262,
+       10
+      ],
+      [
+       12360,
+       15
+      ]
+     ]
+    },
+    "461651": {
+     "name": "Fiery Plate Gauntlets of the Hidden Technique",
+     "out": [
+      227865,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12359,
+       20
+      ],
+      [
+       12655,
+       6
+      ],
+      [
+       7078,
+       2
+      ],
+      [
+       7910,
+       4
+      ]
+     ]
+    },
+    "461667": {
+     "name": "Tempered Dark Iron Plate",
+     "out": [
+      227871,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       11371,
+       20
+      ],
+      [
+       7077,
+       8
+      ]
+     ]
+    },
+    "461669": {
+     "name": "Refined Arcanite Champion",
+     "out": [
+      228125,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12790,
+       1
+      ],
+      [
+       18262,
+       10
+      ]
+     ]
+    },
+    "461671": {
+     "name": "Stronger-hold Gauntlets",
+     "out": [
+      227885,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12360,
+       15
+      ],
+      [
+       12655,
+       20
+      ],
+      [
+       7076,
+       10
+      ],
+      [
+       12361,
+       4
+      ],
+      [
+       12799,
+       4
+      ]
+     ]
+    },
+    "461675": {
+     "name": "Refined Arcanite Reaper",
+     "out": [
+      227845,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12784,
+       1
+      ],
+      [
+       18262,
+       10
+      ]
+     ]
+    },
+    "461712": {
+     "name": "Refined Hammer of the Titans",
+     "out": [
+      228230,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12796,
+       1
+      ],
+      [
+       18262,
+       10
+      ]
+     ]
+    },
+    "461714": {
+     "name": "Desecration",
+     "out": [
+      227857,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12359,
+       40
+      ],
+      [
+       12360,
+       2
+      ],
+      [
+       12662,
+       16
+      ],
+      [
+       12808,
+       8
+      ],
+      [
+       12361,
+       2
+      ],
+      [
+       12644,
+       2
+      ],
+      [
+       8170,
+       4
+      ]
+     ]
+    },
+    "461716": {
+     "name": "Deadly Heartseeker",
+     "out": [
+      227884,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12360,
+       10
+      ],
+      [
+       12655,
+       10
+      ],
+      [
+       12810,
+       2
+      ],
+      [
+       7910,
+       6
+      ],
+      [
+       12800,
+       6
+      ],
+      [
+       12799,
+       6
+      ],
+      [
+       12644,
+       4
+      ]
+     ]
+    },
+    "461718": {
+     "name": "Tranquility",
+     "out": [
+      227881,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12655,
+       6
+      ],
+      [
+       12360,
+       2
+      ],
+      [
+       12804,
+       4
+      ],
+      [
+       12799,
+       2
+      ],
+      [
+       12361,
+       2
+      ],
+      [
+       12364,
+       1
+      ]
+     ]
+    },
+    "461730": {
+     "name": "Hardened Frostguard",
+     "out": [
+      227887,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12797,
+       1
+      ],
+      [
+       18262,
+       10
+      ]
+     ]
+    },
+    "461733": {
+     "name": "Finely-Enchanted Battlehammer",
+     "out": [
+      227880,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12359,
+       20
+      ],
+      [
+       12655,
+       6
+      ],
+      [
+       12364,
+       2
+      ],
+      [
+       12804,
+       4
+      ],
+      [
+       8170,
+       4
+      ]
+     ]
+    },
+    "461735": {
+     "name": "Invincible Mail",
+     "out": [
+      227876,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12360,
+       30
+      ],
+      [
+       12655,
+       30
+      ],
+      [
+       12364,
+       6
+      ],
+      [
+       12800,
+       6
+      ]
+     ]
+    },
+    "461737": {
+     "name": "Tempest Gauntlets",
+     "out": [
+      227870,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12359,
+       20
+      ],
+      [
+       12655,
+       4
+      ],
+      [
+       7080,
+       4
+      ],
+      [
+       12361,
+       4
+      ]
+     ]
+    },
+    "461739": {
+     "name": "Warcrest of the Great Chief",
+     "out": [
+      227872,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12359,
+       40
+      ],
+      [
+       12655,
+       4
+      ],
+      [
+       8168,
+       60
+      ],
+      [
+       12799,
+       6
+      ],
+      [
+       12364,
+       2
+      ]
+     ]
+    },
+    "461743": {
+     "name": "Sageblade of the Archmagus",
+     "out": [
+      227850,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12360,
+       12
+      ],
+      [
+       20725,
+       2
+      ],
+      [
+       13512,
+       2
+      ],
+      [
+       12810,
+       4
+      ]
+     ]
+    },
+    "6517": {
+     "name": "Pearl-handled Dagger",
+     "out": [
+      5540,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2841,
+       6
+      ],
+      [
+       3466,
+       1
+      ],
+      [
+       5498,
+       2
+      ],
+      [
+       3478,
+       2
+      ]
+     ]
+    },
+    "6518": {
+     "name": "Iridescent Hammer",
+     "out": [
+      5541,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2841,
+       10
+      ],
+      [
+       3466,
+       1
+      ],
+      [
+       5500,
+       1
+      ],
+      [
+       3478,
+       2
+      ],
+      [
+       2319,
+       2
+      ]
+     ]
+    },
+    "7221": {
+     "name": "Iron Shield Spike",
+     "out": [
+      6042,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3575,
+       6
+      ],
+      [
+       3478,
+       4
+      ]
+     ]
+    },
+    "7222": {
+     "name": "Iron Counterweight",
+     "out": [
+      6043,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3575,
+       4
+      ],
+      [
+       3478,
+       2
+      ],
+      [
+       1705,
+       1
+      ]
+     ]
+    },
+    "7223": {
+     "name": "Golden Scale Bracers",
+     "out": [
+      6040,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3859,
+       5
+      ],
+      [
+       3486,
+       2
+      ]
+     ]
+    },
+    "7224": {
+     "name": "Steel Weapon Chain",
+     "out": [
+      6041,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3859,
+       8
+      ],
+      [
+       3486,
+       2
+      ],
+      [
+       4234,
+       4
+      ]
+     ]
+    },
+    "7408": {
+     "name": "Heavy Copper Maul",
+     "out": [
+      6214,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2840,
+       12
+      ],
+      [
+       2880,
+       2
+      ],
+      [
+       2318,
+       2
+      ]
+     ]
+    },
+    "7817": {
+     "name": "Rough Bronze Boots",
+     "out": [
+      6350,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2841,
+       6
+      ],
+      [
+       3470,
+       6
+      ]
+     ]
+    },
+    "7818": {
+     "name": "Silver Rod",
+     "out": [
+      6338,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2842,
+       1
+      ],
+      [
+       3470,
+       2
+      ]
+     ]
+    },
+    "8366": {
+     "name": "Ironforge Chain",
+     "out": [
+      6730,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2840,
+       12
+      ],
+      [
+       774,
+       2
+      ],
+      [
+       3470,
+       2
+      ]
+     ]
+    },
+    "8367": {
+     "name": "Ironforge Breastplate",
+     "out": [
+      6731,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2840,
+       16
+      ],
+      [
+       818,
+       2
+      ],
+      [
+       3470,
+       3
+      ]
+     ]
+    },
+    "8368": {
+     "name": "Ironforge Gauntlets",
+     "out": [
+      6733,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2841,
+       8
+      ],
+      [
+       1210,
+       3
+      ],
+      [
+       3478,
+       4
+      ]
+     ]
+    },
+    "8768": {
+     "name": "Iron Buckle",
+     "out": [
+      7071,
+      2,
+      2
+     ],
+     "reagents": [
+      [
+       3575,
+       1
+      ]
+     ]
+    },
+    "8880": {
+     "name": "Copper Dagger",
+     "out": [
+      7166,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2840,
+       6
+      ],
+      [
+       2880,
+       1
+      ],
+      [
+       3470,
+       1
+      ],
+      [
+       2318,
+       1
+      ]
+     ]
+    },
+    "9811": {
+     "name": "Barbaric Iron Shoulders",
+     "out": [
+      7913,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3575,
+       8
+      ],
+      [
+       5635,
+       4
+      ],
+      [
+       1210,
+       2
+      ],
+      [
+       3486,
+       2
+      ]
+     ]
+    },
+    "9813": {
+     "name": "Barbaric Iron Breastplate",
+     "out": [
+      7914,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3575,
+       20
+      ],
+      [
+       3486,
+       4
+      ]
+     ]
+    },
+    "9814": {
+     "name": "Barbaric Iron Helm",
+     "out": [
+      7915,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3575,
+       10
+      ],
+      [
+       5637,
+       2
+      ],
+      [
+       5635,
+       2
+      ]
+     ]
+    },
+    "9818": {
+     "name": "Barbaric Iron Boots",
+     "out": [
+      7916,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3575,
+       12
+      ],
+      [
+       5637,
+       4
+      ],
+      [
+       818,
+       4
+      ],
+      [
+       3486,
+       2
+      ]
+     ]
+    },
+    "9820": {
+     "name": "Barbaric Iron Gloves",
+     "out": [
+      7917,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3575,
+       14
+      ],
+      [
+       3486,
+       3
+      ],
+      [
+       5637,
+       2
+      ]
+     ]
+    },
+    "9916": {
+     "name": "Steel Breastplate",
+     "out": [
+      7963,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3859,
+       16
+      ],
+      [
+       3486,
+       3
+      ]
+     ]
+    },
+    "9918": {
+     "name": "Solid Sharpening Stone",
+     "out": [
+      7964,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       7912,
+       1
+      ]
+     ]
+    },
+    "9920": {
+     "name": "Solid Grinding Stone",
+     "out": [
+      7966,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       7912,
+       4
+      ]
+     ]
+    },
+    "9921": {
+     "name": "Solid Weightstone",
+     "out": [
+      7965,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       7912,
+       1
+      ]
+     ]
+    },
+    "9926": {
+     "name": "Heavy Mithril Shoulder",
+     "out": [
+      7918,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3860,
+       8
+      ],
+      [
+       4234,
+       6
+      ]
+     ]
+    },
+    "9928": {
+     "name": "Heavy Mithril Gauntlet",
+     "out": [
+      7919,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3860,
+       6
+      ],
+      [
+       4338,
+       4
+      ]
+     ]
+    },
+    "9931": {
+     "name": "Mithril Plate Pants",
+     "out": [
+      7920,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3860,
+       12
+      ]
+     ]
+    },
+    "9933": {
+     "name": "Heavy Mithril Pants",
+     "out": [
+      7921,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3860,
+       10
+      ],
+      [
+       1705,
+       2
+      ]
+     ]
+    },
+    "9935": {
+     "name": "Steel Plate Helm",
+     "out": [
+      7922,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3859,
+       14
+      ],
+      [
+       7966,
+       1
+      ]
+     ]
+    },
+    "9937": {
+     "name": "Mithril Plate Bracers",
+     "out": [
+      7924,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3860,
+       8
+      ],
+      [
+       3864,
+       2
+      ]
+     ]
+    },
+    "9939": {
+     "name": "Mithril Shield Spike",
+     "out": [
+      7967,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3860,
+       4
+      ],
+      [
+       6037,
+       2
+      ],
+      [
+       7966,
+       4
+      ]
+     ]
+    },
+    "9942": {
+     "name": "Mithril Plate Gloves",
+     "out": [
+      7925,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3860,
+       8
+      ],
+      [
+       4234,
+       6
+      ],
+      [
+       4338,
+       4
+      ]
+     ]
+    },
+    "9945": {
+     "name": "Ornate Mithril Pants",
+     "out": [
+      7926,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3860,
+       12
+      ],
+      [
+       6037,
+       1
+      ],
+      [
+       7966,
+       1
+      ],
+      [
+       7909,
+       1
+      ]
+     ]
+    },
+    "9950": {
+     "name": "Ornate Mithril Gloves",
+     "out": [
+      7927,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3860,
+       10
+      ],
+      [
+       4338,
+       6
+      ],
+      [
+       6037,
+       1
+      ],
+      [
+       7966,
+       1
+      ]
+     ]
+    },
+    "9952": {
+     "name": "Ornate Mithril Shoulders",
+     "out": [
+      7928,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3860,
+       12
+      ],
+      [
+       6037,
+       1
+      ],
+      [
+       4304,
+       6
+      ]
+     ]
+    },
+    "9954": {
+     "name": "Truesilver Gauntlets",
+     "out": [
+      7938,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3860,
+       10
+      ],
+      [
+       6037,
+       8
+      ],
+      [
+       7909,
+       3
+      ],
+      [
+       3864,
+       3
+      ],
+      [
+       5966,
+       1
+      ],
+      [
+       7966,
+       2
+      ]
+     ]
+    },
+    "9957": {
+     "name": "Orcish War Leggings",
+     "out": [
+      7929,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3860,
+       12
+      ],
+      [
+       7067,
+       1
+      ]
+     ]
+    },
+    "9959": {
+     "name": "Heavy Mithril Breastplate",
+     "out": [
+      7930,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3860,
+       16
+      ]
+     ]
+    },
+    "9961": {
+     "name": "Mithril Coif",
+     "out": [
+      7931,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3860,
+       10
+      ],
+      [
+       4338,
+       6
+      ]
+     ]
+    },
+    "9964": {
+     "name": "Mithril Spurs",
+     "out": [
+      7969,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3860,
+       4
+      ],
+      [
+       7966,
+       3
+      ]
+     ]
+    },
+    "9966": {
+     "name": "Mithril Plate Shoulders",
+     "out": [
+      7932,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3860,
+       14
+      ],
+      [
+       4304,
+       4
+      ],
+      [
+       3864,
+       4
+      ]
+     ]
+    },
+    "9968": {
+     "name": "Heavy Mithril Boots",
+     "out": [
+      7933,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3860,
+       14
+      ],
+      [
+       4304,
+       4
+      ]
+     ]
+    },
+    "9970": {
+     "name": "Heavy Mithril Helm",
+     "out": [
+      7934,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3860,
+       14
+      ],
+      [
+       7909,
+       1
+      ]
+     ]
+    },
+    "9972": {
+     "name": "Ornate Mithril Breastplate",
+     "out": [
+      7935,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3860,
+       16
+      ],
+      [
+       6037,
+       6
+      ],
+      [
+       7077,
+       1
+      ],
+      [
+       7966,
+       1
+      ]
+     ]
+    },
+    "9974": {
+     "name": "Truesilver Breastplate",
+     "out": [
+      7939,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3860,
+       12
+      ],
+      [
+       6037,
+       24
+      ],
+      [
+       7910,
+       4
+      ],
+      [
+       7971,
+       4
+      ],
+      [
+       7966,
+       2
+      ]
+     ]
+    },
+    "9979": {
+     "name": "Ornate Mithril Boots",
+     "out": [
+      7936,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3860,
+       14
+      ],
+      [
+       6037,
+       2
+      ],
+      [
+       4304,
+       4
+      ],
+      [
+       7966,
+       1
+      ],
+      [
+       7909,
+       1
+      ]
+     ]
+    },
+    "9980": {
+     "name": "Ornate Mithril Helm",
+     "out": [
+      7937,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3860,
+       16
+      ],
+      [
+       6037,
+       2
+      ],
+      [
+       7971,
+       1
+      ],
+      [
+       7966,
+       1
+      ]
+     ]
+    },
+    "9983": {
+     "name": "Copper Claymore",
+     "out": [
+      7955,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2840,
+       10
+      ],
+      [
+       2880,
+       2
+      ],
+      [
+       3470,
+       1
+      ],
+      [
+       2318,
+       1
+      ]
+     ]
+    },
+    "9985": {
+     "name": "Bronze Warhammer",
+     "out": [
+      7956,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2841,
+       8
+      ],
+      [
+       3466,
+       1
+      ],
+      [
+       2319,
+       1
+      ]
+     ]
+    },
+    "9986": {
+     "name": "Bronze Greatsword",
+     "out": [
+      7957,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2841,
+       12
+      ],
+      [
+       3466,
+       2
+      ],
+      [
+       2319,
+       2
+      ]
+     ]
+    },
+    "9987": {
+     "name": "Bronze Battle Axe",
+     "out": [
+      7958,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2841,
+       14
+      ],
+      [
+       3466,
+       1
+      ],
+      [
+       2319,
+       2
+      ]
+     ]
+    },
+    "9993": {
+     "name": "Heavy Mithril Axe",
+     "out": [
+      7941,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3860,
+       12
+      ],
+      [
+       3864,
+       2
+      ],
+      [
+       7966,
+       1
+      ],
+      [
+       4234,
+       4
+      ]
+     ]
+    },
+    "9995": {
+     "name": "Blue Glittering Axe",
+     "out": [
+      7942,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3860,
+       16
+      ],
+      [
+       7909,
+       2
+      ],
+      [
+       7966,
+       1
+      ],
+      [
+       4304,
+       4
+      ]
+     ]
+    },
+    "9997": {
+     "name": "Wicked Mithril Blade",
+     "out": [
+      7943,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3860,
+       14
+      ],
+      [
+       6037,
+       4
+      ],
+      [
+       7966,
+       1
+      ],
+      [
+       4304,
+       2
+      ]
+     ]
+    }
+   },
+   "time": 1794488293
+  },
+  "186": {
+   "captured": "2026-11-12",
+   "client": "1.60.1.70888",
+   "complete": true,
+   "faction": "Horde",
+   "recipes": {
+    "10097": {
+     "name": "Smelt Mithril",
+     "out": [
+      3860,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3858,
+       1
+      ]
+     ]
+    },
+    "10098": {
+     "name": "Smelt Truesilver",
+     "out": [
+      6037,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       7911,
+       1
+      ]
+     ]
+    },
+    "1213638": {
+     "name": "Smelt Obsidian-Infused Thorium Bar",
+     "out": [
+      234003,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12655,
+       2
+      ],
+      [
+       22203,
+       2
+      ]
+     ]
+    },
+    "1230161": {
+     "name": "Lodestone",
+     "out": [
+      279960,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2835,
+       1
+      ],
+      [
+       2840,
+       1
+      ]
+     ]
+    },
+    "1249637": {
+     "name": "Smelt Azerothium",
+     "out": [
+      249726,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       249426,
+       2
+      ],
+      [
+       3857,
+       1
+      ]
+     ]
+    },
+    "1262975": {
+     "name": "Rock Garden",
+     "out": [
+      279948,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2838,
+       2
+      ],
+      [
+       2772,
+       1
+      ],
+      [
+       2842,
+       1
+      ]
+     ]
+    },
+    "1263071": {
+     "name": "Molten Foundry",
+     "out": [
+      279952,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       12359,
+       5
+      ],
+      [
+       12365,
+       2
+      ],
+      [
+       6037,
+       1
+      ]
+     ]
+    },
+    "1306126": {
+     "name": "Smelt Heavy Thorium",
+     "out": [
+      251291,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       248815,
+       1
+      ]
+     ]
+    },
+    "14891": {
+     "name": "Smelt Dark Iron",
+     "out": [
+      11371,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       11370,
+       8
+      ]
+     ]
+    },
+    "16153": {
+     "name": "Smelt Thorium",
+     "out": [
+      12359,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       10620,
+       1
+      ]
+     ]
+    },
+    "22967": {
+     "name": "Smelt Elementium",
+     "out": [
+      17771,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       18562,
+       1
+      ],
+      [
+       12360,
+       10
+      ],
+      [
+       17010,
+       1
+      ],
+      [
+       18567,
+       3
+      ]
+     ]
+    },
+    "2657": {
+     "name": "Smelt Copper",
+     "out": [
+      2840,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2770,
+       1
+      ]
+     ]
+    },
+    "2658": {
+     "name": "Smelt Silver",
+     "out": [
+      2842,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2775,
+       1
+      ]
+     ]
+    },
+    "2659": {
+     "name": "Smelt Bronze",
+     "out": [
+      2841,
+      2,
+      2
+     ],
+     "reagents": [
+      [
+       2840,
+       1
+      ],
+      [
+       3576,
+       1
+      ]
+     ]
+    },
+    "3304": {
+     "name": "Smelt Tin",
+     "out": [
+      3576,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2771,
+       1
+      ]
+     ]
+    },
+    "3307": {
+     "name": "Smelt Iron",
+     "out": [
+      3575,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2772,
+       1
+      ]
+     ]
+    },
+    "3308": {
+     "name": "Smelt Gold",
+     "out": [
+      3577,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       2776,
+       1
+      ]
+     ]
+    },
+    "3569": {
+     "name": "Smelt Steel",
+     "out": [
+      3859,
+      1,
+      1
+     ],
+     "reagents": [
+      [
+       3575,
+       1
+      ],
+      [
+       3857,
+       1
+      ]
+     ]
+    }
+   },
+   "time": 1794488304
+  }
+ },
+ "note": "the game client's answers, saved in game by /crafter dump and merged by tools/gen_data.py client-dump (see SOURCES.md, source client)"
+}

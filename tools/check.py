@@ -199,6 +199,9 @@ def check_data(ns):
     expect(n_from > 500, f"only {n_from} recipe items carry Wowhead sourcemore")
     counts["recipe items with from"] = n_from
     for spell, r in ns.Recipes.items():
+        if r.known is not None:
+            expect("client" in r.src.split("+") and r.known <= r.verified,
+                   f"Recipes[{spell}] known needs src client")
         if r.learnText is not None:
             expect("client" in r.src.split("+") and r.learnText, f"Recipes[{spell}] learnText needs src client")
     # wh_tt cross-check (nether.wowhead.com/forever/tooltip/spell/3170, 2026-11-11) = DB2 SpellReagents.
@@ -537,6 +540,7 @@ def check_full_run():
     return n, stats.evaluated, took
 
 
+R_KNOWN_EXCL, R_LISTED_EXCL = 7636, 8778  # Tailoring recipes on no Wowhead Forever list (excluded_recipes.txt)
 SOURCE_TEXT = ("|cFFFFD200Trainer: |rAny Tailoring trainer|n|cFFFFD200Cost: |r50"
                "|TInterface\\MoneyFrame\\UI-SilverIcon:0:0:2:0|t")
 
@@ -555,6 +559,8 @@ def check_dump():
         R_BOLT: (True, 0, {"name": "Bolt of Linen Cloth", "out": [BOLT, 1, 1], "reagents": [[LINEN, 3]]}),
         R_VEST: (True, 1, None),
         R_SHIRT: (False, None, None, SOURCE_TEXT),
+        R_KNOWN_EXCL: (True, 1, None),
+        R_LISTED_EXCL: (False, None, None),
     })
     acq = ns.Planner.Acquire(ns.Recipes[R_SHIRT], R_SHIRT).text
     expect(acq.startswith("Game: ") and "Any Tailoring trainer" in acq,
@@ -563,7 +569,7 @@ def check_dump():
     slash(lua, "dump")
     stub.runTimers(30)
     out = " / ".join(prints(stub, n0))
-    expect("3 recipes (1 unlearned, 1 with the game's source text)" in out and "item data for" in out,
+    expect("5 recipes (2 unlearned, 1 with the game's source text)" in out and "item data for" in out,
            f"/crafter dump output: {out}")
     expect(stub.ts.showUnlearned is False, "/crafter dump did not put the unlearned filter back")
     d = lua.globals().ForeverCrafterDB.dump
@@ -571,6 +577,7 @@ def check_dump():
            "dump misses the unlearned recipe's source text")
     expect(d["items"][got_item] and d["items"][got_item].n == "Client Item" and d["items"][never] is None,
            "dump item data wrong")
+    expect(d.noItem[never] and d.noItem[got_item] is None, "dump does not record the items the game gave no info for")
     with tempfile.TemporaryDirectory() as tmp:
         path = os.path.join(tmp, "ForeverCrafter.lua")
         with open(path, "w", encoding="utf-8") as f:
@@ -578,8 +585,13 @@ def check_dump():
         store = {"lines": {}, "items": {}}
         expect(gen_data.merge_dump(store, gen_data.read_dump(path)) == (1, 1), "client-dump merge counts")
     rec = store["lines"][str(TAILORING)]["recipes"]
-    expect(sorted(rec) == sorted(str(x) for x in (R_BOLT, R_VEST, R_SHIRT)) and "learned" not in rec[str(R_BOLT)],
+    expect(sorted(rec) == sorted(str(x) for x in (R_BOLT, R_VEST, R_SHIRT, R_KNOWN_EXCL, R_LISTED_EXCL))
+           and all(set(e) <= {"name", "out", "reagents", "text"} for e in rec.values()),
            f"merged recipes {rec}")
+    expect(str(never) in store.get("noItem", {}) and str(got_item) not in store["noItem"],
+           f"merged noItem {store.get('noItem')}")
+    expect(sorted(store.get("known", {})) == sorted(str(x) for x in (R_BOLT, R_VEST, R_KNOWN_EXCL)),
+           f"merged known recipes {store.get('known')}")
     manifest, db, wh, _ = gen_data.load_research()
     files, report = gen_data.build(manifest, db, wh, store)
     recipes = files["Data/Recipes.lua"]
@@ -590,6 +602,11 @@ def check_dump():
     expect(bolt and "reagents={{%d,3}}" % LINEN in bolt.group(0), "client reagents do not replace DB2's")
     expect(not re.search(r"\n  \[%d\]=" % R_BOOTS, recipes) and str(R_BOOTS) in
            files["../research/excluded_recipes.txt"], "a recipe missing from the game's full list is not left out")
+    known = re.search(r"\n  \[%d\]=\{[^\n]*" % R_KNOWN_EXCL, recipes)
+    expect(known and 'known="' in known.group(0) and 'src="db2+client"' in known.group(0),
+           f"a left-out recipe a character knows is not brought in: {known and known.group(0)}")
+    expect(not re.search(r"\n  \[%d\]=" % R_LISTED_EXCL, recipes),
+           "a recipe the game merely lists (unlearned, on no Wowhead list) was brought in")
     expect(re.search(r"\n  \[%d\]=\{name=\"Client Item\"[^\n]*src=\"[^\"]*client" % got_item,
                      files["Data/Items.lua"]), "client item info not used")
     expect(any("client reagents differ %d" % R_BOLT in x for x in report), "client reagent difference not reported")

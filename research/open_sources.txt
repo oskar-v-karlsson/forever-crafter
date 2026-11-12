@@ -9,12 +9,8 @@
 2387	197	Linen Cloak	1	no db2 recipe item
 2538	185	Charred Wolf Meat	1	no db2 recipe item
 2540	185	Roasted Boar Meat	1	no db2 recipe item
-2657	186	Smelt Copper	1	no db2 recipe item
-2660	164	Rough Sharpening Stone	1	no db2 recipe item
-2663	164	Copper Bracers	1	no db2 recipe item
 2881	165	Light Leather	1	no db2 recipe item
 2963	197	Bolt of Linen Cloth	1	no db2 recipe item
-3115	164	Rough Weightstone	1	no db2 recipe item
 3275	129	Linen Bandage	1	no db2 recipe item
 3915	197	Brown Linen Shirt	1	no db2 recipe item
 3918	202	Rough Blasting Powder	1	no db2 recipe item
@@ -40,7 +36,6 @@
 10841	129	Heavy Mageweave Bandage	0	no db2 recipe item
 11452	171	Restorative Potion	0	no db2 recipe item
 12044	197	Simple Linen Pants	1	no db2 recipe item
-12260	164	Rough Copper Vest	1	no db2 recipe item
 13028	185	Goldthorn Tea	0	no db2 recipe item
 13240	202	The Mortar: Reloaded	0	no db2 recipe item
 14891	186	Smelt Dark Iron	0	no db2 recipe item
@@ -138,7 +133,6 @@
 1228088	202	Pop-Up Shrub	0	db2 recipe item 239222 Schematic: Pop-Up Shrub: Wowhead lists no source
 1245246	171	Minor Arcane Elixir	1	no db2 recipe item
 1245250	171	Elixir of Minor Force	1	no db2 recipe item
-1245287	164	Copper Rod	1	no db2 recipe item
 1245320	333	Dust to Motes	1	no db2 recipe item
 1245321	333	Novice's Practice Wand	1	no db2 recipe item
 1247741	185	Spinefin Halibut	0	no db2 recipe item
@@ -271,6 +265,15 @@
 1319163	202	Large Purple Rocket Cluster	0	db2 recipe item 286085 Schematic: Large Purple Rocket Cluster: Wowhead lists no source
 1319164	202	Large White Rocket Cluster	0	db2 recipe item 286086 Schematic: Large White Rocket Cluster: Wowhead lists no source
 1319165	202	Large Yellow Rocket Cluster	0	db2 recipe item 286087 Schematic: Large Yellow Rocket Cluster: Wowhead lists no source
+
+## Recipes a character knows (client dump) but no source names: they exist, how they are learned is open
+# spellID, skillLine, name, AcquireMethod, recipe items in the DB2, dump date
+2657	186	Smelt Copper	1	no db2 recipe item	known in game, client dump 2026-11-12
+2660	164	Rough Sharpening Stone	1	no db2 recipe item	known in game, client dump 2026-11-12
+2663	164	Copper Bracers	1	no db2 recipe item	known in game, client dump 2026-11-12
+3115	164	Rough Weightstone	1	no db2 recipe item	known in game, client dump 2026-11-12
+12260	164	Rough Copper Vest	1	no db2 recipe item	known in game, client dump 2026-11-12
+1245287	164	Copper Rod	1	no db2 recipe item	known in game, client dump 2026-11-12
 
 ## Reagents with no source on Wowhead Forever
 # itemID, name, used by
