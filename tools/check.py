@@ -9,7 +9,9 @@
    drives it: skills, trade-skill window capture (learned, unlearned, hidden), AH snapshot (ladder, cancel),
    merchant and invoice capture, the solver (chains, vendor vs AH, cycle guard, depth limit, thin markets,
    learnable gating), the results window and the /crafter commands, a client without the APIs, and a full run
-   over every recipe.
+   over every recipe. What-if mode: skill cap and overrides, chains across professions, the max primary
+   professions limit, confidence levels, the window controls and /crafter cap, "My character" results unchanged,
+   and a timed what-if run over every recipe.
 3. The release zip layout.
 
 Usage: python3 tools/check.py      (exit code 1 on any problem)
@@ -540,6 +542,269 @@ def check_full_run():
     return n, stats.evaluated, took
 
 
+MINING, BLACKSMITHING, ENGINEERING, ALCHEMY, COOKING = 186, 164, 202, 171, 185
+WI_DEFAULT = {"cap": 150, "overrides": {}, "minConf": 4, "maxPrimaries": 2}
+
+
+def wi_run(lua, ns, **kw):
+    """A what-if run with the default settings changed by kw. → ({spell: result}, stats)"""
+    w = dict(WI_DEFAULT)
+    w.update(kw)
+    res, stats = ns.Planner.Run(ltable(lua, {"whatIf": w}))
+    return {r.spell: r for r in res.values()}, stats
+
+
+def wi_world(lua, ns, stub, recipes, auctions):
+    """Only made-up recipes (the real ones removed): recipes {spell: dict(line, learn, out, reagents[, how, acquire,
+    items, known])}; auctions [(item, stack, buyout)]. A character with no professions."""
+    for k in list(ns.Recipes.keys()):
+        ns.Recipes[k] = None
+    items = set(a[0] for a in auctions)
+    for d in recipes.values():
+        items.add(d["out"])
+        items.update(x[0] for x in d["reagents"])
+    for i in items:
+        ns.Items[i] = ltable(lua, {"name": f"Test {i}", "q": 1, "sell": 0, "buy": 0, "src": "db2",
+                                   "verified": "2026-11-12"})
+    for spell, d in recipes.items():
+        r = {"name": f"Make {d['out']}", "skill": d["line"], "learn": d["learn"], "trivLo": d["learn"],
+             "trivHi": d["learn"] + 40, "out": [d["out"], 1, 1], "reagents": d["reagents"], "how": d.get("how", [6]),
+             "cost": d.get("cost", 100), "items": d.get("items", []), "acquire": d.get("acquire", 0), "src": "db2",
+             "verified": "2026-11-12"}
+        if d.get("known"):
+            r["known"] = "2026-11-12"
+        ns.Recipes[spell] = ltable(lua, r)
+    login(lua, stub)
+    set_auctions(lua, stub, auctions)
+    scan(lua, stub)
+
+
+def char_fingerprint(ns):
+    res, stats = ns.Planner.Run()
+    return (sorted((r.spell, r.profit, r.cost, r.value, bool(r.known), bool(r.learnable), r.where, r.color)
+                   for r in res.values()), stats.evaluated, stats.noPrice)
+
+
+def check_what_if():
+    # 1. Cap, overrides and a chain across professions: Mining smelts the bar a Blacksmithing recipe needs.
+    lua, ns, stub = new_runtime()
+    ORE, BAR, BRACER = 990001, 990002, 990003
+    R_SMELT, R_BRACER = 991001, 991002
+    wi_world(lua, ns, stub, {
+        R_SMELT: dict(line=MINING, learn=50, out=BAR, reagents=[[ORE, 1]]),
+        R_BRACER: dict(line=BLACKSMITHING, learn=100, out=BRACER, reagents=[[BAR, 2]]),
+    }, [(ORE, 10, 100), (BAR, 5, 5000), (BRACER, 1, 10000), (BRACER, 1, 10000)])
+    res, st = wi_run(lua, ns)
+    b = res.get(R_BRACER)
+    if expect(b and b.cost == 20 and b.whatIf, f"what-if: bracer from smelted ore should cost 20, got {b and b.cost}"):
+        expect([(p.line, p.rank) for p in b.profs.values()] == [(MINING, 50), (BLACKSMITHING, 100)],
+               "what-if: chain professions/ranks wrong")
+        expect(b.primaries == 2 and ns.UI.ProfsText(b) == "Min+BS", f"what-if: profs text {ns.UI.ProfsText(b)}")
+        expect([s.spell for s in b.steps.values()] == [R_SMELT, R_BRACER], "what-if: chain steps not leaves-first")
+        expect(b.conf == 2 and b.learnCost == 200 and b.learnUnknown == 0 and b.payback == -(-200 // b.profit),
+               f"what-if: conf/learning cost {b.conf} {b.learnCost} {b.payback}")
+    expect(st.whatIf and st.sets == 1, "what-if: two primary professions in the data should be 1 set at max 2")
+    res, _ = wi_run(lua, ns, cap=90)
+    expect(R_BRACER not in res and R_SMELT in res, "what-if: cap 90 must drop the rank 100 recipe only")
+    res, _ = wi_run(lua, ns, cap=90, overrides={BLACKSMITHING: 100})
+    expect(R_BRACER in res, "what-if: Blacksmithing override 100 does not allow the bracer")
+    res, _ = wi_run(lua, ns, overrides={MINING: 40})
+    b = res.get(R_BRACER)
+    expect(b and b.cost == 2000 and R_SMELT not in res and [p.line for p in b.profs.values()] == [BLACKSMITHING],
+           "what-if: Mining override 40 must buy the bars on the AH")
+    res, _ = wi_run(lua, ns, maxPrimaries=1)
+    b = res.get(R_BRACER)
+    expect(b and b.cost == 2000 and b.primaries == 1, "what-if: max 1 primary must buy the bars")
+    # The profession filter matches any profession in the chain: Mining shows the Blacksmithing bracer.
+    ns.settings.mode, ns.settings.profession = "whatIf", MINING
+    ns.UI.results, ns.UI.stats = ns.Planner.Run(ltable(lua, {"whatIf": WI_DEFAULT}))
+    ns.UI.ApplyFilter()
+    expect(sorted(r.spell for r in ns.UI.view.values()) == [R_SMELT, R_BRACER],
+           "what-if profession filter must match any profession in the chain")
+    ns.settings.mode, ns.settings.profession = "char", 0
+    # "My character" mode is unaffected (no professions: nothing to show).
+    expect(len(results(ns)[0]) == 0, "what-if recipes leak into My character results")
+
+    # 2. Max primaries: the cheapest chain needs Alchemy + Engineering + Tailoring.
+    lua, ns, stub = new_runtime()
+    RAW, Q, P, X, RAW2, S, Y = 990010, 990011, 990012, 990013, 990014, 990015, 990016
+    R_Q, R_P, R_X, R_S, R_Y = 991010, 991011, 991012, 991013, 991014
+    wi_world(lua, ns, stub, {
+        R_Q: dict(line=ALCHEMY, learn=10, out=Q, reagents=[[RAW, 1]]),
+        R_P: dict(line=ENGINEERING, learn=10, out=P, reagents=[[Q, 1]]),
+        R_X: dict(line=TAILORING, learn=10, out=X, reagents=[[P, 1]]),
+        R_S: dict(line=COOKING, learn=10, out=S, reagents=[[RAW2, 1]]),
+        R_Y: dict(line=TAILORING, learn=10, out=Y, reagents=[[S, 1]]),
+    }, [(RAW, 1, 1), (Q, 1, 500), (P, 1, 5000), (X, 1, 20000), (X, 1, 20000), (RAW2, 1, 3), (S, 1, 900),
+        (Y, 1, 20000), (Y, 1, 20000)])
+    for mp, cost, lines in ((0, 1, [ALCHEMY, ENGINEERING, TAILORING]), (3, 1, [ALCHEMY, ENGINEERING, TAILORING]),
+                            (2, 500, [ENGINEERING, TAILORING]), (1, 5000, [TAILORING])):
+        res, st = wi_run(lua, ns, maxPrimaries=mp)
+        x = res.get(R_X)
+        expect(x and x.cost == cost and sorted(p.line for p in x.profs.values()) == sorted(lines),
+               f"what-if max {mp}: X costs {x and x.cost}, needs {x and [p.line for p in x.profs.values()]}")
+        y = res.get(R_Y)
+        expect(y and y.cost == 3 and y.primaries == 1 and ns.UI.ProfsText(y) == "Cook+Tail",
+               f"what-if max {mp}: Cooking (secondary) must not count toward the limit")
+    expect(wi_run(lua, ns, maxPrimaries=2)[1].sets == 3 and wi_run(lua, ns, maxPrimaries=0)[1].sets == 1,
+           "what-if: set counts")
+
+    # 3. Confidence levels; a chain takes its least sure recipe.
+    conf = {R_Q: dict(how=[6], acquire=0), R_P: dict(how=[2], acquire=0), R_X: dict(how=[], acquire=1),
+            R_S: dict(how=[], acquire=0), R_Y: dict(how=[], known=True)}
+    lua, ns, stub = new_runtime()
+    base = {R_Q: dict(line=ALCHEMY, learn=10, out=Q, reagents=[[RAW, 1]]),
+            R_P: dict(line=ENGINEERING, learn=10, out=P, reagents=[[Q, 1]]),
+            R_X: dict(line=TAILORING, learn=10, out=X, reagents=[[P, 1]]),
+            R_S: dict(line=COOKING, learn=10, out=S, reagents=[[RAW2, 1]]),
+            R_Y: dict(line=TAILORING, learn=10, out=Y, reagents=[[S, 1]])}
+    for k, v in conf.items():
+        base[k].update(v)
+    auctions = [(RAW, 1, 1), (Q, 1, 500), (P, 1, 5000), (X, 1, 20000), (X, 1, 20000), (RAW2, 1, 3), (S, 1, 900),
+                (Y, 1, 20000), (Y, 1, 20000)]
+    wi_world(lua, ns, stub, base, auctions)
+    PL = ns.Planner
+    levels = {s: PL.Confidence(s, ns.Recipes[s]) for s in base}
+    expect(levels == {R_Q: 2, R_P: 4, R_X: 3, R_S: 5, R_Y: 1}, f"confidence levels {levels}")
+    VEND_RECIPE, DROP_RECIPE = 990020, 990021
+    ns.Items[VEND_RECIPE] = ltable(lua, {"name": "Pattern", "how": [5], "from": [["vendor", "A", "B"]]})
+    ns.Items[DROP_RECIPE] = ltable(lua, {"name": "Pattern", "how": [2], "from": [["drop", "A", "B"]]})
+    expect(PL.Confidence(1, ltable(lua, {"skill": TAILORING, "how": [], "items": [VEND_RECIPE]})) == 2,
+           "confidence: recipe item sold by a vendor is not level 2")
+    expect(PL.Confidence(1, ltable(lua, {"skill": TAILORING, "how": [], "items": [DROP_RECIPE], "acquire": 1})) == 4,
+           "confidence: recipe item from a drop is not level 4")
+    stub.known[R_S] = True
+    ns.char.known[R_S] = True
+    expect(PL.Confidence(R_S, ns.Recipes[R_S]) == 1, "confidence: known on this character is not level 1")
+    ns.char.known[R_S] = None
+    stub.known[R_S] = None
+    res, st = wi_run(lua, ns, maxPrimaries=0, minConf=5)
+    x, y = res.get(R_X), res.get(R_Y)
+    expect(x and x.conf == 4 and x.confSpell == R_P and x.cost == 1, "confidence: chain must take its lowest (4)")
+    expect(y and y.conf == 5 and y.confSpell == R_S, "confidence: Unknown step must make the chain Unknown")
+    expect(list(st.byConf.values()) == [1, 1, 1, 1, 1], f"confidence counts {list(st.byConf.values())}")
+    res, _ = wi_run(lua, ns, maxPrimaries=0)
+    y = res.get(R_Y)
+    expect(R_S not in res and y and y.cost == 900 and y.conf == 1,
+           "minConf 4 must hide Unknown recipes and their chains")
+    res, _ = wi_run(lua, ns, maxPrimaries=0, minConf=2)
+    x = res.get(R_X)
+    expect(not x, "minConf 2 must hide a Likely final recipe")
+    res, _ = wi_run(lua, ns, maxPrimaries=0, minConf=3)
+    x = res.get(R_X)
+    expect(x and x.cost == 5000 and x.conf == 3, "minConf 3 must buy the Drop-only step's output")
+
+    # 4. The window, settings and /crafter cap on real data; "My character" results unchanged.
+    lua, ns, stub = new_runtime()
+    g = lua.globals()
+    tailoring_world(lua, stub)
+    scan(lua, stub)
+    before = char_fingerprint(ns)
+    slash(lua, "")
+    frame = g.ForeverCrafterFrame
+    expect(ns.settings.mode == "char" and not frame.wi.cap.__shown, "what-if controls shown in My character mode")
+    frame.mode.Click(frame.mode)
+    expect(ns.settings.mode == "whatIf" and ns.UI.calculating is not None, "mode button does not start a what-if run")
+    stub.runTimers()
+    expect(ns.UI.calculating is None and ns.UI.stats.whatIf, "what-if run does not finish through the timers")
+    expect(all(r.whatIf for r in ns.UI.view.values()) and len(ns.UI.view) > 0, "what-if view is empty or mixed")
+    expect(frame.wi.cap.__shown and not frame.known.__shown, "what-if controls not swapped in")
+    labels = [h.col.label for h in frame.headers.values() if h.col]
+    expect(labels == ["Recipe", "Profit", "%", "Profs", "Conf", "Sell"], f"what-if columns {labels}")
+    rows = [f for f in stub.frames.values() if f.result is not None and f.result.whatIf]
+    if expect(rows, "what-if rows missing"):
+        rows[0].Click(rows[0])
+        detail = frame.detail.__text
+        expect("Recipes in the chain" in detail and "Confidence" in detail and "What-if" in detail,
+               "what-if detail misses the chain recipes/confidence")
+    frame.wi.conf.Click(frame.wi.conf)
+    frame.wi.max.Click(frame.wi.max)
+    stub.runTimers()
+    expect(ns.settings.whatIf.minConf == 5 and ns.settings.whatIf.maxPrimaries == 3, "cycle buttons")
+    expect(ns.UI.stats.sets == 35, f"max 3 of 7 primaries should be 35 sets, got {ns.UI.stats.sets}")
+    frame.wi.cap.SetText(frame.wi.cap, "75")
+    frame.wi.cap.__scripts.OnEnterPressed(frame.wi.cap)
+    stub.runTimers()
+    expect(ns.settings.whatIf.cap == 75, "skill cap box")
+    expect(all(p.rank <= 75 for r in ns.UI.results.values() for p in r.profs.values()), "cap 75 not applied")
+    ns.settings.profession = TAILORING
+    ns.UI.ApplyFilter()
+    expect(len(ns.UI.view) > 0 and all(any(p.line == TAILORING for p in r.profs.values())
+                                       for r in ns.UI.view.values()), "what-if profession filter")
+    ns.settings.profession = 0
+    frame.wi.overrides.Click(frame.wi.overrides)
+    pop = g.ForeverCrafterOverrides
+    if expect(pop and pop.__shown, "overrides popup does not open"):
+        box = pop.boxes[BLACKSMITHING]
+        box.SetText(box, "200")
+        box.__scripts.OnEnterPressed(box)
+        expect(ns.settings.whatIf.overrides[BLACKSMITHING] == 200, "override box")
+    for cmd, check, msg in (
+            ("cap 150", lambda w: w.cap == 150, "cap 150"),
+            ("cap bs clear", lambda w: w.overrides[BLACKSMITHING] is None, "cap bs clear"),
+            ("cap first aid 75", lambda w: w.overrides[129] == 75, "cap first aid 75"),
+            ("cap Mining 300", lambda w: w.overrides[MINING] == 300, "cap Mining 300"),
+            ("cap first aid clear", lambda w: w.overrides[129] is None, "cap first aid clear")):
+        slash(lua, cmd)
+        expect(check(ns.settings.whatIf), f"/crafter {cmd}")
+    n0 = len(stub.prints)
+    slash(lua, "cap")
+    slash(lua, "cap nothing 5")
+    out = " ".join(prints(stub, n0))
+    expect("what-if skill cap 150" in out and "Mining 300" in out and "no profession" in out, f"/crafter cap: {out}")
+    ns.settings.whatIf.overrides[MINING] = None
+    frame.mode.Click(frame.mode)
+    stub.runTimers()
+    expect(ns.settings.mode == "char" and not any(r.whatIf for r in ns.UI.view.values()), "back to My character")
+    expect(char_fingerprint(ns) == before, "My character results changed after what-if runs")
+    errs = list(ns.errors.values())
+    expect(not errs, f"errors in what-if mode: {errs[:3]}")
+
+
+def check_what_if_full():
+    """Real data, nothing known, every item on the AH: what-if at cap 150 and max 2 primaries. → summary, top 10"""
+    lua, ns, stub = new_runtime()
+    login(lua, stub)
+    listings = []
+    for i in ns.Items.keys():
+        price = 100 + (i * 7919) % 50000
+        listings += [(i, 5, price * 5), (i, 1, price + 10)]
+    set_auctions(lua, stub, listings)
+    scan(lua, stub)
+    out = {}
+    for mp in (2, 0):
+        start = time.time()
+        res, st = wi_run(lua, ns, maxPrimaries=mp)
+        out[mp] = (res, st, time.time() - start)
+    res, st, took = out[2]
+    expect(took < 20, f"what-if run took {took:.1f} s")
+    expect(st.sets == 21, f"max 2 of 7 primaries should be 21 sets, got {st.sets}")
+    profit = [r for r in res.values() if r.profit > 0]
+    expect(len(profit) > 50, f"what-if found only {len(profit)} profitable crafts")
+    for r in res.values():
+        if not expect(r.value - r.cost == r.profit and r.primaries <= 2 and r.conf <= 4
+                      and all(p.rank <= 150 for p in r.profs.values()), f"what-if result {r.spell}"):
+            break
+    # Async: one set per frame; the slowest frame is what the player feels.
+    frames, last = [], [time.time()]
+
+    def progress(i, n):
+        now = time.time()
+        frames.append(now - last[0])
+        last[0] = now
+
+    done = {}
+    ns.Planner.RunAsync(ltable(lua, {"whatIf": WI_DEFAULT}), progress, lambda r, s: done.update(n=len(r)))
+    stub.runTimers()
+    expect(done.get("n") == len(res), "RunAsync results differ from Run")
+    errs = list(ns.errors.values())
+    expect(not errs, f"errors in the what-if run: {errs[:3]}")
+    top = sorted(profit, key=lambda r: -r.profit)[:10]
+    return (f"what-if run (cap 150, max 2 primaries): {st.sets} sets, {st.evaluated} recipes evaluated, "
+            f"{len(profit)} profitable, {took:.2f} s in one go (any number of primaries: {out[0][2]:.2f} s), "
+            f"slowest frame async {max(frames) * 1000:.0f} ms"), top
+
+
 R_KNOWN_EXCL, R_LISTED_EXCL = 7636, 8778  # Tailoring recipes on no Wowhead Forever list (excluded_recipes.txt)
 SOURCE_TEXT = ("|cFFFFD200Trainer: |rAny Tailoring trainer|n|cFFFFD200Cost: |r50"
                "|TInterface\\MoneyFrame\\UI-SilverIcon:0:0:2:0|t")
@@ -641,6 +906,9 @@ def main():
         check_dump()
         n, evaluated, took = check_full_run()
         summary.append(f"full run: {evaluated} recipes evaluated, {n} profitable, {took:.2f} s")
+        check_what_if()
+        line, _ = check_what_if_full()
+        summary.append(line)
         check_zip()
     for p in problems:
         print("FAIL", p)

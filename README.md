@@ -41,6 +41,24 @@ To update, delete the old `ForeverCrafter` folder and put the new one in its pla
 
 Prices are only as fresh as your last scan, and other players buy and post all the time. Check the AH before you buy a large batch.
 
+### What-if mode
+
+The **Mode** button at the top of the window switches between **My character** (your recipes and skill) and **What-if**: a made-up character with every profession at a skill cap, to find profitable chains across professions you have not trained on any character.
+
+- **Skill cap** (default 150) applies to every profession; **Overrides...** (or `/crafter cap <profession> <n|clear>`) sets a different cap for single professions. A recipe counts if its learn rank is at most its profession's cap, both as the craft you sell and as a step in a chain.
+- **Max primaries** (1, 2, 3 or any; default 2): the most primary professions a chain may need. Cooking and First Aid are secondary and do not count. For each recipe the addon finds the cheapest chain that fits the limit, so a recipe whose best chain needs three professions still shows with its best two-profession chain.
+- **Min conf**: how sure it must be that each recipe in the chain can be learned. A chain has the level of its least sure recipe. The default hides **Unknown**.
+
+| Level | Meaning |
+|---|---|
+| 1 Confirmed | A character knew it in a client dump, or this character knows it |
+| 2 Trainer/vendor | Wowhead Forever says a trainer teaches it (or it is a starter recipe), or its recipe item is sold by a vendor |
+| 3 Likely | No source anywhere, but the game data marks it as learned with the profession (`AcquireMethod` 1) |
+| 4 Drop/quest/other | Only other sources: a drop, quest, world object and so on |
+| 5 Unknown | No source at all |
+
+The **Profs** column lists the professions a chain needs (e.g. `Min+BS`), the **Conf** column its level, and the profession filter matches any profession in the chain. The details show each recipe in the chain with its profession and learn rank, its level and how to learn it, the total cost to learn the recipes the character does not know, and how many crafts pay that back. Profit counts only the crafting; the learning costs (and the cost of training the professions) are not taken off. `~` (an estimated price) is separate from the confidence level. The calculation runs over a few frames ("Calculating..." in the status line) so the game does not freeze. The settings are saved for the whole account.
+
 ### Commands
 
 | Command | What it does |
@@ -49,6 +67,7 @@ Prices are only as fresh as your last scan, and other players buy and post all t
 | `/crafter scan` | Full AH snapshot (the AH window must be open) |
 | `/crafter status` | Your professions and skill, snapshot age, the AH cut in use |
 | `/crafter cut <pct>` | Set the AH cut in percent; blank goes back to the measured or assumed cut |
+| `/crafter cap [<profession>] <n\|clear>` | What-if skill cap: `/crafter cap 150` for all professions, `/crafter cap mining 200` for one (name or short name, e.g. `bs`, `first aid`), `/crafter cap mining clear` to drop the override; `/crafter cap` prints them |
 | `/crafter minimap` | Show or hide the minimap button |
 | `/crafter dump` | Save the open profession window's full recipe list (learned and unlearned), reagents, outputs, the game's "how to learn" text (empty in Forever so far) and item info, for the data in this addon (see below); `/crafter dump clear` removes it |
 | `/crafter reset` | Forget prices, merchant data and this character's recipe data |
@@ -69,8 +88,9 @@ These cannot be tested outside the game. Please go through them once and report 
 7. [ ] After an AH sale, open the mailbox: `/crafter status` shows the measured cut (e.g. `AH cut 5.0% (from 1 sale invoice(s))`).
 8. [ ] The minimap button and the compartment entry show a coin icon.
 9. [ ] `/crafter debug` lists no missing APIs or events.
-10. [ ] If your trainer or a vendor teaches a recipe listed in [`research/open_sources.txt`](research/open_sources.txt) (recipes, reagents and vendors that Wowhead Forever has no source for), or you can learn one of the left-out recipes in [`research/excluded_recipes.txt`](research/excluded_recipes.txt), please report it.
-11. [ ] **Help the recipe data:** open each profession window and type `/crafter dump` (on each character, for each profession, both factions if you can). Then `/reload` or log out, and send `WTF\Account\<account>\SavedVariables\ForeverCrafter.lua` (the file also holds your character names, skills and saved prices; the import reads only its `dump` part and keeps the recipes, items, faction and date, and which recipes some character knows, but not which character). A recipe a character knows counts as existing even if Wowhead Forever lists it nowhere, and the game's reagents come before the DB2 ones. The game's recipe list itself holds every recipe in the client data, learnable or not, so it is not used to add recipes. The dump also notes items the game knows nothing about.
+10. [ ] **What-if** mode (Mode button) with Max primaries **3**: the game does not stutter while "Calculating..." runs, and the results look sane (e.g. a Mining + Blacksmithing chain).
+11. [ ] If your trainer or a vendor teaches a recipe listed in [`research/open_sources.txt`](research/open_sources.txt) (recipes, reagents and vendors that Wowhead Forever has no source for), or you can learn one of the left-out recipes in [`research/excluded_recipes.txt`](research/excluded_recipes.txt), please report it.
+12. [ ] **Help the recipe data:** open each profession window and type `/crafter dump` (on each character, for each profession, both factions if you can). Then `/reload` or log out, and send `WTF\Account\<account>\SavedVariables\ForeverCrafter.lua` (the file also holds your character names, skills and saved prices; the import reads only its `dump` part and keeps the recipes, items, faction and date, and which recipes some character knows, but not which character). A recipe a character knows counts as existing even if Wowhead Forever lists it nowhere, and the game's reagents come before the DB2 ones. The game's recipe list itself holds every recipe in the client data, learnable or not, so it is not used to add recipes. The dump also notes items the game knows nothing about.
 
 ## Development
 

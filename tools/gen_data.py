@@ -643,7 +643,7 @@ def build(manifest, db, wh, client=None):
 
     prof = {}
     for r in db["SkillLine"]:
-        prof[int(r["ID"])] = (r["DisplayName_lang"], int(r["ParentSkillLineID"]))
+        prof[int(r["ID"])] = (r["DisplayName_lang"], int(r["ParentSkillLineID"]), int(r["CategoryID"]))
 
     # Pages to read one by one on Wowhead Forever (tools/wowhead_crawl.js): what the list views leave open.
     no_how = {i for i, e in items.items() if not e.get("how")}
@@ -965,11 +965,12 @@ def llist(v):
 
 def lua_recipes(recipes, prof):
     out = [HEADER, "ns.DATA_BUILD = %s" % lstr(BUILD), "",
-           "-- skillLine = { name, parent } (parent 0 = the profession itself)",
+           "-- skillLine = { name, parent, cat } (parent 0 = the profession itself; cat = SkillLine.CategoryID:",
+           "--   11 profession, 9 secondary skill)",
            "ns.SkillLines = {"]
     for k in sorted(prof):
-        out.append("  [%d]={name=%s,parent=%d,src=\"db2\",verified=\"%s\"}," % (
-            k, lstr(prof[k][0]), prof[k][1], DB2_VERIFIED))
+        out.append("  [%d]={name=%s,parent=%d,cat=%d,src=\"db2\",verified=\"%s\"}," % (
+            k, lstr(prof[k][0]), prof[k][1], prof[k][2], DB2_VERIFIED))
     out += ["}", "",
             "-- [spellID] = { name, skill = skill line, learn = rank needed to learn,",
             "--   trivLo/trivHi = yellow/grey skill-up thresholds, out = {itemID, min, max},",

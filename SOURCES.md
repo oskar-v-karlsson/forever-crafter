@@ -8,7 +8,7 @@ All data was taken from client **1.60.1.70888** (wago.tools product `wowf`) on *
 
 | Key | Source | Used for |
 |---|---|---|
-| `db2` | Forever client DB2 tables exported by wago.tools, product `wowf`, build **1.60.1.70888**: `https://wago.tools/db2/<Table>/csv?build=1.60.1.70888` for SkillLine, SkillLineAbility, SpellName, SpellEffect, SpellReagents, Item, ItemSparse, ItemEffect, ItemXItemEffect. Filtered snapshots, with row counts and SHA-256 of the full downloads, are in `research/db2/` (`manifest.json`). | Profession skill lines; every recipe (spell, skill line, `MinSkillLineRank`, `TrivialSkillLineRankLow/High`, `AcquireMethod`); reagents and counts (`SpellReagents`); the created item and count (`SpellEffect` "Create Item", effect 24); recipe items that teach a recipe (`Item` class 9 + `ItemEffect`); item names, quality, `SellPrice`, `BuyPrice`, `VendorStackCount`, max stack, bind type (`ItemSparse`). |
+| `db2` | Forever client DB2 tables exported by wago.tools, product `wowf`, build **1.60.1.70888**: `https://wago.tools/db2/<Table>/csv?build=1.60.1.70888` for SkillLine, SkillLineAbility, SpellName, SpellEffect, SpellReagents, Item, ItemSparse, ItemEffect, ItemXItemEffect. Filtered snapshots, with row counts and SHA-256 of the full downloads, are in `research/db2/` (`manifest.json`). | Profession skill lines and whether each is a primary profession or a secondary skill (`SkillLine.CategoryID`: 11 = professions, 9 = secondary skills Cooking and First Aid; `cat` in `Data/Recipes.lua`, used by what-if mode); every recipe (spell, skill line, `MinSkillLineRank`, `TrivialSkillLineRankLow/High`, `AcquireMethod`); reagents and counts (`SpellReagents`); the created item and count (`SpellEffect` "Create Item", effect 24); recipe items that teach a recipe (`Item` class 9 + `ItemEffect`); item names, quality, `SellPrice`, `BuyPrice`, `VendorStackCount`, max stack, bind type (`ItemSparse`). |
 | `wh_list` | Wowhead Forever list views, read in a browser on 2026-11-11 with `tools/wowhead_dump.js` (www.wowhead.com returns 403 to scripts): the profession spell lists (`https://www.wowhead.com/forever/spells/professions/<profession>`, `.../secondary-skills/cooking`, `.../secondary-skills/first-aid`), the recipe item lists (`https://www.wowhead.com/forever/items/recipes/<profession>`) and the item lists for trade goods, consumables, armour, weapons, quest and miscellaneous items. Trimmed copies with the page URLs and fetch times: `research/wowhead/`. The recipe item lists were dumped again on 2026-11-12 for their `sourcemore` column (`research/wowhead/recipe_item_sourcemore.json`, via `python3 tools/gen_data.py wowhead-sourcemore`). | Which DB2 recipes exist in Forever (a recipe on no list is left out, see below); how a recipe is learned (trainer and training cost, recipe item, drop, quest, vendor) and how an item is obtained (source codes, e.g. 5 = Vendor), used for the vendor reagent list and the "how to learn" text. |
 | `wh_tt` | Wowhead Forever tooltips, `https://nether.wowhead.com/forever/tooltip/spell/<id>` and `.../tooltip/item/<id>` (scriptable). Never add `?dataEnv=`: `dataEnv=8` returns **WotLK** data (its links point to `/wotlk/`). | Cross-check of a sample of recipes against the DB2 data: `tools/crosscheck_wowhead.py`, results in `research/crosscheck_2026-11-12.txt`. `make check` also checks one tooltip fact: Minor Troll's Blood Elixir (3170) takes Peacebloom (2447), Earthroot ×2 (2449) and Empty Vial (3371). Name, quality and sell price of the items that have no `ItemSparse` row: `python3 tools/gen_data.py wowhead-tooltips`, 2026-11-12, `research/wowhead/tooltips_items.json`. |
 | `wh_item` | Wowhead Forever item and spell pages, `https://www.wowhead.com/forever/item=<id>` and `.../spell=<id>`, plus the zone list `https://www.wowhead.com/forever/zones`. Read in a browser on 2026-11-12 with `tools/wowhead_crawl.js` (see "Reading Wowhead Forever pages" below), trimmed by `python3 tools/gen_data.py wowhead-pages <folder>` into `research/wowhead/pages_items.json`, `pages_spells.json` and `zones.json`. | Item pages: the "Sold by" list (NPC name, zone, faction, unlimited or limited stock) of the vendor reagents and of some recipe items, and the source lists ("Dropped by", "Contained in", ...) of reagents that have no source on the list views. Spell pages: a sample of recipes with no source and of left-out recipes (see below). |
@@ -25,6 +25,20 @@ All data was taken from client **1.60.1.70888** (wago.tools product `wowf`) on *
 - **Items** (`Data/Items.lua`, 4044): every reagent, created item and recipe item, with the DB2 prices. 194 IDs are in the `Item` table but have no `ItemSparse` row in this export (`missing=true`; the name comes from Wowhead when it has one).
 - **Vendor reagents** (`Data/Vendor.lua`, 814): items whose Wowhead Forever source list has "Vendor" and whose DB2 `BuyPrice` is above 0. 303 are treated as unlimited stock (source only "Vendor" and quality Common or lower); the rest are marked `limited` and are not used as a buy price until the player sees them at a merchant.
 - **Recipe learning:** `AcquireMethod` (DB2) plus the Wowhead source codes and training cost. 338 recipes have no Wowhead source of their own: for 70 the addon names their recipe item's source, for 6 it says a character knew them in a client dump, and for the other 262 it says "source unknown".
+
+## What-if confidence
+
+What-if mode (README, "What-if mode") rates how sure it is that each recipe can be learned, from the data fields below, first match wins. A chain takes the level of its least sure recipe. Nothing here is a new fact: the levels only sort the sources the data already has.
+
+| Level | Data fields (source) |
+|---|---|
+| 1 Confirmed | `known` in `Data/Recipes.lua` (a character knew it in a client dump, `client`), or the current character knows it (profession window or spellbook, in game) |
+| 2 Trainer/vendor | The recipe's Wowhead source codes `how` have 6 Trainer, 5 Vendor or 10 Starter (`wh_list`); or one of its recipe items (`items`, `db2`) is a vendor recipe in `Data/Vendor.lua` (`recipe=true`, `wh_list`/`wh_item`), was seen at a merchant in game, has source code 5 in `Data/Items.lua` `how`, or has a `vendor` entry in its `from` list (`wh_item`) |
+| 4 Drop/quest/other | Any other source code or `from` entry on the recipe or its recipe items (drop, quest, world object, ...) |
+| 3 Likely | No source, but DB2 `SkillLineAbility.AcquireMethod` is 1 (see "Where sources disagree": all 6 such recipes in the client dump were known) |
+| 5 Unknown | None of the above |
+
+The left-out recipes (`research/excluded_recipes.txt`) are not in the data and never count; a recipe that only the profession window knows (no `learn` rank in the data) is not used in what-if mode. A recipe the profession window hides counts as hidden in both modes.
 
 ## Cross-check with the Wowhead Forever tooltips
 
@@ -51,7 +65,8 @@ The first `/crafter dump` file (2026-11-12): client 1.60.1.70888, toc 16001, a H
 | AH deposit | `CalculateCommodityDeposit(item, 1, 1)` per item, after each scan | Subtracted from the AH value as a cost (it is lost if the item does not sell) |
 | `BuyPrice` and `VendorStackCount` | DB2 `BuyPrice` read as the price of one vendor bundle of `VendorStackCount` items | Unit cost = `BuyPrice / VendorStackCount`, marked `~` until the merchant is seen |
 | Unlimited vendor stock | Not in the client data | Heuristic: Wowhead source only "Vendor" and quality Common or lower |
-| `AcquireMethod` | DB2 values 0 (2570 rows), 1 (38) and 3 (15); the meaning is not documented in the client data. In the client dump a character knew all 6 Blacksmithing and Mining recipes with value 1 | Wowhead's sources and training cost decide the "how to learn" text; a recipe with no Wowhead source and `AcquireMethod` 1 says it may be learned automatically |
+| `AcquireMethod` | DB2 values 0 (2570 rows), 1 (38) and 3 (15); the meaning is not documented in the client data. In the client dump a character knew all 6 Blacksmithing and Mining recipes with value 1 | Wowhead's sources and training cost decide the "how to learn" text; a recipe with no Wowhead source and `AcquireMethod` 1 says it may be learned automatically, and is "Likely" in what-if mode |
+| Primary or secondary | DB2 `SkillLine.CategoryID` 11 (professions) or 9 (secondary skills: Cooking 185, First Aid 129). Mining is 11; Fishing has no recipes and is not in the data | What-if "Max primaries" counts only category 11 |
 
 ## Open: verify in game
 
@@ -67,6 +82,7 @@ These cannot be checked offline. The addon is built so that each one fails safel
 8. The meaning of `SkillLineAbility.AcquireMethod` (value 1 looks like "learned with the profession", see "Client dump").
 9. The merchant API (`GetMerchantItemInfo` price per `stackCount`) and mail invoices (`GetInboxInvoiceInfo`) in the Forever client.
 10. The minimap and compartment icon `Interface\Icons\INV_Misc_Coin_01` exists.
+11. What-if mode's run over every recipe (one profession set per frame) does not stutter: offline it takes about 2-15 ms per frame and 0.04-0.11 s in total at cap 150 with 2 primaries (Lua 5.1 via lupa).
 
 ## Reading Wowhead Forever pages
 

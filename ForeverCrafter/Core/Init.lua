@@ -101,6 +101,10 @@ local DEFAULTS = {
     minListings = 1,       -- the result must have at least this many AH listings to count as AH-sellable
     sort = "profit",
     sortDesc = true,
+    mode = "char",         -- results window: "char" (this character) or "whatIf"
+    -- What-if mode: every profession at a skill cap. overrides = { [skill line] = cap }; minConf = the least sure
+    -- confidence level a recipe may have (1 Confirmed .. 5 Unknown); maxPrimaries = 0 for any number.
+    whatIf = { cap = 150, overrides = {}, minConf = 4, maxPrimaries = 2 },
   },
   realms = {},      -- realm key → { time, items = { [itemID] = { min, qty, n, ladder = {{unit, qty}, ...} } } }
   vendorSeen = {},  -- itemID → { unit, stack, limited, time, npc } from MERCHANT_SHOW (authoritative)
@@ -180,6 +184,7 @@ local function help()
   ns.Print("/crafter              - results window")
   ns.Print("/crafter scan         - full AH snapshot (AH window open)")
   ns.Print("/crafter cut <pct>    - set the AH cut in percent (blank: back to the measured/assumed one)")
+  ns.Print("/crafter cap [<profession>] <n|clear> - what-if skill cap, for all or one profession")
   ns.Print("/crafter minimap      - show or hide the minimap button")
   ns.Print("/crafter status       - professions, snapshot age, AH cut")
   ns.Print("/crafter reset        - forget prices, merchant data and this character's recipe data")
