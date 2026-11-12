@@ -261,4 +261,5 @@ ns.Command("status", function()
   if not any then ns.Print("no professions found") end
   if ns.Scanner then ns.Scanner.PrintStatus() end
   if ns.Pricing then ns.Pricing.PrintStatus() end
+  if ns.Sales then ns.Sales.PrintStatus() end
 end)

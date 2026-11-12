@@ -226,6 +226,7 @@ local function evaluate(spell, r, line, cost)
     where = value.where, sell = value,
     est = est or PL.CountUnknown(r) or (value.where == "vendor" and value.vendorEst) or false,
     runtime = r.runtime,
+    sales = ns.Sales and ns.Sales.Get(outID),
     tree = { id = outID, qty = n, cost = total, src = "craft", spell = spell, crafts = 1, children = kids, h = h + 1 },
   }
 end

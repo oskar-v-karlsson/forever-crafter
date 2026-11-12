@@ -18,22 +18,24 @@ local COLORS = {
 }
 local COLUMNS = {
   char = {
-    { key = "name", label = "Recipe", width = 196 },
-    { key = "profit", label = "Profit", width = 92 },
-    { key = "pct", label = "%", width = 48 },
-    { key = "where", label = "Sell", width = 50 },
-    { key = "listings", label = "Listed", width = 50 },
+    { key = "name", label = "Recipe", width = 170 },
+    { key = "profit", label = "Profit", width = 88 },
+    { key = "pct", label = "%", width = 44 },
+    { key = "where", label = "Sell", width = 46 },
+    { key = "listings", label = "Listed", width = 46 },
+    { key = "sold", label = "Sold/d", width = 46 },
   },
   whatIf = {
-    { key = "name", label = "Recipe", width = 150 },
-    { key = "profit", label = "Profit", width = 80 },
-    { key = "pct", label = "%", width = 40 },
-    { key = "profs", label = "Profs", width = 76 },
-    { key = "conf", label = "Conf", width = 52 },
-    { key = "where", label = "Sell", width = 38 },
+    { key = "name", label = "Recipe", width = 130 },
+    { key = "profit", label = "Profit", width = 76 },
+    { key = "pct", label = "%", width = 38 },
+    { key = "profs", label = "Profs", width = 70 },
+    { key = "conf", label = "Conf", width = 48 },
+    { key = "where", label = "Sell", width = 36 },
+    { key = "sold", label = "Sold/d", width = 44 },
   },
 }
-local MAX_COLUMNS = 6
+local MAX_COLUMNS = 7
 local PL = ns.Planner
 
 local function whatIf()
@@ -72,6 +74,13 @@ end
 
 -- Filtering and sorting -----------------------------------------------------------------------------------------
 
+-- The "Min sold/day" filter: a result sold on the AH whose output sells less than the minimum per day in the region
+-- (TSM), or has no TSM data, is hidden. Vendor sales are never hidden. → true if the result stays
+function UI.SalesOK(r, min)
+  if not min or min <= 0 or r.where ~= "ah" then return true end
+  return r.sales ~= nil and r.sales.perDay >= min
+end
+
 -- "Min+BS": the professions a what-if chain needs, in the order the chain uses them.
 function UI.ProfsText(r)
   local out = {}
@@ -86,6 +95,7 @@ local function sortValue(r, key)
   if key == "pct" then return r.pct or -math.huge end
   if key == "where" then return r.where end
   if key == "listings" then return r.sell.listings or 0 end
+  if key == "sold" then return r.sales and r.sales.perDay or -1 end
   return r.profit
 end
 
@@ -93,6 +103,7 @@ function UI.ApplyFilter()
   local s = ns.settings
   local view = {}
   local wi = whatIf()
+  local salesHidden = 0
   for _, r in ipairs(UI.results) do
     local ok
     if wi then
@@ -108,6 +119,10 @@ function UI.ApplyFilter()
       if ok and s.profession ~= 0 and r.line ~= s.profession then ok = false end
     end
     if ok and r.profit < math.max(s.minProfit or 0, 1) then ok = false end
+    if ok and not UI.SalesOK(r, s.minSoldPerDay) then
+      ok = false
+      salesHidden = salesHidden + 1
+    end
     if ok then table.insert(view, r) end
   end
   local key, desc = s.sort or "profit", s.sortDesc ~= false
@@ -119,7 +134,7 @@ function UI.ApplyFilter()
     end
     return a.spell < b.spell
   end)
-  UI.view = view
+  UI.view, UI.salesHidden = view, salesHidden
   local maxOffset = math.max(#view - ROWS, 0)
   if UI.offset > maxOffset then UI.offset = maxOffset end
 end
@@ -286,6 +301,7 @@ function UI.DetailText(r)
   table.insert(out, string.format("Sell to the %s: %s  |  Cost %s  |  |cff40ff40Profit %s|r%s",
     r.where == "ah" and "AH" or "vendor", Util.Money(r.value), Util.Money(r.cost), Util.Money(r.profit),
     r.pct and string.format(" (%d%%)", math.floor(r.pct * 100 + 0.5)) or ""))
+  table.insert(out, ns.Sales.DetailText(r.sales))
   if s.thin and r.where == "ah" then
     table.insert(out, "|cffff8040Thin market:|r few listings, the price may not hold.")
   end
@@ -364,6 +380,11 @@ function UI.StatusText()
   local st = UI.stats
   table.insert(parts, string.format("%d profitable of %d recipes", #UI.view, st.evaluated or 0))
   if (st.noPrice or 0) > 0 then table.insert(parts, st.noPrice .. " with an unpriced reagent") end
+  if (UI.salesHidden or 0) > 0 then
+    table.insert(parts, string.format("%d hidden: under %s sold/day", UI.salesHidden,
+      ns.Sales.Format(ns.settings.minSoldPerDay)))
+  end
+  table.insert(parts, ns.Sales.StatusText())
   if not t then table.insert(parts, "|cffff8040open the AH and press Scan|r") end
   return table.concat(parts, "  |  ")
 end
@@ -537,6 +558,8 @@ local function cellText(r, key)
     return r.where == "ah" and (r.sell.thin and "|cffff8040AH|r" or "AH") or "vendor"
   elseif key == "listings" then
     return r.sell.listings and tostring(r.sell.listings) or "-"
+  elseif key == "sold" then
+    return ns.Sales.Format(r.sales and r.sales.perDay)
   elseif key == "profs" then
     return UI.ProfsText(r)
   elseif key == "conf" then
@@ -621,14 +644,14 @@ local function build()
   frame.prof:SetPoint("TOPLEFT", 12, -36)
   frame.prof:SetScript("OnClick", cycleProfession)
   frame.known = checkBox(frame, "Known", 182, "showKnown")
-  frame.learn = checkBox(frame, "Learnable", 262, "showLearnable")
-  frame.minProfit = editBox(frame, 60, "Min profit (g)", 372, function()
+  frame.learn = checkBox(frame, "Learnable", 248, "showLearnable")
+  frame.minProfit = editBox(frame, 54, "Min profit (g)", 336, function()
     return tostring((ns.settings.minProfit or 0) / 10000)
   end, function(v)
     local c = Util.ParseMoney(v)
     if c and c >= 0 then ns.settings.minProfit = c end
   end)
-  frame.minListings = editBox(frame, 32, "Min AH listings", 540, function()
+  frame.minListings = editBox(frame, 32, "Min AH listings", 482, function()
     return tostring(ns.settings.minListings or 1)
   end, function(v)
     local n = tonumber(v)
@@ -637,8 +660,18 @@ local function build()
       UI.Recompute()
     end
   end)
+  frame.minSold = editBox(frame, 36, "Min sold/day", 614, function()
+    local n = ns.settings.minSoldPerDay or 0
+    return n == math.floor(n) and string.format("%d", n) or tostring(n)
+  end, function(v)
+    local n = tonumber(v)
+    if n and n >= 0 then ns.settings.minSoldPerDay = n end
+  end)
+  hint(frame.minSold, { "Min sold/day", "Hide crafts sold on the AH whose item sells fewer than this many per day "
+    .. "in your region (TradeSkillMaster), or that TSM has no data for. 0 = off.",
+    "Vendor sales are never hidden. Profit is not changed." })
   frame.scan = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
-  frame.scan:SetSize(90, 22)
+  frame.scan:SetSize(80, 22)
   frame.scan:SetPoint("TOPRIGHT", -14, -36)
   frame.scan:SetText("Scan AH")
   frame.scan:SetScript("OnClick", function() ns.Scanner.Start() end)

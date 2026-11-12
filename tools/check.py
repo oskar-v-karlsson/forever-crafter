@@ -133,7 +133,7 @@ def check_gen_data():
 
 def check_data(ns):
     keys = source_keys()
-    expect({"db2", "wh_list", "wh_tt", "wh_item", "ui", "in-game", "client"} <= keys,
+    expect({"db2", "wh_list", "wh_tt", "wh_item", "ui", "in-game", "client", "tsm"} <= keys,
            f"SOURCES.md sources table misses keys (has {sorted(keys)})")
     expect(ns.DATA_BUILD in read(os.path.join(ROOT, "SOURCES.md")), "SOURCES.md does not name the pinned DB2 build")
     date = re.compile(r"^\d{4}-\d{2}-\d{2}$")
@@ -210,6 +210,38 @@ def check_data(ns):
     r = ns.Recipes[3170]
     got = sorted((rg[1], rg[2]) for rg in r.reagents.values()) if r else None
     expect(got == [(2447, 1), (2449, 2), (3371, 1)], f"Recipes[3170] reagents {got} differ from Wowhead Forever")
+    counts.update(check_sales_data(ns, keys, date))
+    return counts
+
+
+def check_sales_data(ns, keys, date):
+    """Data/Sales.lua (gen_data.py tsm): fetched from TSM and changing daily, so it is checked for shape, ranges and
+    src, and against the snapshot table in SOURCES.md, not rebuilt from research/."""
+    d = ns.SalesData
+    if not expect(d is not None, "Data/Sales.lua does not set ns.SalesData"):
+        return {}
+    expect(d.src in keys and d.src == "tsm", f"SalesData src {d.src!r}")
+    expect(isinstance(d.verified, str) and date.match(d.verified), "SalesData has no verified date")
+    outputs = {r.out[1] for r in ns.Recipes.values()}
+    sources = read(os.path.join(ROOT, "SOURCES.md"))
+    counts = {}
+    for reg in ("us", "eu"):
+        e = d.regions[reg]
+        if not expect(e is not None, f"SalesData has no {reg} region"):
+            continue
+        expect(isinstance(e.updated, str) and re.match(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$", e.updated),
+               f"SalesData {reg} updated {e.updated!r}")
+        expect(isinstance(e.sha256, str) and re.match(r"^[0-9a-f]{64}$", e.sha256), f"SalesData {reg} sha256")
+        expect(e.sha256 in sources and e.updated in sources, f"SOURCES.md TSM snapshot table does not name the {reg} file")
+        n = 0
+        for i, v in e["items"].items():
+            n += 1
+            ok = i in outputs and v[1] >= 0 and 0 <= v[2] <= 1
+            if not expect(ok, f"SalesData {reg}[{i}] = {list(v.values())} (must be a recipe output, sold/day >= 0, "
+                              f"rate 0-1)"):
+                break
+        expect(n > 500 and n <= e.rows, f"SalesData {reg} keeps {n} of {e.rows} rows")
+        counts[f"TSM {reg} items"] = n
     return counts
 
 
@@ -539,7 +571,8 @@ def check_full_run():
             break
     errs = list(ns.errors.values())
     expect(not errs, f"errors in the full run: {errs[:3]}")
-    return n, stats.evaluated, took
+    hidden = sales_hidden(lua, ns, stub, lambda: ns.Planner.Run(), "char")
+    return n, stats.evaluated, took, hidden
 
 
 MINING, BLACKSMITHING, ENGINEERING, ALCHEMY, COOKING = 186, 164, 202, 171, 185
@@ -616,12 +649,13 @@ def check_what_if():
     b = res.get(R_BRACER)
     expect(b and b.cost == 2000 and b.primaries == 1, "what-if: max 1 primary must buy the bars")
     # The profession filter matches any profession in the chain: Mining shows the Blacksmithing bracer.
-    ns.settings.mode, ns.settings.profession = "whatIf", MINING
+    # Made-up item IDs have no TSM sales data: the Min sold/day filter is off here (check_sales tests it).
+    ns.settings.mode, ns.settings.profession, ns.settings.minSoldPerDay = "whatIf", MINING, 0
     ns.UI.results, ns.UI.stats = ns.Planner.Run(ltable(lua, {"whatIf": WI_DEFAULT}))
     ns.UI.ApplyFilter()
     expect(sorted(r.spell for r in ns.UI.view.values()) == [R_SMELT, R_BRACER],
            "what-if profession filter must match any profession in the chain")
-    ns.settings.mode, ns.settings.profession = "char", 0
+    ns.settings.mode, ns.settings.profession, ns.settings.minSoldPerDay = "char", 0, 1
     # "My character" mode is unaffected (no professions: nothing to show).
     expect(len(results(ns)[0]) == 0, "what-if recipes leak into My character results")
 
@@ -710,7 +744,7 @@ def check_what_if():
     expect(all(r.whatIf for r in ns.UI.view.values()) and len(ns.UI.view) > 0, "what-if view is empty or mixed")
     expect(frame.wi.cap.__shown and not frame.known.__shown, "what-if controls not swapped in")
     labels = [h.col.label for h in frame.headers.values() if h.col]
-    expect(labels == ["Recipe", "Profit", "%", "Profs", "Conf", "Sell"], f"what-if columns {labels}")
+    expect(labels == ["Recipe", "Profit", "%", "Profs", "Conf", "Sell", "Sold/d"], f"what-if columns {labels}")
     rows = [f for f in stub.frames.values() if f.result is not None and f.result.whatIf]
     if expect(rows, "what-if rows missing"):
         rows[0].Click(rows[0])
@@ -800,9 +834,195 @@ def check_what_if_full():
     errs = list(ns.errors.values())
     expect(not errs, f"errors in the what-if run: {errs[:3]}")
     top = sorted(profit, key=lambda r: -r.profit)[:10]
+    hidden = sales_hidden(lua, ns, stub, lambda: ns.Planner.Run(ltable(lua, {"whatIf": WI_DEFAULT})), "whatIf")
     return (f"what-if run (cap 150, max 2 primaries): {st.sets} sets, {st.evaluated} recipes evaluated, "
             f"{len(profit)} profitable, {took:.2f} s in one go (any number of primaries: {out[0][2]:.2f} s), "
-            f"slowest frame async {max(frames) * 1000:.0f} ms"), top
+            f"slowest frame async {max(frames) * 1000:.0f} ms"), top, hidden
+
+
+def sales_hidden(lua, ns, stub, run, mode):
+    """Profitable results the default Min sold/day filter (1) hides, with the test snapshot's region set to EU, then
+    US. run() → the Planner's results. → {region: (hidden, no data, under 1, shown at filter 0)}"""
+    out = {}
+    for reg in ("EU", "US"):
+        stub.regionName = reg
+        ns.Sales.Reset()
+        ns.UI.results, ns.UI.stats = run()
+        ns.settings.mode, ns.settings.profession = mode, 0
+        ns.settings.minSoldPerDay = 0
+        ns.UI.ApplyFilter()
+        all_view = list(ns.UI.view.values())
+        ns.settings.minSoldPerDay = 1
+        ns.UI.ApplyFilter()
+        kept = {r.spell for r in ns.UI.view.values()}
+        gone = [r for r in all_view if r.spell not in kept]
+        expect(len(gone) == ns.UI.salesHidden and all(r.where == "ah" for r in gone),
+               f"{mode} {reg}: the sales filter hid {len(gone)} ({ns.UI.salesHidden} counted), vendor sales among them")
+        expect(all(ns.UI.SalesOK(r, 1) for r in ns.UI.view.values()), f"{mode} {reg}: a result under 1/day shown")
+        out[reg] = (len(gone), sum(1 for r in gone if r.sales is None), sum(1 for r in gone if r.sales is not None),
+                    len(all_view))
+    stub.regionName = "EU"
+    ns.Sales.Reset()
+    ns.settings.mode = "char"
+    return out
+
+
+def hidden_text(h):
+    return "; ".join(f"{reg} {n} of {total} ({nodata} no TSM data, {low} under 1/day)"
+                     for reg, (n, nodata, low, total) in h.items())
+
+
+def check_sales():
+    """TSM sold per day: the bundled snapshot by region, the TSM addon's live values and their scale, the filter."""
+    lua, ns, stub = new_runtime()
+    g = lua.globals()
+    login(lua, stub)
+    S = ns.Sales
+    eu, us = ns.SalesData.regions.eu, ns.SalesData.regions.us
+    both = sorted(i for i in eu["items"].keys() if us["items"][i] is not None and eu["items"][i][1] >= 1
+                  and us["items"][i][1] != eu["items"][i][1])
+    item = both[0]
+    # Snapshot, by region name and by region number.
+    key, name = S.Region()
+    expect((key, name) == ("eu", "EU"), f"Sales.Region() with GetCurrentRegionName EU = {key}, {name}")
+    e = S.Get(item)
+    expect(e and e.src == "snapshot" and e.perDay == eu["items"][item][1] and e.rate == eu["items"][item][2]
+           and e.updated == eu.updated, f"EU snapshot Sales.Get({item})")
+    for reg_name, reg_num, want in (("US", 3, "us"), (None, 1, "us"), (None, 3, "eu"), ("", 3, "eu")):
+        stub.regionName, stub.region = reg_name, reg_num
+        S.Reset()
+        expect(S.Region()[0] == want, f"region name {reg_name!r} number {reg_num} → {S.Region()}, want {want}")
+    stub.regionName, stub.region = "US", 1
+    S.Reset()
+    e = S.Get(item)
+    expect(e and e.src == "snapshot" and e.perDay == us["items"][item][1], f"US snapshot Sales.Get({item})")
+    expect(S.Get(2) is None and S.Get(None) is None, "Sales.Get of an item with no data")
+    for reg_name, reg_num in (("KR", 2), (None, 2), (None, None)):
+        stub.regionName, stub.region = reg_name, reg_num
+        S.Reset()
+        expect(S.Region()[0] is None and S.Get(item) is None, f"region {reg_name!r}/{reg_num} must have no snapshot")
+    n0 = len(stub.prints)
+    slash(lua, "status")
+    out = "\n".join(prints(stub, n0))
+    expect("region unknown" in out and "no TSM snapshot" in out,
+           f"/crafter status with an unknown region: {out}")
+    del g["GetCurrentRegionName"], g["GetCurrentRegion"]
+    S.Reset()
+    expect(S.Region()[0] is None and S.Get(item) is None, "a client without the region functions must have no snapshot")
+    lua.execute("function GetCurrentRegionName() return STUB.regionName end "
+                "function GetCurrentRegion() return STUB.region end")
+
+    # The TSM addon: live values, scaled x1000 (sold/day) and x100 (sale rate) or raw.
+    stub.regionName, stub.region = "EU", 3
+    lua.execute("""
+      TSM_STUB = { perDay = 1000, rate = 100, live = {}, calls = 0 }
+      TSM_API = { GetCustomPriceValue = function(key, s)
+        TSM_STUB.calls = TSM_STUB.calls + 1
+        if TSM_STUB.fail then error("TSM is broken") end
+        local id = tonumber(s:match("^i:(%d+)$"))
+        local e = TSM_STUB.live[id]
+        if not e then return nil end
+        if key == "DBRegionSoldPerDay" then return e[1] * TSM_STUB.perDay end
+        if key == "DBRegionSaleRate" then return e[2] * TSM_STUB.rate end
+      end }
+    """)
+    tsm = g.TSM_STUB
+
+    def feed(scale_d, scale_r, factor=1.1, region=eu):
+        tsm.perDay, tsm.rate = scale_d, scale_r
+        for i, v in region["items"].items():
+            tsm.live[i] = lua.table_from([v[1] * factor, min(v[2] * factor, 1)])
+
+    S.Reset()
+    a = S.Get(item)
+    expect(a and a.src == "snapshot", "TSM loaded without values must fall back to the snapshot")
+    feed(1000, 100)
+    b = S.Get(item)
+    expect(b and b.src == "tsm" and abs(b.perDay - eu["items"][item][1] * 1.1) < 1e-6
+           and abs(b.rate - min(eu["items"][item][2] * 1.1, 1)) < 1e-6,
+           f"TSM live x1000/x100 not read back (got {b and (b.src, b.perDay, b.rate)}): an item read before TSM had "
+           f"values must not stay cached")
+    n0 = len(stub.prints)
+    slash(lua, "status")
+    out = "\n".join(prints(stub, n0))
+    expect("scale 1000 (sale rate 100)" in out and "compared with the snapshot" in out and "EU" in out,
+           f"/crafter status with TSM live: {out}")
+    tsm.live[item] = None
+    S.Reset()
+    feed(1000, 100)
+    tsm.live[item] = None
+    c = S.Get(item)
+    expect(c and c.src == "snapshot", "an item TSM has no value for must fall back to the snapshot")
+    S.Reset()
+    feed(1, 1)
+    d = S.Get(item)
+    expect(d and d.src == "tsm" and abs(d.perDay - eu["items"][item][1] * 1.1) < 1e-6, "TSM live raw values")
+    S.Reset()
+    tsm.fail = True
+    e = S.Get(item)
+    expect(e and e.src == "snapshot", "a TSM_API that errors must fall back to the snapshot")
+    tsm.fail = False
+    # No snapshot for the region (KR): the scale comes from the sale rate alone.
+    stub.regionName = "KR"
+    S.Reset()
+    feed(1000, 1000)
+    f = S.Get(item)
+    expect(f and f.src == "tsm" and abs(f.perDay - eu["items"][item][1] * 1.1) < 1e-6,
+           f"TSM live with no snapshot (KR, x1000): {f and (f.src, f.perDay)}")
+    n0 = len(stub.prints)
+    slash(lua, "status")
+    out = "\n".join(prints(stub, n0))
+    expect("scale 1000" in out and "from the sale rate" in out and "no TSM snapshot" in out,
+           f"/crafter status with TSM and no snapshot: {out}")
+    lua.execute("TSM_API = nil")
+    stub.regionName = "EU"
+    S.Reset()
+
+    # Texts and the filter rule.
+    expect([S.Format(x) for x in (None, 0.25, 3.44, 12.6)] == ["—", "0.25", "3.4", "13"], "Sales.Format")
+    expect(S.DetailText(None) == "No TSM sales data for this item", "detail text without data")
+    t = S.DetailText(S.Get(item))
+    expect(t.startswith("Sells ~") and "/day in EU (TSM snapshot " + eu.updated[:10] + ")" in t and "sale rate" in t,
+           f"detail text {t!r}")
+    r = lambda where, sales: ltable(lua, {"where": where, "sales": sales})
+    ok = ns.UI.SalesOK
+    expect(ok(r("vendor", None), 1) and ok(r("vendor", {"perDay": 0.1}), 5), "vendor sales must never be hidden")
+    expect(not ok(r("ah", None), 1) and not ok(r("ah", {"perDay": 0.5}), 1) and ok(r("ah", {"perDay": 1}), 1),
+           "AH sales under the minimum or with no data must be hidden")
+    expect(ok(r("ah", None), 0) and ok(r("ah", None), None), "filter 0 must hide nothing")
+
+    # In the window: a result with no TSM data shows "—", and filter 0 shows exactly what the filter ignores.
+    tailoring_world(lua, stub)
+    scan(lua, stub)
+    expect(ns.settings.minSoldPerDay == 1, "Min sold/day must default to 1")
+    slash(lua, "")
+    frame = g.ForeverCrafterFrame
+    ns.settings.minSoldPerDay = 0
+    ns.UI.ApplyFilter()
+    view0 = [x.spell for x in ns.UI.view.values()]
+    expect(ns.UI.salesHidden == 0 and view0, "filter 0 hides results")
+    labels = [h.col.label for h in frame.headers.values() if h.col]
+    expect(labels == ["Recipe", "Profit", "%", "Sell", "Listed", "Sold/d"], f"My character columns {labels}")
+    ns.UI.Refresh()
+    cells = [f.cells[6].__text for f in stub.frames.values() if f.cells is not None and f.result is not None]
+    expect(cells and all(c == S.Format(x.sales and x.sales.perDay) for c, x in
+                         zip(cells, ns.UI.view.values())), f"Sold/d cells {cells}")
+    frame.minSold.SetText(frame.minSold, "2.5")
+    frame.minSold.__scripts.OnEnterPressed(frame.minSold)
+    expect(ns.settings.minSoldPerDay == 2.5 and frame.minSold.__text == "2.5", "Min sold/day box")
+    frame.minSold.SetText(frame.minSold, "-1")
+    frame.minSold.__scripts.OnEnterPressed(frame.minSold)
+    expect(ns.settings.minSoldPerDay == 2.5, "Min sold/day box must reject negatives")
+    frame.minSold.SetText(frame.minSold, "1")
+    frame.minSold.__scripts.OnEnterPressed(frame.minSold)
+    expect(frame.minSold.__text == "1" and "Sold/day: TSM EU snapshot" in frame.status.__text,
+           f"status line {frame.status.__text!r}")
+    rows = [x for x in stub.frames.values() if x.result is not None]
+    if rows:
+        rows[0].Click(rows[0])
+        expect("TSM" in frame.detail.__text, "detail pane has no TSM sales line")
+    errs = list(ns.errors.values())
+    expect(not errs, f"errors in the sales checks: {errs[:3]}")
 
 
 R_KNOWN_EXCL, R_LISTED_EXCL = 7636, 8778  # Tailoring recipes on no Wowhead Forever list (excluded_recipes.txt)
@@ -904,11 +1124,14 @@ def main():
         check_solver_shapes()
         check_missing_apis()
         check_dump()
-        n, evaluated, took = check_full_run()
+        n, evaluated, took, hidden = check_full_run()
         summary.append(f"full run: {evaluated} recipes evaluated, {n} profitable, {took:.2f} s")
+        summary.append("  Min sold/day 1 hides (My character): " + hidden_text(hidden))
         check_what_if()
-        line, _ = check_what_if_full()
+        line, _, hidden = check_what_if_full()
         summary.append(line)
+        summary.append("  Min sold/day 1 hides (What-if): " + hidden_text(hidden))
+        check_sales()
         check_zip()
     for p in problems:
         print("FAIL", p)

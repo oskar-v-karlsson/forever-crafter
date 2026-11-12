@@ -15,6 +15,7 @@ All data was taken from client **1.60.1.70888** (wago.tools product `wowf`) on *
 | `ui` | Blizzard UI code for Forever 1.60.1 ([reckhou/WoWBlzCode](https://github.com/reckhou/WoWBlzCode), @ `7245053`, folder `Forever/BlizzardInterfaceCode/Interface/AddOns`: `Blizzard_APIDocumentationGenerated/` `AuctionHouseDocumentation.lua`, `TradeSkillUIDocumentation.lua`, `SkillInfoDocumentation.lua`, `ItemDocumentation.lua`, `SpellBookDocumentation.lua`, `MailInfoDocumentation.lua`; `Blizzard_UIPanels_Game/{Vanilla,Mainline}/MerchantFrame.lua`; `Blizzard_MailFrame/MailFrame.lua`) | API names, arguments, return values and events: `C_AuctionHouse.ReplicateItems`, `GetNumReplicateItems`, `GetReplicateItemInfo` (18 returns), `GetReplicateItemLink`, `REPLICATE_ITEM_LIST_UPDATE`, `CalculateCommodityDeposit` (duration index 1 = 12 h), `C_TradeSkillUI.GetAllRecipeIDs`, `GetRecipeInfo`, `GetRecipeSchematic`, `SetShowUnlearned`, `GetBaseProfessionInfo`, `GetChildProfessionInfo`, `TRADE_SKILL_SHOW` / `LIST_UPDATE` / `CLOSE`, `C_SkillInfo.GetSkillLineInfoByID`, the merchant API (`GetMerchantNumItems`, `GetMerchantItemID`, `GetMerchantItemInfo`), mail invoices (`GetInboxInvoiceInfo`), the frame templates. The UI code has no AH cut constant. |
 | `in-game` | The live Forever client while the addon runs | Overrides static data where the game knows better: recipes and reagents of the open profession window (`C_TradeSkillUI`), prices of every merchant the player opens, the AH cut measured from sale invoices in the mailbox, AH deposits (`CalculateCommodityDeposit`), item sell prices (`C_Item.GetItemInfo`). Stored in the SavedVariables, never in `Data/`. |
 | `client` | The live Forever client, saved by `/crafter dump` in game (`C_TradeSkillUI.GetAllRecipeIDs`, `GetRecipeInfo`, `GetRecipeSchematic`, `GetRecipeSourceText`, `C_Item.GetItemInfo`) and merged from the SavedVariables file by `python3 tools/gen_data.py client-dump <ForeverCrafter.lua>` into `research/client/dump.json`. No character names or skills are kept; which recipes some dumped character knows is kept without saying who (`known`). `GetRecipeSourceText` is not in the generated API docs; Forever's own profession window calls it for unlearned recipes (`Blizzard_ProfessionsTemplates/Blizzard_ProfessionsRecipeSchematicForm.lua`, `ui` above). | Comes **before** Wowhead Forever: a recipe a dumped character knows exists (`known`), even if no Wowhead list has it; a DB2 recipe missing from a profession's full listing is left out; the game's reagents and output replace the DB2 ones where they differ; the game's "how to learn" text (`learnText`) if it gives one; name, quality and sell price of items with no `ItemSparse` row. Being in the game's list alone proves nothing: the list holds every DB2 recipe of the profession (see "Client dump" below). Wowhead fills what the client does not say (vendor NPCs, drop sources, which recipes can be learned). |
+| `tsm` | [TradeSkillMaster](https://tradeskillmaster.com) public region data for WoW: Forever, `https://public-data.tradeskillmaster.com/forever/{us,eu}/region/items.csv` (no key, updated daily; columns `itemId,name,marketValue,historical,avgSalePrice,saleRate,soldPerDay,updatedAt`), downloaded by `python3 tools/gen_data.py tsm` (`make tsm`); in game the TSM addon's `TSM_API.GetCustomPriceValue("DBRegionSoldPerDay" | "DBRegionSaleRate", "i:<id>")` when it is loaded. Data by TradeSkillMaster, offered free and public on the terms published with it; there is no explicit redistribution clause, so only the derived subset is bundled (below), with this attribution, and the raw CSVs are not kept in `research/`. | Sold per day and sale rate of recipe outputs (`Data/Sales.lua`), for the **Sold/day** column and the **Min sold/day** filter. Never used for prices or profit. |
 
 ## How the data is built
 
@@ -39,6 +40,26 @@ What-if mode (README, "What-if mode") rates how sure it is that each recipe can 
 | 5 Unknown | None of the above |
 
 The left-out recipes (`research/excluded_recipes.txt`) are not in the data and never count; a recipe that only the profession window knows (no `learn` rank in the data) is not used in what-if mode. A recipe the profession window hides counts as hidden in both modes.
+
+## TradeSkillMaster sales data
+
+How many of a recipe's output sell per day, to hide crafts that are profitable on paper but hardly sell (README, "Sold per day").
+
+- **Scope:** TSM publishes sales only **region-wide** (all realms, all realm types, both factions together). Its Forever realm files (`.../forever/<region>/realm/<normal|pvp|roleplay|roleplay-pvp>-<horde|alliance>/items.csv`) have prices only (`marketValue,minBuyout,recent,historical`), no sales, and are not used. A region figure says nothing about one realm's faction AH.
+- **Kept:** `soldPerDay` and `saleRate` (0-1) of the recipe outputs in `Data/Recipes.lua` only; no prices, no names, no other items. An output that is not in TSM's file has **no data** (usually never sold on the AH); the window shows "—" and hides it while the filter is above 0. `make check` checks `Data/Sales.lua` for structure, `src`/`verified`, value ranges, that every item is a recipe output, and that the snapshot below names the same files. Unlike the other data it is not rebuilt from `research/` (it changes daily).
+- **Order in game, per item:** the TSM addon's own region value when it is loaded and returns one (its AuctionDB data from the TSM Desktop App, loaded at login or `/reload`), otherwise the bundled snapshot of the game's region. The region is `GetCurrentRegionName()` ("US", "EU", as Forever's own UI code uses it, `ui`), else `GetCurrentRegion()` (1 = US, 3 = EU, assumed); any other region has no snapshot.
+- **Scale of the TSM addon's values:** not verified (TSM's API documentation site was not reachable). The addon compares the live values of up to 25 snapshot items with the snapshot and picks the scale (1, 100 or 1000) nearest to the median ratio, for sold per day and sale rate separately. With no snapshot for the region it reads the sale rate (raw 0-1, so a larger value is scaled) and uses that scale for both. `/crafter status` shows the scale and how it was found.
+
+Snapshot in `Data/Sales.lua` (rewritten by `gen_data.py tsm`):
+
+<!-- tsm-snapshot -->
+| Region | File | updatedAt | Rows | sha256 | Recipe outputs kept (sold/day >= 1) |
+|---|---|---|---|---|---|
+| US | `https://public-data.tradeskillmaster.com/forever/us/region/items.csv` | 2026-11-11T08:47:34Z | 6653 | `33bbe7a6f2b1bc077ed2fde18d9b38a45b99ca858972bd85871adc44ba2e324d` | 939 (650) |
+| EU | `https://public-data.tradeskillmaster.com/forever/eu/region/items.csv` | 2026-11-11T00:20:19Z | 7008 | `24fe47dbf0be4ab3ca20964430437c03b4e047909d16fefeee0644a31f0b8639` | 1021 (662) |
+
+Downloaded 2026-11-12; 2032 recipe outputs in Data/Recipes.lua.
+<!-- /tsm-snapshot -->
 
 ## Cross-check with the Wowhead Forever tooltips
 
@@ -67,6 +88,7 @@ The first `/crafter dump` file (2026-11-12): client 1.60.1.70888, toc 16001, a H
 | Unlimited vendor stock | Not in the client data | Heuristic: Wowhead source only "Vendor" and quality Common or lower |
 | `AcquireMethod` | DB2 values 0 (2570 rows), 1 (38) and 3 (15); the meaning is not documented in the client data. In the client dump a character knew all 6 Blacksmithing and Mining recipes with value 1 | Wowhead's sources and training cost decide the "how to learn" text; a recipe with no Wowhead source and `AcquireMethod` 1 says it may be learned automatically, and is "Likely" in what-if mode |
 | Primary or secondary | DB2 `SkillLine.CategoryID` 11 (professions) or 9 (secondary skills: Cooking 185, First Aid 129). Mining is 11; Fishing has no recipes and is not in the data | What-if "Max primaries" counts only category 11 |
+| Sales per day | TradeSkillMaster has sales only per region (all realms and factions); the TSM addon's value scale is not documented where we could read it | Region figure, output item only, filter only (profit unchanged); scale detected against the snapshot ("TradeSkillMaster sales data") |
 
 ## Open: verify in game
 
@@ -83,6 +105,9 @@ These cannot be checked offline. The addon is built so that each one fails safel
 9. The merchant API (`GetMerchantItemInfo` price per `stackCount`) and mail invoices (`GetInboxInvoiceInfo`) in the Forever client.
 10. The minimap and compartment icon `Interface\Icons\INV_Misc_Coin_01` exists.
 11. What-if mode's run over every recipe (one profession set per frame) does not stutter: offline it takes about 2-15 ms per frame and 0.04-0.11 s in total at cap 150 with 2 primaries (Lua 5.1 via lupa).
+12. `GetCurrentRegionName()` returns "US" or "EU" in Forever, and `GetCurrentRegion()` 1 for US and 3 for EU (the fallback).
+13. With TradeSkillMaster 4.15+ loaded: `TSM_API.GetCustomPriceValue("DBRegionSoldPerDay", "i:<id>")` and `"DBRegionSaleRate"` return values, and their scale (raw, x100 or x1000; `/crafter status` shows the one detected) matches the TSM addon's own tooltip.
+14. The **Min sold/day** box and the other boxes in the second toolbar row do not overlap at the default window size.
 
 ## Reading Wowhead Forever pages
 
