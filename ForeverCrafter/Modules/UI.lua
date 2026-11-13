@@ -88,6 +88,16 @@ function UI.ProfsText(r)
   return table.concat(out, "+")
 end
 
+-- Row hint for a craft with a random output count (here or in a step of its chain), else nil.
+function UI.RandomHint(r)
+  if r.outMin then
+    return string.format("Makes %d-%d per craft at random; profit uses the average. Worst case %s, best case %s.",
+      r.outMin, r.outMax, Util.Money(r.worst), Util.Money(r.best))
+  elseif r.var then
+    return "A step of the chain makes a random count; its cost uses the average."
+  end
+end
+
 local function sortValue(r, key)
   if key == "name" then return r.name end
   if key == "profs" then return (r.primaries or 0) * 1000 + #(r.profs or {}) end
@@ -187,13 +197,30 @@ end
 
 local SRC_TEXT = { ah = "AH", vendor = "vendor", craft = "craft" }
 
+local function countText(n)
+  return n == math.floor(n) and tostring(n) or string.format("%.1f", n)
+end
+
+-- " - makes 1-5 each (avg 3)[, worst case 3 crafts]" for a craft with a random output count.
+local function rangeNote(node, depth)
+  if not node.outMin then return "" end
+  local s = string.format(", |cffc080ffmakes %d-%d each (avg %s)", node.outMin, node.outMax,
+    countText((node.outMin + node.outMax) / 2))
+  local worst = math.ceil(node.qty / node.outMin)
+  if depth > 0 and worst > node.crafts then
+    s = s .. string.format(", worst case %d crafts", worst)
+  end
+  return s .. "|r"
+end
+
 local function nodeLines(node, depth, out)
   local pad = string.rep("    ", depth)
-  local qty = node.qty == math.floor(node.qty) and tostring(node.qty) or string.format("%.1f", node.qty)
+  local qty = countText(node.qty)
   if node.src == "craft" then
     local r = ns.Planner.Recipe(node.spell)
-    table.insert(out, string.format("%s|cffffd100Craft|r %s x%s  (%d craft%s of %s)  %s", pad, Util.ItemText(node.id),
-      qty, node.crafts, node.crafts == 1 and "" or "s", r and r.name or "?", Util.Money(node.cost)))
+    table.insert(out, string.format("%s|cffffd100Craft|r %s x%s  (%d craft%s of %s%s)  %s", pad,
+      Util.ItemText(node.id), qty, node.crafts, node.crafts == 1 and "" or "s", r and r.name or "?",
+      rangeNote(node, depth), Util.Money(node.cost)))
     for _, c in ipairs(node.children) do nodeLines(c, depth + 1, out) end
   else
     local note = node.est and " ~" or ""
@@ -279,8 +306,13 @@ function UI.DetailText(r)
   end
   table.insert(out, "")
   local s = r.sell
-  local n = r.n == math.floor(r.n) and tostring(r.n) or string.format("%.1f (average)", r.n)
-  table.insert(out, string.format("Makes %s x %s", n, Util.ItemText(r.out)))
+  if r.outMin then
+    table.insert(out, string.format("Makes %d-%d (avg %s) x %s", r.outMin, r.outMax, countText(r.n),
+      Util.ItemText(r.out)))
+  else
+    local n = r.n == math.floor(r.n) and tostring(r.n) or string.format("%.1f (average)", r.n)
+    table.insert(out, string.format("Makes %s x %s", n, Util.ItemText(r.out)))
+  end
   if ns.Planner.CountUnknown(ns.Planner.Recipe(r.spell)) then
     table.insert(out, "  ~ the game data gives no count for this craft; 1 is assumed. Open the profession window to "
       .. "read the real count.")
@@ -301,6 +333,13 @@ function UI.DetailText(r)
   table.insert(out, string.format("Sell to the %s: %s  |  Cost %s  |  |cff40ff40Profit %s|r%s",
     r.where == "ah" and "AH" or "vendor", Util.Money(r.value), Util.Money(r.cost), Util.Money(r.profit),
     r.pct and string.format(" (%d%%)", math.floor(r.pct * 100 + 0.5)) or ""))
+  if r.outMin then
+    table.insert(out, string.format("|cffc080ffRandom count:|r worst case (%d) profit %s, best case (%d) profit %s per "
+      .. "craft; the profit above uses the average.", r.outMin, Util.Money(r.worst), r.outMax, Util.Money(r.best)))
+  elseif r.var then
+    table.insert(out, "|cffc080ffRandom count:|r a step of the chain makes a random count; its cost uses the average "
+      .. "(see the chain).")
+  end
   table.insert(out, ns.Sales.DetailText(r.sales))
   if s.thin and r.where == "ah" then
     table.insert(out, "|cffff8040Thin market:|r few listings, the price may not hold.")
@@ -548,6 +587,11 @@ local function cellText(r, key)
     local col = COLORS[r.color] or COLORS.unknown
     local name = "|c" .. col .. r.name .. "|r"
     if not r.known then name = "|cff66ccff[L]|r " .. name end
+    if r.outMin then
+      name = string.format("|cffc080ff[%d-%d]|r ", r.outMin, r.outMax) .. name
+    elseif r.var then
+      name = "|cffc080ff[rnd]|r " .. name
+    end
     if ns.Planner.Steps(r.tree) > 1 then name = name .. " |cffaaaaaa+chain|r" end
     return name
   elseif key == "profit" then
@@ -568,6 +612,7 @@ local function cellText(r, key)
   end
   return ""
 end
+UI.CellText = cellText
 
 local function build()
   frame = CreateFrame("Frame", "ForeverCrafterFrame", UIParent, "BackdropTemplate")
@@ -736,6 +781,8 @@ local function build()
       if r.whatIf then
         table.insert(lines, "Needs " .. UI.ProfsText(r) .. "; confidence " .. PL.CONF[r.conf])
       end
+      local var = UI.RandomHint(r)
+      if var then table.insert(lines, var) end
       UI.ShowHint(self, lines)
     end)
     row:SetScript("OnLeave", UI.HideHint)
@@ -805,8 +852,8 @@ function UI.Refresh()
     end
   end
   local n = #UI.view
-  frame.footer:SetText(n > 0 and string.format("%d-%d of %d   (scroll with the mouse wheel; [L] = not learned yet)",
-    UI.offset + 1, math.min(UI.offset + ROWS, n), n) or "nothing profitable with these filters")
+  frame.footer:SetText(n > 0 and string.format("%d-%d of %d   (scroll with the mouse wheel; [L] = not learned yet; "
+    .. "[1-5] = random count)", UI.offset + 1, math.min(UI.offset + ROWS, n), n) or "nothing profitable with these filters")
   detail:SetText(UI.DetailText(UI.selected))
   frame.detailChild:SetHeight(math.max(detail:GetStringHeight() + 10, 10))
 end

@@ -578,6 +578,78 @@ def check_full_run():
 MINING, BLACKSMITHING, ENGINEERING, ALCHEMY, COOKING = 186, 164, 202, 171, 185
 WI_DEFAULT = {"cap": 150, "overrides": {}, "minConf": 4, "maxPrimaries": 2}
 
+# Random output counts: SpellEffect.Variance at build 1.60.1.70888 read as base x (1 -/+ variance/2) (assumed, see
+# SOURCES.md). spell: (base, variance, min, max)
+RANDOM_OUTPUT = {3962: (3, 0.6667, 2, 4), 3937: (3, 0.6667, 2, 4), 3950: (3, 0.6667, 2, 4), 3931: (2, 1.0, 1, 3),
+                 3946: (3, 1.3333, 1, 5), 3941: (2, 1.0, 1, 3), 8339: (2, 1.0, 1, 3), 435964: (3, 1.0, 2, 4),
+                 435966: (3, 1.0, 2, 4)}
+R_HEAVY_DYNAMITE, HEAVY_DYNAMITE, HEAVY_POWDER, WOOL = 3946, 4378, 4377, 2592
+
+
+def check_random_output():
+    lua, ns, stub = new_runtime()
+    # 1. The generated ranges: these 9 vary, every other recipe makes a fixed count.
+    for spell, r in ns.Recipes.items():
+        want = RANDOM_OUTPUT.get(spell)
+        got = (r.out[2], r.out[3])
+        if want:
+            expect(got == want[2:], f"Recipes[{spell}] {r.name} makes {got[0]}-{got[1]}, expected {want[2]}-{want[3]}")
+        elif not expect(got[0] == got[1], f"Recipes[{spell}] {r.name} makes {got[0]}-{got[1]}: not a random recipe"):
+            break
+
+    # 2. Heavy Dynamite (1-5): cost and value use the average 3; worst and best case at 1 and 5.
+    login(lua, stub, skills={ENGINEERING: 300}, known=[R_HEAVY_DYNAMITE])
+    set_auctions(lua, stub, [(HEAVY_POWDER, 2, 2), (WOOL, 1, 1), (HEAVY_DYNAMITE, 1, 5000), (HEAVY_DYNAMITE, 1, 5200)])
+    scan(lua, stub)
+    unit = ns.Pricing.SellValue(HEAVY_DYNAMITE).unit
+    hd = results(ns)[0].get(R_HEAVY_DYNAMITE)
+    if expect(hd is not None, "Heavy Dynamite not evaluated"):
+        expect(hd.n == 3 and hd.cost == 3 and hd.value == int(unit * 3) and hd.profit == hd.value - 3,
+               f"Heavy Dynamite average: n {hd.n} cost {hd.cost} value {hd.value} (unit {unit})")
+        expect(hd.outMin == 1 and hd.outMax == 5 and hd.var, "Heavy Dynamite range not on the result")
+        expect(hd.worst == int(unit * 1) - 3 and hd.best == int(unit * 5) - 3,
+               f"Heavy Dynamite worst {hd.worst} best {hd.best} (unit {unit})")
+        t = ns.UI.DetailText(hd)
+        expect("Makes 1-5 (avg 3) x " in t, "detail has no 'Makes 1-5 (avg 3)' line")
+        expect(f"worst case (1) profit {ns.Util.Money(hd.worst)}, best case (5) profit {ns.Util.Money(hd.best)}" in t,
+               "detail has no worst/best case line")
+        expect("makes 1-5 each (avg 3)" in t, "chain tree does not show the range of the craft")
+        expect(ns.UI.CellText(hd, "name").startswith("|cffc080ff[1-5]|r "), "list has no [1-5] marker")
+        expect("Worst case" in (ns.UI.RandomHint(hd) or ""), "row hint does not explain the random count")
+
+    # 3. The profession window's schematic overrides the static range.
+    def schematic_run(out):
+        open_ts(lua, stub, ENGINEERING, 300, {R_HEAVY_DYNAMITE: (True, 0, {
+            "name": "Heavy Dynamite", "out": [HEAVY_DYNAMITE] + out, "reagents": [[HEAVY_POWDER, 2], [WOOL, 1]]})})
+        return results(ns)[0].get(R_HEAVY_DYNAMITE)
+    r = schematic_run([2, 6])
+    expect(r and r.runtime and r.outMin == 2 and r.outMax == 6 and r.n == 4 and r.value == int(unit * 4),
+           "window schematic 2-6 does not override the static 1-5")
+    r = schematic_run([3, 3])
+    expect(r and r.runtime and r.outMin is None and not r.var and r.n == 3 and "Random count" not in
+           ns.UI.DetailText(r), "window schematic 3-3 still shows a random count")
+
+    # 4. A random-count craft as a step of a chain: 7 X needed, X makes 1-5 (avg 3) -> 3 crafts, worst case 7.
+    lua, ns, stub = new_runtime()
+    login(lua, stub, skills={TAILORING: 300})
+    X, Y, TOP = 990301, 990302, 990303
+    synthetic(lua, ns, stub, {991301: (X, [[Y, 1]]), 991302: (TOP, [[X, 7]])}, [X, Y, TOP])
+    ns.Recipes[991301].out[3] = 5
+    set_auctions(lua, stub, [(Y, 10, 100), (X, 1, 100000), (TOP, 1, 1000000)])
+    scan(lua, stub)
+    top = results(ns)[0].get(991302)
+    if expect(top is not None, "chain with a random-count step not evaluated"):
+        step = top.tree.children[1]
+        expect(step.src == "craft" and step.crafts == 3 and step.outMin == 1 and step.outMax == 5 and top.cost == 30,
+               f"random-count step: {step.src} x{step.crafts}, cost {top.cost}")
+        expect(top.var and top.outMin is None and top.worst is None, "chain result should be var without its own range")
+        t = ns.UI.DetailText(top)
+        expect("makes 1-5 each (avg 3), worst case 7 crafts" in t, "chain tree does not show the step's worst case")
+        expect("a step of the chain makes a random count" in t, "detail does not mention the random step")
+        expect(ns.UI.CellText(top, "name").startswith("|cffc080ff[rnd]|r "), "list has no [rnd] marker")
+    errs = list(ns.errors.values())
+    expect(not errs, f"errors in the random output checks: {errs[:3]}")
+
 
 def wi_run(lua, ns, **kw):
     """A what-if run with the default settings changed by kw. → ({spell: result}, stats)"""
@@ -1178,6 +1250,7 @@ def main():
     if not problems:
         check_core_flow()
         check_solver_shapes()
+        check_random_output()
         check_missing_apis()
         check_dump()
         n, evaluated, took, hidden = check_full_run()
