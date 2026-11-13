@@ -96,12 +96,13 @@
         "EffectIndex",
         "Effect",
         "EffectItemType",
-        "EffectBasePointsF"
+        "EffectBasePointsF",
+        "Variance"
       ],
       "full_rows": 43508,
       "full_sha256": "da2fb074eedb51bd1246ef53666044c0b757bdb67340c3969b712caa8481ac2b",
       "snapshot_rows": 2300,
-      "snapshot_sha256": "d43dac2e4c3357b19960d8a774d1c142d21d66bb6d6b6f32612d22a385e70f4e",
+      "snapshot_sha256": "910ba1821219d0ab089e15fcce9c10b0ccc773819574b9f436df46ea45383b35",
       "url": "https://wago.tools/db2/SpellEffect/csv?build=1.60.1.70888"
     },
     "SpellName": {

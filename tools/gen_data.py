@@ -36,6 +36,7 @@ import csv
 import hashlib
 import io
 import json
+import math
 import os
 import re
 import shutil
@@ -71,7 +72,7 @@ TABLES = {
                          "TrivialSkillLineRankLow", "TrivialSkillLineRankHigh", "NumSkillUps"],
     "SpellName": ["ID", "Name_lang"],
     "SpellEffect": ["ID", "SpellID", "DifficultyID", "EffectIndex", "Effect", "EffectItemType",
-                    "EffectBasePointsF"],
+                    "EffectBasePointsF", "Variance"],
     "SpellReagents": ["ID", "SpellID"] + ["Reagent_%d" % i for i in range(8)]
                      + ["ReagentCount_%d" % i for i in range(8)],
     "Item": ["ID", "ClassID", "SubclassID"],
@@ -579,6 +580,22 @@ def load_research():
     return manifest, db, wh, client
 
 
+def output_range(base, variance):
+    """Items per craft from SpellEffect: EffectBasePointsF and Variance. ASSUMED (not verified in game, see SOURCES.md):
+    the count is base x (1 -/+ variance/2), rounded to whole items, with .5 rounded toward the base so the range's
+    mean stays the base (Heavy Dynamite 3, 1.3333 -> 1-5)."""
+    if not variance:
+        return int(base), int(base)
+    half = base * variance / 2
+
+    def toward_base(x):
+        lo, frac = int(math.floor(x)), x - math.floor(x)
+        if abs(frac - 0.5) < 1e-6:
+            return lo + 1 if x < base else lo
+        return int(math.floor(x + 0.5))
+    return max(toward_base(base - half), 0), toward_base(base + half)
+
+
 def build(manifest, db, wh, client=None):
     """Return (files dict name->text, report lines). client = research/client/dump.json (comes before Wowhead)."""
     report = []
@@ -596,7 +613,8 @@ def build(manifest, db, wh, client=None):
     for r in sorted(db["SpellEffect"], key=lambda r: (int(r["SpellID"]), int(r["DifficultyID"]),
                                                       int(r["EffectIndex"]))):
         if r["DifficultyID"] == "0" and r["SpellID"] not in creates:
-            creates[r["SpellID"]] = (int(r["EffectItemType"]), num(r["EffectBasePointsF"]))
+            creates[r["SpellID"]] = (int(r["EffectItemType"]), num(r["EffectBasePointsF"]),
+                                     float(r.get("Variance") or 0))
     reagents = {}
     for r in db["SpellReagents"]:
         lst = []
@@ -641,11 +659,14 @@ def build(manifest, db, wh, client=None):
             excluded.append((int(sp), int(a["SkillLine"]), spell_name.get(sp, "?") + " (learnedat 9999)"))
             continue
         w = w or {}
-        out_id, out_n = creates[sp]
+        out_id, out_n, variance = creates[sp]
         rg = reagents.get(sp, [])
         if w.get("reagents") and sorted(map(list, w["reagents"])) != sorted(rg):
             report.append("reagent mismatch %s %s db2=%s wh=%s" % (sp, w["name"], rg, w["reagents"]))
-        out_min = out_max = int(out_n)
+        out_min, out_max = output_range(out_n, variance)
+        if out_min != out_max:
+            report.append("random output %s %s: base %s variance %.4f -> %d-%d" % (
+                sp, spell_name.get(sp, "?"), out_n, variance, out_min, out_max))
         if w.get("creates"):
             c = w["creates"]
             if c[0] != out_id or c[1] != out_n:

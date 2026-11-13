@@ -59,9 +59,15 @@ function PL.CountUnknown(r)
   return (r.out[2] or 1) < 1
 end
 
-local function avgOut(r)
+-- Items per craft as min, max. Some crafts make a random count (Heavy Dynamite 1-5, from SpellEffect.Variance); costs
+-- and profit use the average, and the result shows the worst and best case.
+function PL.OutRange(r)
   local lo = math.max(r.out[2] or 1, 1)
-  local hi = math.max(r.out[3] or lo, lo)
+  return lo, math.max(r.out[3] or lo, lo)
+end
+
+local function avgOut(r)
+  local lo, hi = PL.OutRange(r)
   return (lo + hi) / 2
 end
 PL.AvgOut = avgOut
@@ -93,8 +99,9 @@ local function newSolver(usable, producers)
       for _, spell in ipairs(producers[id] or {}) do
         local r = PL.Recipe(spell)
         if usable(spell, r) then
-          local crafts = math.ceil(qty / avgOut(r))
-          local total, kids, ok, est, h = 0, {}, true, PL.CountUnknown(r), 0
+          local lo, hi = PL.OutRange(r)
+          local crafts = math.ceil(qty / ((lo + hi) / 2))
+          local total, kids, ok, est, h, var = 0, {}, true, PL.CountUnknown(r), 0, hi > lo
           for _, rg in ipairs(r.reagents) do
             local c, inc = cost(rg[1], rg[2] * crafts, depth + 1, visiting)
             if inc then incomplete = true end
@@ -104,12 +111,13 @@ local function newSolver(usable, producers)
             end
             total = total + c.cost
             if c.est then est = true end
+            if c.var then var = true end
             if c.h > h then h = c.h end
             table.insert(kids, c)
           end
           if ok and (not best or total < best.cost) then
             best = { id = id, qty = qty, cost = total, src = "craft", spell = spell, crafts = crafts, children = kids,
-              est = est, h = h + 1 }
+              est = est, h = h + 1, var = var or nil, outMin = hi > lo and lo or nil, outMax = hi > lo and hi or nil }
           end
         end
       end
@@ -208,18 +216,20 @@ local function evaluate(spell, r, line, cost)
   local outID = r.out[1]
   local value = ns.Pricing.SellValue(outID)
   if not value then return nil, "noValue" end
-  local total, kids, est, h = 0, {}, false, 0
+  local total, kids, est, h, var = 0, {}, false, 0, false
   for _, rg in ipairs(r.reagents) do
     local c = cost(rg[1], rg[2], 0, { [outID] = true })
     if not c then return nil, "noPrice" end
     total = total + c.cost
     if c.est then est = true end
+    if c.var then var = true end
     if c.h > h then h = c.h end
     table.insert(kids, c)
   end
-  local n = avgOut(r)
+  local lo, hi = PL.OutRange(r)
+  local n = (lo + hi) / 2
   local worth = math.floor(value.unit * n)
-  return {
+  local res = {
     spell = spell, name = r.name or Util.ItemName(outID), line = line, out = outID, n = n,
     cost = total, value = worth, profit = worth - total,
     pct = total > 0 and (worth - total) / total or nil,
@@ -229,6 +239,19 @@ local function evaluate(spell, r, line, cost)
     sales = ns.Sales and ns.Sales.Get(outID),
     tree = { id = outID, qty = n, cost = total, src = "craft", spell = spell, crafts = 1, children = kids, h = h + 1 },
   }
+  -- Random output count: the worst and best case of one craft (profit itself uses the average). var: this craft or
+  -- a step of its chain makes a random count.
+  if hi > lo then
+    res.outMin, res.outMax = lo, hi
+    res.worst = math.floor(value.unit * lo) - total
+    res.best = math.floor(value.unit * hi) - total
+    res.tree.outMin, res.tree.outMax = lo, hi
+  end
+  if hi > lo or var then
+    res.var = true
+    res.tree.var = true
+  end
+  return res
 end
 
 local function byProfit(a, b)
