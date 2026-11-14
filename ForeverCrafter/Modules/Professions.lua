@@ -154,6 +154,10 @@ function P.Capture()
     local okI, r = ns.Call("C_TradeSkillUI.GetRecipeInfo", id)
     if okI and type(r) == "table" then
       all[id] = true
+      local okC, spell = ns.Call("C_Spell.GetSpellInfo", id)
+      if okC and type(spell) == "table" and type(spell.castTime) == "number" and spell.castTime >= 0 then
+        char.casts[id] = spell.castTime
+      end
       if r.learned then
         learned = learned + 1
         char.known[id] = true

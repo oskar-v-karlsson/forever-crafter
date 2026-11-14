@@ -73,6 +73,8 @@ TABLES = {
     "SpellName": ["ID", "Name_lang"],
     "SpellEffect": ["ID", "SpellID", "DifficultyID", "EffectIndex", "Effect", "EffectItemType",
                     "EffectBasePointsF", "Variance"],
+    "SpellMisc": ["ID", "SpellID", "DifficultyID", "CastingTimeIndex"],
+    "SpellCastTimes": ["ID", "Base", "Minimum"],
     "SpellReagents": ["ID", "SpellID"] + ["Reagent_%d" % i for i in range(8)]
                      + ["ReagentCount_%d" % i for i in range(8)],
     "Item": ["ID", "ClassID", "SubclassID"],
@@ -142,6 +144,9 @@ def cmd_fetch(args):
     effects = [r for r in rows["SpellEffect"] if r["SpellID"] in spells and r["Effect"] == str(CREATE_ITEM)]
     reagents = [r for r in rows["SpellReagents"] if r["SpellID"] in spells]
     names = [r for r in rows["SpellName"] if r["ID"] in spells]
+    misc = [r for r in rows["SpellMisc"] if r["SpellID"] in spells]
+    cast_ids = {r["CastingTimeIndex"] for r in misc}
+    cast_times = [r for r in rows["SpellCastTimes"] if r["ID"] in cast_ids]
 
     recipe_items = {r["ID"] for r in rows["Item"] if r["ClassID"] == str(RECIPE_CLASS)}
     item_effects = {r["ID"]: r for r in rows["ItemEffect"]}
@@ -162,7 +167,7 @@ def cmd_fetch(args):
 
     filtered = {
         "SkillLine": skill_lines, "SkillLineAbility": sla, "SpellName": names,
-        "SpellEffect": effects, "SpellReagents": reagents, "Item": item_rows,
+        "SpellEffect": effects, "SpellMisc": misc, "SpellCastTimes": cast_times, "SpellReagents": reagents, "Item": item_rows,
         "ItemXItemEffect": ixe, "ItemEffect": ie, "ItemSparse": sparse,
     }
     os.makedirs(DB2_DIR, exist_ok=True)
@@ -615,6 +620,12 @@ def build(manifest, db, wh, client=None):
         if r["DifficultyID"] == "0" and r["SpellID"] not in creates:
             creates[r["SpellID"]] = (int(r["EffectItemType"]), num(r["EffectBasePointsF"]),
                                      float(r.get("Variance") or 0))
+    # Cast time: SpellMisc.CastingTimeIndex (DifficultyID 0) -> SpellCastTimes.Base (ms).
+    cast_base = {r["ID"]: int(r["Base"]) for r in db["SpellCastTimes"]}
+    casts = {}
+    for r in sorted(db["SpellMisc"], key=lambda r: int(r["ID"])):
+        if r["DifficultyID"] == "0" and r["SpellID"] not in casts and cast_base.get(r["CastingTimeIndex"], -1) >= 0:
+            casts[r["SpellID"]] = cast_base[r["CastingTimeIndex"]]
     reagents = {}
     for r in db["SpellReagents"]:
         lst = []
@@ -692,6 +703,8 @@ def build(manifest, db, wh, client=None):
             "whLearn": int(w.get("learnedat", 0) or 0) if w else int(a["MinSkillLineRank"]),
             "items": [],
         }
+        if sp in casts:
+            recipes[sp]["cast"] = casts[sp]
         if w:
             recipes[sp]["onWh"] = True
         if sp in cl_known:
@@ -721,6 +734,8 @@ def build(manifest, db, wh, client=None):
         else:
             r["learn"] = min(ranks)
 
+    for sp in sorted((sp for sp, r in recipes.items() if "cast" not in r), key=int):
+        report.append("no cast time %s %s (no SpellMisc row)" % (sp, recipes[sp]["name"]))
     # Items referenced by the kept recipes.
     item_ids = set()
     for r in recipes.values():
@@ -1106,7 +1121,8 @@ def lua_recipes(recipes, prof):
             "--   reagents = {{itemID, count}}, how = Wowhead source codes (6 trainer, 5 vendor,",
             "--   2 drop, 4 quest, ...; from the profession lists, or from the recipe's own page when",
             "--   src has wh_item), cost = trainer cost (copper), items = recipe item IDs,",
-            "--   acquire = SkillLineAbility.AcquireMethod, learnText = the game's own \"how to learn\" text",
+            "--   acquire = SkillLineAbility.AcquireMethod, cast = cast time in ms (SpellMisc.CastingTimeIndex ->",
+            "--   SpellCastTimes.Base; missing = no SpellMisc row, time unknown), learnText = the game's own \"how to learn\" text",
             "--   (C_TradeSkillUI.GetRecipeSourceText, src client), known = date of the client dump in which a",
             "--   character knew the recipe (src client); src client = the game listed the recipe and its",
             "--   reagents/output come from the game }",
@@ -1118,6 +1134,7 @@ def lua_recipes(recipes, prof):
         ver = max(PAGES_VERIFIED if r.get("page") else DB2_VERIFIED, r.get("client") or "", r.get("known") or "")
         text = ",learnText=%s" % lstr(r["learnText"]) if r.get("learnText") else ""
         text += ",known=%s" % lstr(r["known"]) if r.get("known") else ""
+        text = (",cast=%d" % r["cast"] if "cast" in r else "") + text
         out.append(
             "  [%s]={name=%s,skill=%d,learn=%d,trivLo=%d,trivHi=%d,out=%s,reagents=%s,how=%s,"
             "cost=%d,items=%s,acquire=%d%s,src=\"%s\",verified=\"%s\"}," % (

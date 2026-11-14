@@ -20,6 +20,7 @@ import os
 import re
 import subprocess
 import sys
+import math
 import time
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -314,12 +315,15 @@ def ltable(lua, v):
     return v
 
 
-def open_ts(lua, stub, line, rank, recipes, show_unlearned=False):
-    """recipes: {spell: (learned, difficulty, schematic or None[, GetRecipeSourceText])}"""
+def open_ts(lua, stub, line, rank, recipes, show_unlearned=False, casts=None):
+    """recipes: {spell: (learned, difficulty, schematic or None[, GetRecipeSourceText])}; casts: {spell: castTime ms}
+    for C_Spell.GetSpellInfo (else it returns nil)."""
     t = {"line": line, "rank": rank, "max": 300, "showUnlearned": show_unlearned, "recipes": {}}
     for spell, (learned, diff, schem, *source) in recipes.items():
         t["recipes"][spell] = {"learned": learned, "difficulty": diff, "schematic": schem,
                                "source": source[0] if source else None}
+        if casts and spell in casts:
+            t["recipes"][spell]["cast"] = casts[spell]
     stub.ts = ltable(lua, t)
     stub.fire("TRADE_SKILL_SHOW")
     stub.runTimers()
@@ -575,7 +579,7 @@ def check_full_run():
     errs = list(ns.errors.values())
     expect(not errs, f"errors in the full run: {errs[:3]}")
     hidden = sales_hidden(lua, ns, stub, lambda: ns.Planner.Run(), "char")
-    return n, stats.evaluated, took, hidden, shuffle_stats(list(res.values()))
+    return n, stats.evaluated, took, hidden, shuffle_stats(list(res.values())), time_stats(list(res.values()))
 
 
 MINING, BLACKSMITHING, ENGINEERING, ALCHEMY, COOKING = 186, 164, 202, 171, 185
@@ -754,6 +758,142 @@ def check_vendor_shuffles():
     expect(not errs, f"errors in the vendor shuffle checks: {errs[:3]}")
 
 
+def time_stats(res):
+    """Crafting time over results: each time is the chain's crafts x cast, per hour = profit / time.
+    → (results with an unknown time, top 10 by AH g/h, top 10 by vendor g/h)"""
+    for r in res:
+        ok = r.time is not None and r.casts >= 1 and (r.timeUnknown or r.time > 0)
+        if ok and r.time > 0 and not r.timeUnknown:
+            ok = ((r.ahProfit is None) == (r.ahPerHour is None)
+                  and (r.vendorProfit is None) == (r.vendorPerHour is None)
+                  and (r.ahPerHour is None or abs(r.ahPerHour - r.ahProfit / r.time * 3600) < 1e-6)
+                  and (r.ahProfit is None or r.ahProfit <= r.profit))
+        if not expect(ok, f"result {r.spell}: time {r.time} casts {r.casts} unknown {r.timeUnknown} "
+                          f"ah {r.ahProfit}/{r.ahPerHour} vendor {r.vendorProfit}/{r.vendorPerHour}"):
+            break
+    prof = [r for r in res if r.profit > 0]
+    unknown = sum(1 for r in res if r.timeUnknown)
+    ah = sorted([r for r in prof if r.ahPerHour is not None], key=lambda r: (-r.ahPerHour, r.spell))[:10]
+    vend = sorted([r for r in prof if r.vendorPerHour is not None], key=lambda r: (-r.vendorPerHour, r.spell))[:10]
+    return unknown, ah, vend
+
+
+def time_text(ns, st, label):
+    def fmt(r, v):
+        return f"{r.name} {re.sub(r'[|]c[0-9a-f]{8}|[|]r', '', ns.UI.PerHourText(v))}/h ({ns.UI.TimeText(r.time)})"
+    return [f"  crafting time ({label}): {st[0]} results with an unknown time",
+            "  top AH g/h: " + "; ".join(fmt(r, r.ahPerHour) for r in st[1]),
+            "  top Vend g/h: " + "; ".join(fmt(r, r.vendorPerHour) for r in st[2])]
+
+
+R_TRUESILVER_CHAMPION = 10015
+
+
+def check_crafting_time():
+    lua, ns, stub = new_runtime()
+    g = lua.globals()
+    # 1. Cast times from SpellMisc -> SpellCastTimes.Base (build 1.60.1.70888); every recipe has one.
+    expect(ns.Recipes[R_HEAVY_DYNAMITE].cast == 5125 and ns.Recipes[R_TRUESILVER_CHAMPION].cast == 60000,
+           "cast times of Heavy Dynamite / Truesilver Champion")
+    missing = [k for k, r in ns.Recipes.items() if r.cast is None]
+    expect(not missing, f"recipes without a cast time: {missing[:5]}")
+
+    # 2. A 3-step chain: ORE -> BAR (3 s), 2 BAR -> POWDER (5 s), 4 POWDER + 1 BAR -> TOP (10 s).
+    #    1 TOP + 4 POWDER + (8 + 1) BAR crafts = 14 casts, 10 + 20 + 27 = 57 s.
+    login(lua, stub, skills={TAILORING: 300})
+    ORE, BAR, POWDER, TOP, VOUT, AOUT = 990501, 990502, 990503, 990504, 990505, 990506
+    R_BAR, R_POWDER, R_TOP, R_VOUT, R_AOUT = 991501, 991502, 991503, 991504, 991505
+    synthetic(lua, ns, stub, {R_BAR: (BAR, [[ORE, 1]]), R_POWDER: (POWDER, [[BAR, 2]]),
+                              R_TOP: (TOP, [[POWDER, 4], [BAR, 1]]), R_VOUT: (VOUT, [[ORE, 1]]),
+                              R_AOUT: (AOUT, [[ORE, 1]])}, [ORE, BAR, POWDER, TOP, VOUT, AOUT])
+    for spell, ms in ((R_BAR, 3000), (R_POWDER, 5000), (R_TOP, 10000), (R_VOUT, 2000), (R_AOUT, 4000)):
+        ns.Recipes[spell].cast = ms
+    stub["items"][TOP] = lua.table_from({"name": "Test top", "sell": 0})
+    stub["items"][VOUT] = lua.table_from({"name": "Test vendor", "sell": 500})    # vendor only: not on the AH
+    set_auctions(lua, stub, [(ORE, 50, 500), (BAR, 1, 100000), (POWDER, 1, 100000), (TOP, 1, 1000000),
+                             (AOUT, 1, 20000)])
+    scan(lua, stub)
+    res, _ = results(ns)
+    top, vout, aout = res.get(R_TOP), res.get(R_VOUT), res.get(R_AOUT)
+    if expect(top is not None and vout is not None and aout is not None, "crafting time recipes not evaluated"):
+        expect((top.time, top.casts, top.timeUnknown) == (57, 14, False),
+               f"chain time {top.time} s, {top.casts} casts, unknown {top.timeUnknown}")
+        expect(top.profit == top.ahProfit and top.vendorProfit is None and top.vendorPerHour is None
+               and abs(top.ahPerHour - top.profit / 57 * 3600) < 1e-6, "AH-only item: AH g/h, no vendor g/h")
+        expect(vout.where == "vendor" and vout.ahProfit is None and vout.ahPerHour is None
+               and vout.vendorPerHour == vout.vendorProfit / 2 * 3600 == (500 - 10) * 1800, "vendor-only item")
+        expect(aout.ahPerHour == aout.ahProfit / 4 * 3600, "AH g/h of a single craft")
+        t = ns.UI.DetailText(top)
+        expect(f"Crafting time 57 s (14 casts)  |  AH {ns.Util.Money(math.floor(top.ahPerHour + 0.5))}/h  |  vendor —"
+               in t, "detail has no crafting time line")
+        expect("time between casts are not included" in t, "detail has no note on what the time leaves out")
+        expect("(1 craft of Make 990504, 10 s)" in t and "(4 crafts of Make 990503, 20 s)" in t
+               and "(8 crafts of Make 990502, 24 s)" in t and "(1 craft of Make 990502, 3 s)" in t,
+               "chain tree does not show each step's time")
+        cell = ns.UI.CellText
+        expect(cell(top, "time") == "57s" and cell(top, "vgh") == "—" and cell(vout, "ahgh") == "—"
+               and cell(vout, "vgh") == ns.UI.PerHourText(vout.vendorPerHour) and cell(top, "ahgh").endswith("g"),
+               f"time/g/h cells {[cell(top, k) for k in ('time', 'ahgh', 'vgh')]} {cell(vout, 'ahgh')}")
+        expect(ns.UI.TimeText(75) == "1 min 15 s" and ns.UI.TimeText(75, True) == "1m15s"
+               and ns.UI.TimeText(5.125) == "5.1 s" and ns.UI.TimeText(7380, True) == "2h03m", "time formats")
+        expect(ns.UI.PerHourText(-250) == "|cff808080-2s|r" and ns.UI.PerHourText(12, True) == "12c ~",
+               "per-hour text")
+
+    # 3. Sorting: AH g/h and Vend g/h high first (no value last); Time short first.
+    ns.settings.minSoldPerDay = 0
+    slash(lua, "")
+    frame = g.ForeverCrafterFrame
+    UI = ns.UI
+    view = lambda: [r.spell for r in UI.view.values()]
+    heads = {h.col.key: h for h in frame.headers.values() if h.col}
+
+    def order(key):
+        return [s for s, _ in sorted(((s, getattr(res[s], key)) for s in (R_TOP, R_VOUT, R_AOUT, R_BAR, R_POWDER)
+                                      if s in res and res[s].profit > 0),
+                                     key=lambda x: (-(x[1] if x[1] is not None else -1e18), x[0]))]
+    heads["ahgh"].Click(heads["ahgh"])
+    expect(ns.settings.sort == "ahgh" and ns.settings.sortDesc and view() == order("ahPerHour"),
+           f"sorted by AH g/h: {view()} expected {order('ahPerHour')}")
+    expect(view()[-1] == R_VOUT, "a result with no AH g/h must sort last")
+    heads["vgh"].Click(heads["vgh"])
+    expect(ns.settings.sort == "vgh" and view() == order("vendorPerHour") and view()[0] == R_VOUT,
+           f"sorted by Vend g/h: {view()}")
+    heads["time"].Click(heads["time"])
+    times = [res[s].time for s in view()]
+    expect(ns.settings.sort == "time" and not ns.settings.sortDesc and times == sorted(times),
+           f"sorted by Time (short first): {times}")
+
+    # 4. Unknown time: a step with no cast time -> "at least", ">", no per hour, sorted after known times.
+    ns.Recipes[R_POWDER].cast = None
+    UI.Recompute()
+    by = {r.spell: r for r in UI.results.values()}
+    top = by[R_TOP]
+    expect(top.timeUnknown and top.time == 37 and top.ahPerHour is None and top.vendorPerHour is None
+           and top.profit == res[R_TOP].profit, f"unknown time: {top.time} s, AH g/h {top.ahPerHour}")
+    expect("at least 37 s" in UI.DetailText(top) and "time unknown" in UI.DetailText(top)
+           and UI.CellText(top, "time") == "|cffff8040>37s|r" and UI.CellText(top, "ahgh") == "—",
+           "unknown time in the detail and cells")
+    expect(view()[-1] == R_TOP, f"unknown time must sort after known times: {view()}")
+    ns.Recipes[R_POWDER].cast = 5000
+
+    # 5. The profession window's cast time (C_Spell.GetSpellInfo castTime) overrides the game data.
+    open_ts(lua, stub, TAILORING, 300, {s: (True, 0, None) for s in (R_BAR, R_POWDER, R_TOP, R_VOUT, R_AOUT)},
+            casts={R_TOP: 2500, R_BAR: 0})
+    expect(ns.char.casts[R_TOP] == 2500 and ns.char.casts[R_BAR] == 0 and ns.char.casts[R_POWDER] is None,
+           "cast times from the window not stored")
+    expect(ns.Planner.CastMs(R_TOP) == (2500, "game") and ns.Planner.CastMs(R_POWDER) == (5000, "db2"),
+           "CastMs source")
+    res2, _ = results(ns)
+    expect(res2[R_TOP].time == 2.5 + 20 and res2[R_TOP].casts == 14 and res2[R_TOP].profit == res[R_TOP].profit,
+           f"window cast times: chain {res2[R_TOP].time} s")
+    saved = stub.savedVariables("ForeverCrafterDB")
+    lua2, ns2, stub2 = new_runtime(saved=saved)
+    login(lua2, stub2, skills={TAILORING: 300})
+    expect(ns2.char.casts[R_TOP] == 2500, "window cast times not saved")
+    errs = list(ns.errors.values()) + list(ns2.errors.values())
+    expect(not errs, f"errors in the crafting time checks: {errs[:3]}")
+
+
 def wi_run(lua, ns, **kw):
     """A what-if run with the default settings changed by kw. → ({spell: result}, stats)"""
     w = dict(WI_DEFAULT)
@@ -919,7 +1059,8 @@ def check_what_if():
     expect(all(r.whatIf for r in ns.UI.view.values()) and len(ns.UI.view) > 0, "what-if view is empty or mixed")
     expect(frame.wi.cap.__shown and not frame.known.__shown, "what-if controls not swapped in")
     labels = [h.col.label for h in frame.headers.values() if h.col]
-    expect(labels == ["Recipe", "Profit", "Vend. profit", "%", "Profs", "Conf", "Sell", "Sold/d"],
+    expect(labels == ["Recipe", "Profit", "Vend. profit", "%", "Profs", "Conf", "Sell", "Sold/d", "Time", "AH g/h",
+                     "Vend g/h"],
            f"what-if columns {labels}")
     rows = [f for f in stub.frames.values() if f.result is not None and f.result.whatIf]
     if expect(rows, "what-if rows missing"):
@@ -1013,7 +1154,8 @@ def check_what_if_full():
     hidden = sales_hidden(lua, ns, stub, lambda: ns.Planner.Run(ltable(lua, {"whatIf": WI_DEFAULT})), "whatIf")
     return (f"what-if run (cap 150, max 2 primaries): {st.sets} sets, {st.evaluated} recipes evaluated, "
             f"{len(profit)} profitable, {took:.2f} s in one go (any number of primaries: {out[0][2]:.2f} s), "
-            f"slowest frame async {max(frames) * 1000:.0f} ms"), top, hidden, shuffle_stats(list(res.values()))
+            f"slowest frame async {max(frames) * 1000:.0f} ms"), top, hidden, shuffle_stats(list(res.values())), \
+        time_stats(list(res.values()))
 
 
 def sales_hidden(lua, ns, stub, run, mode):
@@ -1234,7 +1376,7 @@ def check_sales():
     view0 = [x.spell for x in ns.UI.view.values()]
     expect(ns.UI.salesHidden == 0 and view0, "filter 0 hides results")
     labels = [h.col.label for h in frame.headers.values() if h.col]
-    expect(labels == ["Recipe", "Profit", "Vend. profit", "%", "Sell", "Listed", "Sold/d"],
+    expect(labels == ["Recipe", "Profit", "Vend. profit", "%", "Sell", "Listed", "Sold/d", "Time", "AH g/h", "Vend g/h"],
            f"My character columns {labels}")
     ns.UI.Refresh()
     cells = [f.cells[7].__text for f in stub.frames.values() if f.cells is not None and f.result is not None]
@@ -1357,17 +1499,20 @@ def main():
         check_solver_shapes()
         check_random_output()
         check_vendor_shuffles()
+        check_crafting_time()
         check_missing_apis()
         check_dump()
-        n, evaluated, took, hidden, shuffles = check_full_run()
+        n, evaluated, took, hidden, shuffles, times = check_full_run()
         summary.append(f"full run: {evaluated} recipes evaluated, {n} profitable, {took:.2f} s")
         summary.append("  Min sold/day 1 hides (My character): " + hidden_text(hidden))
         summary.append("  vendor shuffles (My character): " + shuffle_text(shuffles))
+        summary += time_text(ns, times, "My character")
         check_what_if()
-        line, _, hidden, shuffles = check_what_if_full()
+        line, _, hidden, shuffles, times = check_what_if_full()
         summary.append(line)
         summary.append("  Min sold/day 1 hides (What-if): " + hidden_text(hidden))
         summary.append("  vendor shuffles (What-if): " + shuffle_text(shuffles))
+        summary += time_text(ns, times, "What-if")
         check_sales()
         check_zip()
     for p in problems:

@@ -16,6 +16,11 @@ local ROWS, ROW_H = 18, 20
 local COLORS = {
   orange = "ffff8040", yellow = "ffffff00", green = "ff40c040", grey = "ff808080", unknown = "ffffffff",
 }
+local TIME_HINT = "Casts only: buying the reagents, travel and the time between casts are not included."
+local AH_HOUR_HINT = "AH profit per hour of crafting (the whole chain). — = no AH price (none listed, or fewer than Min "
+  .. "AH listings) or no crafting time."
+local VENDOR_HOUR_HINT = "Vendor profit per hour of crafting (the whole chain). — = a vendor will not buy it or no "
+  .. "crafting time; ~ = estimated vendor price."
 local COLUMNS = {
   char = {
     { key = "name", label = "Recipe", width = 170 },
@@ -25,6 +30,9 @@ local COLUMNS = {
     { key = "where", label = "Sell", width = 46 },
     { key = "listings", label = "Listed", width = 46 },
     { key = "sold", label = "Sold/d", width = 46 },
+    { key = "time", label = "Time", width = 48, hint = "Crafting time of the chain. " .. TIME_HINT },
+    { key = "ahgh", label = "AH g/h", width = 52, hint = AH_HOUR_HINT },
+    { key = "vgh", label = "Vend g/h", width = 56, hint = VENDOR_HOUR_HINT },
   },
   whatIf = {
     { key = "name", label = "Recipe", width = 130 },
@@ -35,10 +43,14 @@ local COLUMNS = {
     { key = "conf", label = "Conf", width = 48 },
     { key = "where", label = "Sell", width = 36 },
     { key = "sold", label = "Sold/d", width = 44 },
+    { key = "time", label = "Time", width = 46, hint = "Crafting time of the chain. " .. TIME_HINT },
+    { key = "ahgh", label = "AH g/h", width = 50, hint = AH_HOUR_HINT },
+    { key = "vgh", label = "Vend g/h", width = 56, hint = VENDOR_HOUR_HINT },
   },
 }
-local MAX_COLUMNS = 8
-local LIST_W = 540
+local MAX_COLUMNS = 11
+local LIST_W = 680
+local FRAME_W = LIST_W + 400
 local PL = ns.Planner
 
 local function whatIf()
@@ -113,12 +125,66 @@ function UI.ShuffleHint(r)
     r.vendorEst and " (vendor price ~ estimate)" or "")
 end
 
+-- "5.1 s", "1 min 15 s", "2 h 3 min"; compact: "5.1s", "1m15s", "2h03m".
+function UI.TimeText(sec, compact)
+  if sec < 60 then
+    local v = sec == math.floor(sec) and string.format("%d", sec) or string.format("%.1f", sec)
+    return v .. (compact and "s" or " s")
+  end
+  local t = math.floor(sec + 0.5)
+  local h, m, sc = math.floor(t / 3600), math.floor(t % 3600 / 60), t % 60
+  if compact then
+    if h > 0 then return string.format("%dh%02dm", h, m) end
+    return sc > 0 and string.format("%dm%02ds", m, sc) or (m .. "m")
+  end
+  if h > 0 then return m > 0 and string.format("%d h %d min", h, m) or (h .. " h") end
+  return sc > 0 and string.format("%d min %d s", m, sc) or (m .. " min")
+end
+
+-- Profit per hour for the list: whole gold, silver or copper ("123g", "45s"); "—" when nil.
+function UI.PerHourText(v, est)
+  if not v then return "—" end
+  local a = math.abs(v)
+  local t
+  if a >= 10000 then
+    t = math.floor(a / 10000) .. "g"
+  elseif a >= 100 then
+    t = math.floor(a / 100) .. "s"
+  else
+    t = math.floor(a) .. "c"
+  end
+  t = (v < 0 and "-" or "") .. t .. (est and " ~" or "")
+  return v > 0 and t or ("|cff808080" .. t .. "|r")
+end
+
+-- "Crafting time 1 min 15 s (5 casts)  |  AH 12g 30s/h  |  vendor 3g/h"
+function UI.TimeLine(r)
+  if not r.time then return nil end
+  local t
+  if r.timeUnknown then
+    t = string.format("Crafting time |cffff8040at least %s|r (%d casts; a recipe has no cast time)",
+      UI.TimeText(r.time), r.casts)
+  elseif r.time == 0 then
+    t = string.format("Crafting time: instant (%d cast%s)", r.casts, r.casts == 1 and "" or "s")
+  else
+    t = string.format("Crafting time %s (%d cast%s)", UI.TimeText(r.time), r.casts, r.casts == 1 and "" or "s")
+  end
+  local function hour(v, est)
+    if not v then return "—" end
+    return Util.Money(math.floor(v + 0.5)) .. "/h" .. (est and " ~" or "")
+  end
+  return string.format("%s  |  AH %s  |  vendor %s", t, hour(r.ahPerHour), hour(r.vendorPerHour, r.vendorEst))
+end
+
 local function sortValue(r, key)
   if key == "name" then return r.name end
   if key == "profs" then return (r.primaries or 0) * 1000 + #(r.profs or {}) end
   if key == "conf" then return r.conf or 0 end
   if key == "pct" then return r.pct or -math.huge end
   if key == "vprofit" then return r.vendorProfit or -math.huge end
+  if key == "time" then return (r.timeUnknown or not r.time) and math.huge or r.time end
+  if key == "ahgh" then return r.ahPerHour or -math.huge end
+  if key == "vgh" then return r.vendorPerHour or -math.huge end
   if key == "where" then return r.where end
   if key == "listings" then return r.sell.listings or 0 end
   if key == "sold" then return r.sales and r.sales.perDay or -1 end
@@ -239,9 +305,11 @@ local function nodeLines(node, depth, out)
   local qty = countText(node.qty)
   if node.src == "craft" then
     local r = ns.Planner.Recipe(node.spell)
-    table.insert(out, string.format("%s|cffffd100Craft|r %s x%s  (%d craft%s of %s%s)  %s", pad,
+    local cast = ns.Planner.CastMs(node.spell, r)
+    table.insert(out, string.format("%s|cffffd100Craft|r %s x%s  (%d craft%s of %s%s, %s)  %s", pad,
       Util.ItemText(node.id), qty, node.crafts, node.crafts == 1 and "" or "s", r and r.name or "?",
-      rangeNote(node, depth), Util.Money(node.cost)))
+      rangeNote(node, depth), cast and UI.TimeText(cast * node.crafts / 1000) or "time unknown",
+      Util.Money(node.cost)))
     for _, c in ipairs(node.children) do nodeLines(c, depth + 1, out) end
   else
     local note = node.est and " ~" or ""
@@ -365,6 +433,11 @@ function UI.DetailText(r)
     table.insert(out, string.format("|cff40ff40Vendor shuffle:|r sell to a vendor instead for %s%s -> profit %s%s; "
       .. "no AH needed.", Util.Money(math.floor(s.vendor * r.n)), r.vendorEst and " ~" or "", Util.Money(r.vendorProfit),
       r.vendorWorst and string.format(" (worst case (%d) %s)", r.outMin, Util.Money(r.vendorWorst)) or ""))
+  end
+  local tl = UI.TimeLine(r)
+  if tl then
+    table.insert(out, tl)
+    table.insert(out, "|cff808080  " .. TIME_HINT .. "|r")
   end
   table.insert(out, ns.Sales.DetailText(r.sales))
   if s.thin and r.where == "ah" then
@@ -640,6 +713,14 @@ local function cellText(r, key)
     return r.sell.listings and tostring(r.sell.listings) or "-"
   elseif key == "sold" then
     return ns.Sales.Format(r.sales and r.sales.perDay)
+  elseif key == "time" then
+    if not r.time then return "—" end
+    if r.timeUnknown then return "|cffff8040>" .. UI.TimeText(r.time, true) .. "|r" end
+    return UI.TimeText(r.time, true)
+  elseif key == "ahgh" then
+    return UI.PerHourText(r.ahPerHour)
+  elseif key == "vgh" then
+    return UI.PerHourText(r.vendorPerHour, r.vendorPerHour and r.vendorEst)
   elseif key == "profs" then
     return UI.ProfsText(r)
   elseif key == "conf" then
@@ -652,7 +733,7 @@ UI.CellText = cellText
 
 local function build()
   frame = CreateFrame("Frame", "ForeverCrafterFrame", UIParent, "BackdropTemplate")
-  frame:SetSize(940, 520)
+  frame:SetSize(FRAME_W, 520)
   frame:SetPoint("CENTER")
   frame:SetFrameStrata("DIALOG")
   frame:SetToplevel(true)
@@ -770,7 +851,7 @@ local function build()
 
   frame.status = text(frame, "small", 0.8, 0.8, 0.8)
   frame.status:SetPoint("TOPLEFT", 14, -66)
-  frame.status:SetWidth(910)
+  frame.status:SetWidth(FRAME_W - 30)
 
   -- List.
   local list = CreateFrame("Frame", nil, frame)
@@ -794,10 +875,15 @@ local function build()
         ns.settings.sortDesc = not ns.settings.sortDesc
       else
         ns.settings.sort, ns.settings.sortDesc = key, key ~= "name" and key ~= "profs" and key ~= "conf"
+          and key ~= "time"
       end
       UI.ApplyFilter()
       UI.Refresh()
     end)
+    h:SetScript("OnEnter", function(self)
+      if self.col and self.col.hint then UI.ShowHint(self, { self.col.label, self.col.hint }) end
+    end)
+    h:SetScript("OnLeave", UI.HideHint)
     table.insert(frame.headers, h)
   end
   rows = {}
@@ -832,6 +918,11 @@ local function build()
       if var then table.insert(lines, var) end
       local shuffle = UI.ShuffleHint(r)
       if shuffle then table.insert(lines, shuffle) end
+      local tl = UI.TimeLine(r)
+      if tl then
+        table.insert(lines, tl)
+        table.insert(lines, TIME_HINT)
+      end
       UI.ShowHint(self, lines)
     end)
     row:SetScript("OnLeave", UI.HideHint)

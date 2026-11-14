@@ -88,6 +88,18 @@
       "snapshot_sha256": "a8c642e86c46411012b9ae21fd86b3973ccfd9bf8cf37ed612064c5a11f1ffdc",
       "url": "https://wago.tools/db2/SkillLineAbility/csv?build=1.60.1.70888"
     },
+    "SpellCastTimes": {
+      "columns": [
+        "ID",
+        "Base",
+        "Minimum"
+      ],
+      "full_rows": 72,
+      "full_sha256": "f94e1e3a3495d11af875fd7b007124fdd660a19ba626bc1de00a609da81f25d8",
+      "snapshot_rows": 14,
+      "snapshot_sha256": "42f60ec3d8d2a557f1ac06c8e5e2de9eef066dfd2a3887f377301a6c450ef7dc",
+      "url": "https://wago.tools/db2/SpellCastTimes/csv?build=1.60.1.70888"
+    },
     "SpellEffect": {
       "columns": [
         "ID",
@@ -104,6 +116,19 @@
       "snapshot_rows": 2300,
       "snapshot_sha256": "910ba1821219d0ab089e15fcce9c10b0ccc773819574b9f436df46ea45383b35",
       "url": "https://wago.tools/db2/SpellEffect/csv?build=1.60.1.70888"
+    },
+    "SpellMisc": {
+      "columns": [
+        "ID",
+        "SpellID",
+        "DifficultyID",
+        "CastingTimeIndex"
+      ],
+      "full_rows": 32461,
+      "full_sha256": "4b3d573dae575c2051e71d524dc73ac3590c56aa102b69770675c0eb10508f85",
+      "snapshot_rows": 2580,
+      "snapshot_sha256": "d535e1ce2ca35e32724765d765e33c8568a6acc48dfe3ab3c943508a24e32941",
+      "url": "https://wago.tools/db2/SpellMisc/csv?build=1.60.1.70888"
     },
     "SpellName": {
       "columns": [
