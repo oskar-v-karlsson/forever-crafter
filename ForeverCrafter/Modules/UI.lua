@@ -23,7 +23,7 @@ local VENDOR_HOUR_HINT = "Vendor profit per hour of crafting (the whole chain). 
   .. "crafting time; ~ = estimated vendor price."
 local COLUMNS = {
   char = {
-    { key = "name", label = "Recipe", width = 170 },
+    { key = "name", label = "Recipe", width = 162 },
     { key = "profit", label = "Profit", width = 88 },
     { key = "vprofit", label = "Vend. profit", width = 84 },
     { key = "pct", label = "%", width = 44 },
@@ -56,6 +56,8 @@ local PL = ns.Planner
 local function whatIf()
   return ns.settings.mode == "whatIf"
 end
+
+UI.COLUMNS, UI.ROW_W = COLUMNS, LIST_W - 8
 
 local function columns()
   return COLUMNS[whatIf() and "whatIf" or "char"]

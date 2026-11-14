@@ -155,7 +155,7 @@ function P.Capture()
     if okI and type(r) == "table" then
       all[id] = true
       local okC, spell = ns.Call("C_Spell.GetSpellInfo", id)
-      if okC and type(spell) == "table" and type(spell.castTime) == "number" and spell.castTime >= 0 then
+      if okC and type(spell) == "table" and type(spell.castTime) == "number" and spell.castTime > 0 then
         char.casts[id] = spell.castTime
       end
       if r.learned then

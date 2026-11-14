@@ -28,7 +28,7 @@ end
 -- DB2 (SpellMisc -> SpellCastTimes.Base). → ms or nil (unknown), "game" | "db2"
 function PL.CastMs(spell, r)
   local c = ns.char and ns.char.casts and ns.char.casts[spell]
-  if c then return c, "game" end
+  if c and c > 0 then return c, "game" end
   r = r or PL.Recipe(spell)
   if r and r.cast then return r.cast, "db2" end
   return nil

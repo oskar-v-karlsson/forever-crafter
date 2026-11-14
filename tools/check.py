@@ -839,6 +839,11 @@ def check_crafting_time():
         expect(ns.UI.PerHourText(-250) == "|cff808080-2s|r" and ns.UI.PerHourText(12, True) == "12c ~",
                "per-hour text")
 
+    # Every column fits in a list row, in both modes.
+    for mode, cols in ns.UI.COLUMNS.items():
+        w = sum(c.width for c in cols.values())
+        expect(w <= ns.UI.ROW_W, f"{mode} columns are {w} px wide, a row only {ns.UI.ROW_W}")
+
     # 3. Sorting: AH g/h and Vend g/h high first (no value last); Time short first.
     ns.settings.minSoldPerDay = 0
     slash(lua, "")
@@ -879,12 +884,13 @@ def check_crafting_time():
     # 5. The profession window's cast time (C_Spell.GetSpellInfo castTime) overrides the game data.
     open_ts(lua, stub, TAILORING, 300, {s: (True, 0, None) for s in (R_BAR, R_POWDER, R_TOP, R_VOUT, R_AOUT)},
             casts={R_TOP: 2500, R_BAR: 0})
-    expect(ns.char.casts[R_TOP] == 2500 and ns.char.casts[R_BAR] == 0 and ns.char.casts[R_POWDER] is None,
-           "cast times from the window not stored")
-    expect(ns.Planner.CastMs(R_TOP) == (2500, "game") and ns.Planner.CastMs(R_POWDER) == (5000, "db2"),
-           "CastMs source")
+    # castTime 0 (an unknown or unlearned spell) must not replace the game data's time with "instant".
+    expect(ns.char.casts[R_TOP] == 2500 and ns.char.casts[R_BAR] is None and ns.char.casts[R_POWDER] is None,
+           "cast times from the window not stored (or a 0 stored)")
+    expect(ns.Planner.CastMs(R_TOP) == (2500, "game") and ns.Planner.CastMs(R_POWDER) == (5000, "db2")
+           and ns.Planner.CastMs(R_BAR) == (3000, "db2"), "CastMs source")
     res2, _ = results(ns)
-    expect(res2[R_TOP].time == 2.5 + 20 and res2[R_TOP].casts == 14 and res2[R_TOP].profit == res[R_TOP].profit,
+    expect(res2[R_TOP].time == 2.5 + 20 + 27 and res2[R_TOP].ahPerHour is not None and res2[R_TOP].casts == 14 and res2[R_TOP].profit == res[R_TOP].profit,
            f"window cast times: chain {res2[R_TOP].time} s")
     saved = stub.savedVariables("ForeverCrafterDB")
     lua2, ns2, stub2 = new_runtime(saved=saved)
