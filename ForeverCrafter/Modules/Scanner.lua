@@ -1,6 +1,7 @@
 -- Modules/Scanner.lua: one full auction house snapshot with C_AuctionHouse.ReplicateItems.
 -- For every item the recipes use it keeps the lowest unit buyout, the quantity and listing count, and a
 -- price ladder (cheapest steps first) so the planner can price buying N of an item.
+-- The ladder is flat to keep memory and SavedVariables small: steps = { unit1, qty1, unit2, qty2, ... }.
 local _, ns = ...
 local S = {}
 ns.Scanner = S
@@ -8,7 +9,7 @@ local Util = ns.Util
 
 local BATCH = 2000          -- listings read per frame
 local TIMEOUT = 60          -- seconds to wait for REPLICATE_ITEM_LIST_UPDATE
-local LADDER_STEPS = 20
+S.LADDER_STEPS = 50       -- price steps kept per item (cheapest first)
 local THROTTLE = 15 * 60    -- assumed ReplicateItems cooldown (Retail value; unverified in Forever)
 
 S.ahOpen = false
@@ -35,17 +36,17 @@ function S.Summarise(raw)
   local items = {}
   for id, list in pairs(raw) do
     table.sort(list, function(a, b) return a[1] < b[1] end)
-    local ladder, qty = {}, 0
+    local steps, qty = {}, 0
     for _, l in ipairs(list) do
       qty = qty + l[2]
-      local last = ladder[#ladder]
-      if last and last[1] == l[1] then
-        last[2] = last[2] + l[2]
-      elseif #ladder < LADDER_STEPS then
-        table.insert(ladder, { l[1], l[2] })
+      local k = #steps
+      if k > 0 and steps[k - 1] == l[1] then
+        steps[k] = steps[k] + l[2]
+      elseif k < 2 * S.LADDER_STEPS then
+        steps[k + 1], steps[k + 2] = l[1], l[2]
       end
     end
-    items[id] = { min = list[1][1], qty = qty, n = #list, ladder = ladder }
+    items[id] = { min = list[1][1], qty = qty, n = #list, steps = steps }
   end
   return items
 end

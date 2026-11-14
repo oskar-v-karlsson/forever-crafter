@@ -386,7 +386,7 @@ def check_core_flow():
     expect(linen and linen["min"] == 10 and linen.qty == 25 and linen.n == 2, "linen price summary wrong")
     expect(ns.Scanner.Price(999999) is None, "an item no recipe uses was stored")
     expect(ns.db.deposit[VEST] == 15, "deposit not captured after the scan")
-    total, deep = ns.Pricing.AHBuy(LINEN, 22)
+    total, deep, _ = ns.Pricing.AHBuy(LINEN, 22)
     expect(total == 230 and not deep, f"AH ladder: 22 linen cost {total}, want 230")
     expect(ns.Pricing.AHBuy(LINEN, 26) is None, "AH ladder sells more than is listed")
 
@@ -394,7 +394,10 @@ def check_core_flow():
     vest = res.get(R_VEST)
     if expect(vest, "Brown Linen Vest (known, AH 1g) not profitable"):
         # Bolt crafted from 2 linen (20c) beats the AH bolt (200c); thread from the vendor list (10c, estimate).
-        expect(vest.cost == 30, f"vest cost {vest.cost}, want 30 (bolt crafted 20c + thread 10c)")
+        expect(vest.cost1 == 30, f"vest first craft cost {vest.cost1}, want 30 (bolt crafted 20c + thread 10c)")
+        # 25 linen (20 @ 10c, 5 @ 15c) make 12 bolts; then neither 13 bolts nor 26 linen are listed.
+        expect(vest.batch == 12 and not vest.batchCapped and vest.cost == 32,
+               f"vest batch {vest.batch} avg cost {vest.cost}, want 12 crafts at 32c ((260 + 120) / 12 rounded up)")
         expect(vest.value == 9999 * 95 // 100 - 15, f"vest value {vest.value}, want AH 1g-1c after 5% and deposit")
         expect(vest.where == "ah" and vest.est, "vest should sell on the AH with an estimated reagent")
         expect(ns.Planner.Steps(vest.tree) == 2, "vest chain is not bolt -> vest")
@@ -417,7 +420,7 @@ def check_core_flow():
     expect(seen and seen.unit == 12 and not seen.limited and seen.npc == "Rachel", "merchant price not captured")
     expect(ns.db.vendorSeen[DYE].limited, "limited merchant stock not flagged")
     vest = results(ns)[0].get(R_VEST)
-    expect(vest and vest.cost == 32 and not vest.est, "merchant price did not replace the estimate")
+    expect(vest and vest.cost1 == 32 and not vest.est, "merchant price did not replace the estimate")
 
     # Invoices and the cut.
     stub.invoices = ltable(lua, [["seller", 20000, 1000], ["seller", 40000, 2000], ["buyer", 100, 0]])
@@ -445,7 +448,7 @@ def check_core_flow():
     stub.fire("TRADE_SKILL_LIST_UPDATE")
     stub.runTimers()
     shirt = results(ns)[0].get(R_SHIRT)
-    expect(shirt and shirt.known and shirt.cost == 20 and shirt.runtime, "window schematic did not override reagents")
+    expect(shirt and shirt.known and shirt.cost1 == 20 and shirt.runtime, "window schematic did not override reagents")
     stub.fire("NEW_RECIPE_LEARNED", R_ROBE)
     expect(ns.Professions.IsKnown(R_ROBE, TAILORING), "NEW_RECIPE_LEARNED not recorded")
 
@@ -579,7 +582,8 @@ def check_full_run():
     errs = list(ns.errors.values())
     expect(not errs, f"errors in the full run: {errs[:3]}")
     hidden = sales_hidden(lua, ns, stub, lambda: ns.Planner.Run(), "char")
-    return n, stats.evaluated, took, hidden, shuffle_stats(list(res.values())), time_stats(list(res.values()))
+    return n, stats.evaluated, took, hidden, shuffle_stats(list(res.values())), time_stats(list(res.values())), \
+        batch_stats(ns, list(res.values()))
 
 
 MINING, BLACKSMITHING, ENGINEERING, ALCHEMY, COOKING = 186, 164, 202, 171, 185
@@ -756,6 +760,207 @@ def check_vendor_shuffles():
     expect(ns2.settings.vendorShuffles is False and ns2.settings.sort == "profit", "checkbox off")
     errs = list(ns.errors.values()) + list(ns2.errors.values())
     expect(not errs, f"errors in the vendor shuffle checks: {errs[:3]}")
+
+
+def check_cheap_batch():
+    """Cheap batch: the most crafts whose own (marginal) profit stays >= 75% of the first craft's, from the AH price
+    steps of the snapshot. Profit and g/h become batch averages; the first craft's numbers are kept."""
+    lua, ns, stub = new_runtime()
+    g = lua.globals()
+    login(lua, stub, skills={TAILORING: 300})
+    expect(ns.settings.minBatch == 5, "Min batch must default to 5")
+    R1, R2, R3, R4, R5, R6, R7 = 990501, 990502, 990503, 990504, 990505, 990506, 990507
+    O1, O2, O3, O4, O5, O6, MID = 990511, 990512, 990513, 990514, 990515, 990516, 990517
+    T1, T2, T3, T4, T5, T6, TM = 991501, 991502, 991503, 991504, 991505, 991506, 991507
+    synthetic(lua, ns, stub, {T1: (O1, [[R1, 1]]), T2: (O2, [[R2, 1]]), T3: (O3, [[R3, 1]]), T4: (O4, [[R4, 1]]),
+                              T5: (O5, [[R5, 1]]), TM: (MID, [[R6, 2]]), T6: (O6, [[MID, 1]])},
+              [R1, R2, R3, R4, R5, R6, R7, O1, O2, O3, O4, O5, O6, MID])
+    ns.Items[O4].sell = 300
+    stub["items"][O4] = lua.table_from({"name": f"Test {O4}", "sell": 300})   # seen by the client: exact
+    listings = [(o, 1, 1000) for o in (O1, O2, O3, O4, O5, O6)] + [(MID, 1, 50000)]
+    listings += [(R1, 1, 10), (R1, 1, 10)] + [(R1, 1, 1000)] * 100              # 2 cheap, then the bulk
+    listings += [(R2, 1, 10), (R2, 1, 20), (R2, 1, 30)] + [(R2, 100, 1000000)]  # rising, then a wall
+    listings += [(R3, 1000, 5000)]                                                # deep: 1000 @ 5c
+    listings += [(R4, 1, 10), (R4, 1, 50), (R4, 1, 100), (R4, 1, 200), (R4, 100, 500000)]
+    listings += [(R5, 1, 10 + i) for i in range(60)]                              # more steps than the snapshot keeps
+    listings += [(R6, 4, 40), (R6, 100, 40000)]                                   # the intermediate's reagent
+    set_auctions(lua, stub, listings)
+    scan(lua, stub)
+    res, _ = results(ns)
+    worth = 999 * 95 // 100
+    got = lambda r: (r.batch, bool(r.batchCapped), r.profit1, r.profit, r.cost1, r.cost)
+    # 1. Two cheap listings, then 10s each: 2 crafts.
+    r = res.get(T1)
+    expect(r and got(r) == (2, False, worth - 10, worth - 10, 10, 10), f"2 cheap listings: {r and got(r)}")
+    # 2. Averages vs the first craft: 10c, 20c, 30c, then 100s: 3 crafts at an average cost of 20c.
+    r = res.get(T2)
+    expect(r and got(r) == (3, False, worth - 10, worth - 20, 10, 20) and r.batchProfit == 3 * worth - 60
+           and r.ahProfit == worth - 20, f"rising price steps: {r and got(r)} batch profit {r and r.batchProfit}")
+    # 3. Deep supply: the search stops at the cap; shown as at least.
+    r = res.get(T3)
+    cap = ns.Planner.BATCH_CAP
+    expect(r and got(r) == (cap, True, worth - 5, worth - 5, 5, 5), f"deep reagent: {r and got(r)}")
+    # 4. Vendor batch vs AH batch: AH first profit 939 allows +245c per craft (4 crafts), vendor 290 only +72c (2).
+    r = res.get(T4)
+    if expect(r, "vendor batch recipe not evaluated"):
+        expect((r.batch, r.vendorBatch, r.vendorProfit1, r.vendorProfit, r.vendorBatchProfit)
+               == (4, 2, 290, 270, 600 - 60) and r.profit == worth - 90,
+               f"vendor batch: {(r.batch, r.vendorBatch, r.vendorProfit1, r.vendorProfit, r.vendorBatchProfit)}")
+    # 5. More price steps than the snapshot keeps: the batch stops where the steps end, as at least.
+    r = res.get(T5)
+    steps = ns.Scanner.LADDER_STEPS
+    expect(r and r.batch == steps and r.batchCapped, f"batch at the end of the price steps: {r and got(r)}")
+    # 6. A chain: the intermediate's own reagent gets pricier after 4 (2 crafts of the top recipe); the intermediate
+    # itself (sold for 5g) keeps a big batch: 104 reagents make 52.
+    r = res.get(T6)
+    if expect(r and got(r) == (2, False, worth - 20, worth - 20, 20, 20), f"chain batch {r and got(r)}"):
+        shop = {e.id: (e.qty, e.src) for e in ns.Planner.ShoppingList(r.batchTree).values()}
+        expect(shop == {R6: (4, "ah")} and r.batchTree.crafts == 2, f"batch shopping list {shop}")
+    expect(res.get(TM) and res[TM].batch == 52 and not res[TM].batchCapped, "intermediate batch limited by supply")
+
+    # The window: Min batch 5 hides the small batches; the status line counts them.
+    slash(lua, "")
+    frame = g.ForeverCrafterFrame
+    UI = ns.UI
+    ns.settings.minSoldPerDay = 0
+    UI.ApplyFilter()
+    UI.Refresh()
+    view = lambda: {r.spell for r in UI.view.values()}
+    expect(view() == {T3, T5, TM} and UI.batchHidden == 4, f"Min batch 5: {view()} hidden {UI.batchHidden}")
+    expect("4 hidden: cheap batch under 5" in frame.status.__text, f"status line {frame.status.__text!r}")
+    by = {r.spell: r for r in UI.results.values()}
+    expect(UI.CellText(by[T3], "batch") == f"\u2265{cap}" and UI.CellText(by[T1], "batch") == "2"
+           and UI.CellText(by[T5], "batch") == f"\u2265{steps}", "Batch cells")
+    t = UI.DetailText(by[T2])
+    expect("Cheap batch:|r 3 crafts" in t and f"avg profit {ns.Util.Money(worth - 20)} (first craft "
+           f"{ns.Util.Money(worth - 10)})" in t and "Batch shopping list (3 crafts):" in t
+           and f"up to {ns.Util.Money(30)} each" in t, "batch detail of a rising reagent")
+    t = UI.DetailText(by[T3])
+    expect(f"at least {cap} crafts (the search stops at {cap})" in t, "capped batch detail")
+    expect("Vendor batch:|r 2 crafts" in UI.DetailText(by[T4]), "vendor batch line in the detail")
+    frame.minBatch.SetText(frame.minBatch, "2")
+    frame.minBatch.__scripts.OnEnterPressed(frame.minBatch)
+    expect(ns.settings.minBatch == 2 and view() == {T1, T2, T3, T4, T5, T6, TM}, f"Min batch 2: {view()}")
+    frame.minBatch.SetText(frame.minBatch, "0")
+    frame.minBatch.__scripts.OnEnterPressed(frame.minBatch)
+    expect(ns.settings.minBatch == 2 and frame.minBatch.__text == "2", "Min batch below 1 accepted")
+    # Vendor shuffles: the vendor batch counts (T4's is 2; the others have no vendor price).
+    ns.settings.minBatch = 3
+    frame.shuffles.SetChecked(frame.shuffles, True)
+    frame.shuffles.Click(frame.shuffles)
+    expect(view() == set() and UI.batchHidden == 1 and UI.CellText(by[T4], "batch") == "2",
+           f"vendor shuffles, Min batch 3: {view()} hidden {UI.batchHidden}")
+    expect("vendor cheap batch under 3" in frame.status.__text, f"status line {frame.status.__text!r}")
+    frame.shuffles.SetChecked(frame.shuffles, False)
+    frame.shuffles.Click(frame.shuffles)
+
+    # Saved and restored.
+    saved = stub.savedVariables("ForeverCrafterDB")
+    lua2, ns2, stub2 = new_runtime(saved=saved)
+    login(lua2, stub2, skills={TAILORING: 300})
+    expect(ns2.settings.minBatch == 3, f"Min batch not restored: {ns2.settings.minBatch}")
+    errs = list(ns.errors.values()) + list(ns2.errors.values())
+    expect(not errs, f"errors in the cheap batch checks: {errs[:3]}")
+
+
+def batch_stats(ns, res):
+    """Cheap batch over the profitable results. → (distribution text, hidden at Min batch 5, top AH g/h, top vendor g/h)"""
+    prof = [r for r in res if r.profit > 0]
+    for r in prof:
+        ok = (r.batch is not None and r.batch >= 1 and r.profit1 >= r.profit > 0 and r.profit >= 0.75 * r.profit1
+              and r.cost == r.cost1 + r.profit1 - r.profit
+              and (r.vendorBatch is None or r.vendorProfit1 > 0 and r.vendorProfit >= 0.75 * r.vendorProfit1))
+        if not expect(ok, f"result {r.spell}: batch {r.batch} profit {r.profit1} -> {r.profit}"):
+            break
+    buckets = [("1", 1, 1), ("2-4", 2, 4), ("5-9", 5, 9), ("10-49", 10, 49), ("50-199", 50, 199), ("200", 200, 200)]
+    dist = []
+    for label, lo, hi in buckets:
+        rs = [r for r in prof if lo <= r.batch <= hi]
+        capped = sum(1 for r in rs if r.batchCapped)
+        dist.append(f"{label}: {len(rs)}" + (f" ({capped} >=)" if capped else ""))
+    hidden = sum(1 for r in prof if r.batch < 5)
+    changed = sum(1 for r in prof if r.profit != r.profit1)
+    ah = sorted([r for r in prof if r.ahPerHour is not None], key=lambda r: (-r.ahPerHour, r.spell))[:10]
+    vend = sorted([r for r in prof if r.vendorPerHour is not None and r.vendorBatch is not None],
+                  key=lambda r: (-r.vendorPerHour, r.spell))[:10]
+    return f"{', '.join(dist)}; profit below the first craft's: {changed}", hidden, ah, vend
+
+
+def batch_text(ns, st, label):
+    def fmt(r, v, k, capped):
+        return (f"{r.name} {re.sub(r'[|]c[0-9a-f]{8}|[|]r', '', ns.UI.PerHourText(v))}/h "
+                f"(batch {'>=' if capped else ''}{k})")
+    return [f"  cheap batch ({label}): {st[0]}; hidden at Min batch 5: {st[1]}",
+            "    top AH g/h: " + "; ".join(fmt(r, r.ahPerHour, r.batch, r.batchCapped) for r in st[2]),
+            "    top Vend g/h: " + "; ".join(fmt(r, r.vendorPerHour, r.vendorBatch, r.vendorBatchCapped)
+                                           for r in st[3])]
+
+
+def deep_listings(ns, kind):
+    """Synthetic snapshots for the cheap batch. infinite: one stack of 100000 per item (the first-craft price never
+    runs out); graded: per item 3, 15 or 60 listings of 1-5, each step 3% dearer, or one stack of 500."""
+    out = []
+    for i in ns.Items.keys():
+        price = 100 + (i * 7919) % 50000
+        if kind == "infinite":
+            out.append((i, 100000, price * 100000))
+            continue
+        depth = (3, 15, 60, 0)[i % 4]
+        if depth == 0:
+            out.append((i, 500, price * 500))
+        for j in range(depth):
+            q = 1 + (i + j) % 5
+            out.append((i, q, int(price * 1.03 ** j) * q))
+    return out
+
+
+def check_batch_depth():
+    """Infinite depth: every result equals the first craft (= main). Graded depth: distribution, timings, top 10."""
+    lines = []
+    for kind in ("infinite", "graded"):
+        lua, ns, stub = new_runtime()
+        login(lua, stub, skills={line: 300 for line in (171, 164, 333, 202, 165, 197, 185, 129, 186)},
+              known=list(ns.Recipes.keys()))
+        set_auctions(lua, stub, deep_listings(ns, kind))
+        t0 = time.time()
+        scan(lua, stub)
+        scan_took = time.time() - t0
+        t0 = time.time()
+        res, _ = results(ns)
+        took = time.time() - t0
+        char = list(res.values())
+        t0 = time.time()
+        wres, _ = wi_run(lua, ns)
+        wtook = time.time() - t0
+        frames, last = [], [time.time()]
+
+        def progress(i, n):
+            now = time.time()
+            frames.append(now - last[0])
+            last[0] = now
+
+        ns.Planner.RunAsync(ltable(lua, {"whatIf": WI_DEFAULT}), progress, lambda r, st: None)
+        stub.runTimers()
+        wi = list(wres.values())
+        if kind == "infinite":
+            for r in char + wi:
+                ok = (r.profit == r.profit1 and r.cost == r.cost1 and r.vendorProfit == r.vendorProfit1
+                      and (r.profit <= 0 or r.batchCapped and (r.vendorBatch is None or r.vendorBatchCapped)))
+                if not expect(ok, f"infinite depth: {r.spell} profit {r.profit1} -> {r.profit} batch {r.batch} "
+                                  f"capped {r.batchCapped}"):
+                    break
+            caps = sum(1 for r in char if r.profit > 0 and r.batch == ns.Planner.BATCH_CAP)
+            lines.append(f"  infinite depth: every profit equals the first craft's; batch at the cap "
+                         f"{caps} of {sum(1 for r in char if r.profit > 0)}; full run {took:.2f} s, what-if "
+                         f"{wtook:.2f} s, slowest frame async {max(frames) * 1000:.0f} ms")
+        else:
+            lines.append(f"  graded depth: scan {scan_took:.2f} s, full run {took:.2f} s, what-if {wtook:.2f} s, "
+                         f"slowest frame async {max(frames) * 1000:.0f} ms")
+            lines += batch_text(ns, batch_stats(ns, char), "graded, My character")
+            lines += batch_text(ns, batch_stats(ns, wi), "graded, What-if")
+        errs = list(ns.errors.values())
+        expect(not errs, f"errors in the {kind} depth run: {errs[:3]}")
+    return lines
 
 
 def time_stats(res):
@@ -1065,8 +1270,8 @@ def check_what_if():
     expect(all(r.whatIf for r in ns.UI.view.values()) and len(ns.UI.view) > 0, "what-if view is empty or mixed")
     expect(frame.wi.cap.__shown and not frame.known.__shown, "what-if controls not swapped in")
     labels = [h.col.label for h in frame.headers.values() if h.col]
-    expect(labels == ["Recipe", "Profit", "Vend. profit", "%", "Profs", "Conf", "Sell", "Sold/d", "Time", "AH g/h",
-                     "Vend g/h"],
+    expect(labels == ["Recipe", "Profit", "Vend. profit", "%", "Profs", "Conf", "Sell", "Sold/d", "Batch", "Time",
+                     "AH g/h", "Vend g/h"],
            f"what-if columns {labels}")
     rows = [f for f in stub.frames.values() if f.result is not None and f.result.whatIf]
     if expect(rows, "what-if rows missing"):
@@ -1161,7 +1366,7 @@ def check_what_if_full():
     return (f"what-if run (cap 150, max 2 primaries): {st.sets} sets, {st.evaluated} recipes evaluated, "
             f"{len(profit)} profitable, {took:.2f} s in one go (any number of primaries: {out[0][2]:.2f} s), "
             f"slowest frame async {max(frames) * 1000:.0f} ms"), top, hidden, shuffle_stats(list(res.values())), \
-        time_stats(list(res.values()))
+        time_stats(list(res.values())), batch_stats(ns, list(res.values()))
 
 
 def sales_hidden(lua, ns, stub, run, mode):
@@ -1173,7 +1378,7 @@ def sales_hidden(lua, ns, stub, run, mode):
         ns.Sales.Reset()
         ns.UI.results, ns.UI.stats = run()
         ns.settings.mode, ns.settings.profession = mode, 0
-        ns.settings.minSoldPerDay = 0
+        ns.settings.minSoldPerDay, ns.settings.minBatch = 0, 1
         ns.UI.ApplyFilter()
         all_view = list(ns.UI.view.values())
         ns.settings.minSoldPerDay = 1
@@ -1185,6 +1390,7 @@ def sales_hidden(lua, ns, stub, run, mode):
         expect(all(ns.UI.SalesOK(r, 1) for r in ns.UI.view.values()), f"{mode} {reg}: a result under 1/day shown")
         out[reg] = (len(gone), sum(1 for r in gone if r.sales is None), sum(1 for r in gone if r.sales is not None),
                     len(all_view))
+    ns.settings.minBatch = 5
     stub.regionName = "EU"
     ns.Sales.Reset()
     ns.settings.mode = "char"
@@ -1382,7 +1588,8 @@ def check_sales():
     view0 = [x.spell for x in ns.UI.view.values()]
     expect(ns.UI.salesHidden == 0 and view0, "filter 0 hides results")
     labels = [h.col.label for h in frame.headers.values() if h.col]
-    expect(labels == ["Recipe", "Profit", "Vend. profit", "%", "Sell", "Listed", "Sold/d", "Time", "AH g/h", "Vend g/h"],
+    expect(labels == ["Recipe", "Profit", "Vend. profit", "%", "Sell", "Listed", "Sold/d", "Batch", "Time", "AH g/h",
+                     "Vend g/h"],
            f"My character columns {labels}")
     ns.UI.Refresh()
     cells = [f.cells[7].__text for f in stub.frames.values() if f.cells is not None and f.result is not None]
@@ -1506,19 +1713,23 @@ def main():
         check_random_output()
         check_vendor_shuffles()
         check_crafting_time()
+        check_cheap_batch()
         check_missing_apis()
         check_dump()
-        n, evaluated, took, hidden, shuffles, times = check_full_run()
+        n, evaluated, took, hidden, shuffles, times, batches = check_full_run()
         summary.append(f"full run: {evaluated} recipes evaluated, {n} profitable, {took:.2f} s")
         summary.append("  Min sold/day 1 hides (My character): " + hidden_text(hidden))
         summary.append("  vendor shuffles (My character): " + shuffle_text(shuffles))
         summary += time_text(ns, times, "My character")
+        summary += batch_text(ns, batches, "My character")
         check_what_if()
-        line, _, hidden, shuffles, times = check_what_if_full()
+        line, _, hidden, shuffles, times, batches = check_what_if_full()
         summary.append(line)
         summary.append("  Min sold/day 1 hides (What-if): " + hidden_text(hidden))
         summary.append("  vendor shuffles (What-if): " + shuffle_text(shuffles))
         summary += time_text(ns, times, "What-if")
+        summary += batch_text(ns, batches, "What-if")
+        summary += check_batch_depth()
         check_sales()
         check_zip()
     for p in problems:

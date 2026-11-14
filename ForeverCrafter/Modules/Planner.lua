@@ -9,6 +9,8 @@ ns.Planner = PL
 local Util = ns.Util
 
 PL.MAX_DEPTH = 8
+PL.BATCH_CAP = 200     -- the cheap batch search stops here
+PL.BATCH_KEEP = 0.75   -- a craft is in the cheap batch while its own profit is at least this share of the first's
 
 -- Effective recipe: the trade-skill window's schematic (authoritative) over the static data.
 function PL.Recipe(spell)
@@ -102,13 +104,14 @@ local function newSolver(usable, producers)
   local memo = {}
   local cost
   cost = function(id, qty, depth, visiting)
-    local key = id * 100000 + qty
+    local key = id * 1000000 + qty
     local m = memo[key]
     -- A cached chain is reused only if it still fits under the depth limit from here (h = crafts in its height).
     if m == false or (m and depth + m.h <= PL.MAX_DEPTH) then return m or nil, false end
     local best
-    local ah, est = ns.Pricing.AHBuy(id, qty)
-    if ah then best = { id = id, qty = qty, cost = ah, src = "ah", est = est, h = 0 } end
+    local ah, est, top = ns.Pricing.AHBuy(id, qty)
+    -- deep: more than the snapshot's price steps (the cost is a lower bound)
+    if ah then best = { id = id, qty = qty, cost = ah, src = "ah", est = est, h = 0, top = top, deep = est or nil } end
     local unit, label, limited = ns.Pricing.VendorUnit(id)
     if unit then
       local c = math.ceil(unit * qty)
@@ -126,7 +129,7 @@ local function newSolver(usable, producers)
         if usable(spell, r) then
           local lo, hi = PL.OutRange(r)
           local crafts = math.ceil(qty / ((lo + hi) / 2))
-          local total, kids, ok, est, h, var = 0, {}, true, PL.CountUnknown(r), 0, hi > lo
+          local total, kids, ok, est, h, var, deep = 0, {}, true, PL.CountUnknown(r), 0, hi > lo, nil
           for _, rg in ipairs(r.reagents) do
             local c, inc = cost(rg[1], rg[2] * crafts, depth + 1, visiting)
             if inc then incomplete = true end
@@ -137,12 +140,14 @@ local function newSolver(usable, producers)
             total = total + c.cost
             if c.est then est = true end
             if c.var then var = true end
+            if c.deep then deep = true end
             if c.h > h then h = c.h end
             table.insert(kids, c)
           end
           if ok and (not best or total < best.cost) then
             best = { id = id, qty = qty, cost = total, src = "craft", spell = spell, crafts = crafts, children = kids,
-              est = est, h = h + 1, var = var or nil, outMin = hi > lo and lo or nil, outMax = hi > lo and hi or nil }
+              est = est, h = h + 1, var = var or nil, outMin = hi > lo and lo or nil, outMax = hi > lo and hi or nil,
+              deep = deep }
           end
         end
       end
@@ -235,28 +240,102 @@ local function producersOf(spells)
   return producers
 end
 
--- One recipe's craft: sell value of its output minus the cheapest reagents. → result, or nil and the reason
--- ("noValue" | "noPrice")
+-- The reagents of k crafts of a recipe, each priced by the solver for the whole quantity (AH price steps, vendor,
+-- crafting). → { cost, kids, est, var, deep, h } or nil (cannot be bought or made)
+local function solveCrafts(r, k, cost)
+  local outID = r.out[1]
+  local s = { cost = 0, kids = {}, est = false, var = false, h = 0 }
+  for _, rg in ipairs(r.reagents) do
+    local c = cost(rg[1], rg[2] * k, 0, { [outID] = true })
+    if not c then return nil end
+    s.cost = s.cost + c.cost
+    if c.est then s.est = true end
+    if c.var then s.var = true end
+    if c.deep then s.deep = true end
+    if c.h > s.h then s.h = c.h end
+    table.insert(s.kids, c)
+  end
+  return s
+end
+
+-- Cheap batch: the most crafts k (up to BATCH_CAP) for which every craft's own profit, worth - (cost(k) - cost(k-1)),
+-- is at least BATCH_KEEP of the first craft's. The extra cost of each craft is taken to never fall, so k is found by
+-- doubling and a binary search. at(k) is the cached solveCrafts. → k, capped (k is a lower bound: the search cap,
+-- or the next craft needs more than the snapshot's price steps)
+local function cheapBatch(worth, at)
+  local first = worth - at(1).cost
+  if first <= 0 then return nil end
+  local need = PL.BATCH_KEEP * first
+  local status = {}
+  local function check(k)
+    if status[k] == nil then
+      local s, prev = at(k), at(k - 1)
+      if not s or not prev then
+        status[k] = "fail"
+      elseif s.deep then
+        status[k] = "deep"
+      else
+        status[k] = worth - (s.cost - prev.cost) >= need and "ok" or "fail"
+      end
+    end
+    return status[k]
+  end
+  if at(1).deep then return 1, true end
+  local lo, hi = 1, 2
+  while hi <= PL.BATCH_CAP and check(hi) == "ok" do
+    lo, hi = hi, hi * 2
+  end
+  if hi > PL.BATCH_CAP then
+    if check(PL.BATCH_CAP) == "ok" then return PL.BATCH_CAP, true end
+    hi = PL.BATCH_CAP
+  end
+  while hi - lo > 1 do
+    local mid = math.floor((lo + hi) / 2)
+    if check(mid) == "ok" then lo = mid else hi = mid end
+  end
+  -- The binary search checks single crafts; make sure the batch as a whole keeps the share too.
+  while lo > 1 and lo * worth - at(lo).cost < need * lo do lo = lo - 1 end
+  return lo, check(lo + 1) == "deep"
+end
+
+-- Average cost per craft of a batch of k. Leftovers of a step that makes several items are not counted as a saving,
+-- so the average is never below the first craft's cost (with deep enough supply, batch = first craft).
+local function batchCost(at, k)
+  local c1 = at(1).cost
+  return math.max(c1, math.ceil(at(k).cost / k))
+end
+
+-- A batch's chain tree, for its shopping list.
+local function batchTree(spell, outID, n, k, s)
+  return { id = outID, qty = n * k, cost = s.cost, src = "craft", spell = spell, crafts = k, children = s.kids,
+    h = s.h + 1 }
+end
+
+-- One recipe's craft: sell value of its output minus the cheapest reagents, as the average of its cheap batch (the
+-- first craft's numbers are kept as profit1, cost1). → result, or nil and the reason ("noValue" | "noPrice")
 local function evaluate(spell, r, line, cost)
   local outID = r.out[1]
   local value = ns.Pricing.SellValue(outID)
   if not value then return nil, "noValue" end
-  local total, kids, est, h, var = 0, {}, false, 0, false
-  for _, rg in ipairs(r.reagents) do
-    local c = cost(rg[1], rg[2], 0, { [outID] = true })
-    if not c then return nil, "noPrice" end
-    total = total + c.cost
-    if c.est then est = true end
-    if c.var then var = true end
-    if c.h > h then h = c.h end
-    table.insert(kids, c)
+  local solved = {}
+  local function at(k)
+    if k < 1 then return nil end
+    local s = solved[k]
+    if s == nil then
+      s = solveCrafts(r, k, cost) or false
+      solved[k] = s
+    end
+    return s or nil
   end
+  local one = at(1)
+  if not one then return nil, "noPrice" end
+  local total, kids, est, h, var = one.cost, one.kids, one.est, one.h, one.var
   local lo, hi = PL.OutRange(r)
   local n = (lo + hi) / 2
   local worth = math.floor(value.unit * n)
   local res = {
     spell = spell, name = r.name or Util.ItemName(outID), line = line, out = outID, n = n,
-    cost = total, value = worth, profit = worth - total,
+    cost = total, value = worth, profit = worth - total, cost1 = total, profit1 = worth - total,
     pct = total > 0 and (worth - total) / total or nil,
     where = value.where, sell = value,
     est = est or PL.CountUnknown(r) or (value.where == "vendor" and value.vendorEst) or false,
@@ -268,22 +347,47 @@ local function evaluate(spell, r, line, cost)
   -- a step of its chain makes a random count.
   if hi > lo then
     res.outMin, res.outMax = lo, hi
-    res.worst = math.floor(value.unit * lo) - total
-    res.best = math.floor(value.unit * hi) - total
     res.tree.outMin, res.tree.outMax = lo, hi
   end
   if hi > lo or var then
     res.var = true
     res.tree.var = true
   end
+  -- Cheap batch for the best sale, and for a vendor sale (Vendor shuffles); the numbers below are batch averages.
+  local vworth = value.vendor and math.floor(value.vendor * n)
+  res.batch, res.batchCapped = cheapBatch(worth, at)
+  if res.batch then
+    res.cost = batchCost(at, res.batch)
+    res.profit = worth - res.cost
+    res.batchProfit = res.batch * worth - math.max(res.batch * total, at(res.batch).cost)
+    res.batchTree = batchTree(spell, outID, n, res.batch, at(res.batch))
+    res.pct = res.cost > 0 and res.profit / res.cost or nil
+  end
+  local vcost = res.cost
+  if vworth and vworth - total > 0 then
+    if vworth == worth then
+      res.vendorBatch, res.vendorBatchCapped = res.batch, res.batchCapped
+    else
+      res.vendorBatch, res.vendorBatchCapped = cheapBatch(vworth, at)
+    end
+    vcost = batchCost(at, res.vendorBatch)
+    res.vendorBatchProfit = res.vendorBatch * vworth - math.max(res.vendorBatch * total, at(res.vendorBatch).cost)
+    res.vendorBatchTree = res.vendorBatch == res.batch and res.batchTree
+      or batchTree(spell, outID, n, res.vendorBatch, at(res.vendorBatch))
+  end
+  if hi > lo then
+    res.worst = math.floor(value.unit * lo) - res.cost
+    res.best = math.floor(value.unit * hi) - res.cost
+  end
   -- Vendor shuffle: the profit when the output goes to a vendor, even if the AH pays more (vendorProfit <= profit).
   if value.vendor then
-    res.vendorProfit = math.floor(value.vendor * n) - total
+    res.vendorProfit1 = vworth - total
+    res.vendorProfit = vworth - vcost
     res.vendorEst = value.vendorEst or false
-    if hi > lo then res.vendorWorst = math.floor(value.vendor * lo) - total end
+    if hi > lo then res.vendorWorst = math.floor(value.vendor * lo) - vcost end
   end
-  if value.ah then res.ahProfit = math.floor(value.ah * n) - total end
-  -- Crafting time and profit per hour (nil when the time is 0 or partly unknown). Profit itself is unchanged.
+  if value.ah then res.ahProfit = math.floor(value.ah * n) - res.cost end
+  -- Crafting time (per craft) and the batch-average profit per hour (nil when the time is 0 or partly unknown).
   res.time, res.casts, res.timeUnknown = PL.ChainTime(res.tree)
   if res.time > 0 and not res.timeUnknown then
     res.ahPerHour = res.ahProfit and res.ahProfit / res.time * 3600
@@ -594,7 +698,7 @@ function PL.CancelAsync()
   runToken = runToken + 1
 end
 
--- Leaves of a chain tree, merged per item and source. → { {id, qty, cost, src, est}, ... }
+-- Leaves of a chain tree, merged per item and source. → { {id, qty, cost, src, est, top (highest AH unit price)}, ... }
 function PL.ShoppingList(tree)
   local byKey, list = {}, {}
   local function walk(node)
@@ -611,6 +715,7 @@ function PL.ShoppingList(tree)
     end
     e.qty = e.qty + node.qty
     e.cost = e.cost + node.cost
+    if node.top and (not e.top or node.top > e.top) then e.top = node.top end
   end
   walk(tree)
   table.sort(list, function(a, b) return a.cost > b.cost end)
