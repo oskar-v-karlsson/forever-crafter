@@ -31,20 +31,29 @@ function P.VendorUnit(id)
   return nil
 end
 
--- Cost of buying qty from the AH snapshot. → total, estimate (more than 20 price steps), or nil if too few
+-- Cost of buying qty from the AH snapshot. → total, estimate (beyond the snapshot's cheapest price steps), the
+-- highest unit price paid; or nil if fewer are listed
 function P.AHBuy(id, qty)
   local p = ns.Scanner.Price(id)
   if not p or p.qty < qty then return nil end
+  local steps = p.steps
+  if not steps then
+    -- A snapshot saved by an older version: ladder = { {unit, qty}, ... }
+    steps = {}
+    for _, s in ipairs(p.ladder or {}) do
+      steps[#steps + 1], steps[#steps + 2] = s[1], s[2]
+    end
+  end
   local left, total = qty, 0
-  for _, step in ipairs(p.ladder) do
-    local take = math.min(left, step[2])
-    total = total + take * step[1]
+  for i = 1, #steps, 2 do
+    local take = math.min(left, steps[i + 1])
+    total = total + take * steps[i]
     left = left - take
-    if left <= 0 then return total, false end
+    if left <= 0 then return total, false, steps[i] end
   end
   -- The ladder keeps only the cheapest steps; price the rest at the last one (a lower bound).
-  local last = p.ladder[#p.ladder]
-  return total + left * last[1], true
+  local last = steps[#steps - 1]
+  return total + left * last, true, last
 end
 
 -- Deposit for posting one item, cached from the client when the AH is open. → copper or nil

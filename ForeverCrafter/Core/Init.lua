@@ -105,6 +105,9 @@ local DEFAULTS = {
     -- Show only vendor shuffles: crafts that make a profit when the output is sold to a vendor. Min profit then
     -- applies to the vendor profit; Min sold/day and Min AH listings do not apply.
     vendorShuffles = false,
+    -- Hide crafts whose cheap batch (crafts at >= 75% of the first craft's profit, from the AH price steps) is smaller;
+    -- with Vendor shuffles on it applies to the vendor batch.
+    minBatch = 5,
     sort = "profit",
     sortDesc = true,
     mode = "char",         -- results window: "char" (this character) or "whatIf"
@@ -112,7 +115,7 @@ local DEFAULTS = {
     -- confidence level a recipe may have (1 Confirmed .. 5 Unknown); maxPrimaries = 0 for any number.
     whatIf = { cap = 150, overrides = {}, minConf = 4, maxPrimaries = 2 },
   },
-  realms = {},      -- realm key → { time, items = { [itemID] = { min, qty, n, ladder = {{unit, qty}, ...} } } }
+  realms = {},      -- realm key → { time, items = { [itemID] = { min, qty, n, steps = {unit1, qty1, ...} } } }
   vendorSeen = {},  -- itemID → { unit, stack, limited, time, npc } from MERCHANT_SHOW (authoritative)
   deposit = {},     -- itemID → deposit for one item, 12 h (C_AuctionHouse.CalculateCommodityDeposit)
   -- cutSeen = { pct, n, time } from sale invoices (GetInboxInvoiceInfo)

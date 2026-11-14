@@ -21,6 +21,10 @@ local AH_HOUR_HINT = "AH profit per hour of crafting (the whole chain). — = no
   .. "AH listings) or no crafting time."
 local VENDOR_HOUR_HINT = "Vendor profit per hour of crafting (the whole chain). — = a vendor will not buy it or no "
   .. "crafting time; ~ = estimated vendor price."
+local BATCH_HINT = "Cheap batch: how many crafts you can make before the reagents' AH price steps cut a craft's own "
+  .. "profit below 75% of the first craft's. Profit and g/h are the batch average. Buy the batch, craft it, let the AH "
+  .. "restock, repeat. 50+ = the batch may be bigger (the snapshot's price steps or the search end there). With Vendor "
+  .. "shuffles on: the vendor batch."
 local COLUMNS = {
   char = {
     { key = "name", label = "Recipe", width = 162 },
@@ -30,6 +34,7 @@ local COLUMNS = {
     { key = "where", label = "Sell", width = 46 },
     { key = "listings", label = "Listed", width = 46 },
     { key = "sold", label = "Sold/d", width = 46 },
+    { key = "batch", label = "Batch", width = 40, hint = BATCH_HINT },
     { key = "time", label = "Time", width = 48, hint = "Crafting time of the chain. " .. TIME_HINT },
     { key = "ahgh", label = "AH g/h", width = 52, hint = AH_HOUR_HINT },
     { key = "vgh", label = "Vend g/h", width = 56, hint = VENDOR_HOUR_HINT },
@@ -43,13 +48,14 @@ local COLUMNS = {
     { key = "conf", label = "Conf", width = 48 },
     { key = "where", label = "Sell", width = 36 },
     { key = "sold", label = "Sold/d", width = 44 },
+    { key = "batch", label = "Batch", width = 40, hint = BATCH_HINT },
     { key = "time", label = "Time", width = 46, hint = "Crafting time of the chain. " .. TIME_HINT },
     { key = "ahgh", label = "AH g/h", width = 50, hint = AH_HOUR_HINT },
     { key = "vgh", label = "Vend g/h", width = 56, hint = VENDOR_HOUR_HINT },
   },
 }
-local MAX_COLUMNS = 11
-local LIST_W = 680
+local MAX_COLUMNS = 12
+local LIST_W = 720
 local FRAME_W = LIST_W + 400
 local PL = ns.Planner
 
@@ -127,6 +133,26 @@ function UI.ShuffleHint(r)
     r.vendorEst and " (vendor price ~ estimate)" or "")
 end
 
+-- The cheap batch the view uses: the vendor batch with Vendor shuffles on, else the batch for the best sale.
+-- → crafts, capped (a lower bound), vendor  or nil (not profitable)
+function UI.Batch(r)
+  if ns.settings.vendorShuffles then return r.vendorBatch, r.vendorBatchCapped, true end
+  return r.batch, r.batchCapped, false
+end
+
+-- "23", "50+" (may be bigger), "—".
+function UI.BatchText(r)
+  local k, capped = UI.Batch(r)
+  if not k then return "—" end
+  return k .. (capped and "+" or "")
+end
+
+-- The Min batch filter. → true if the result stays
+function UI.BatchOK(r, min)
+  if not min or min <= 1 then return true end
+  return (UI.Batch(r) or 0) >= min
+end
+
 -- "5.1 s", "1 min 15 s", "2 h 3 min"; compact: "5.1s", "1m15s", "2h03m".
 function UI.TimeText(sec, compact)
   if sec < 60 then
@@ -190,6 +216,7 @@ local function sortValue(r, key)
   if key == "where" then return r.where end
   if key == "listings" then return r.sell.listings or 0 end
   if key == "sold" then return r.sales and r.sales.perDay or -1 end
+  if key == "batch" then return UI.Batch(r) or -1 end
   return r.profit
 end
 
@@ -197,7 +224,7 @@ function UI.ApplyFilter()
   local s = ns.settings
   local view = {}
   local wi = whatIf()
-  local salesHidden = 0
+  local salesHidden, batchHidden = 0, 0
   for _, r in ipairs(UI.results) do
     local ok
     if wi then
@@ -222,6 +249,10 @@ function UI.ApplyFilter()
         salesHidden = salesHidden + 1
       end
     end
+    if ok and not UI.BatchOK(r, s.minBatch) then
+      ok = false
+      batchHidden = batchHidden + 1
+    end
     if ok then table.insert(view, r) end
   end
   local key, desc = s.sort or "profit", s.sortDesc ~= false
@@ -233,7 +264,7 @@ function UI.ApplyFilter()
     end
     return a.spell < b.spell
   end)
-  UI.view, UI.salesHidden = view, salesHidden
+  UI.view, UI.salesHidden, UI.batchHidden = view, salesHidden, batchHidden
   local maxOffset = math.max(#view - ROWS, 0)
   if UI.offset > maxOffset then UI.offset = maxOffset end
 end
@@ -319,6 +350,59 @@ local function nodeLines(node, depth, out)
     table.insert(out, string.format("%sBuy %s x%s from %s%s  %s", pad, Util.ItemText(node.id), qty, SRC_TEXT[node.src],
       note, Util.Money(node.cost)))
   end
+end
+
+-- "  46 x Iron Bar - AH up to 1s 20c each  55s"
+function UI.ShoppingLines(tree)
+  local out = {}
+  for _, e in ipairs(ns.Planner.ShoppingList(tree)) do
+    local up = ""
+    if e.src == "ah" and e.top and e.qty > 1 and e.top * e.qty ~= e.cost then
+      up = " up to " .. Util.Money(e.top) .. " each"
+    end
+    table.insert(out, string.format("  %s x %s - %s%s%s%s  %s", countText(e.qty), Util.ItemText(e.id), SRC_TEXT[e.src],
+      up, e.src == "vendor" and Util.VendorNPC(e.id) or "", e.est and " ~" or "", Util.Money(e.cost)))
+  end
+  return out
+end
+
+-- The highest AH unit price paid per reagent of a batch, most expensive first: "Iron Bar up to 1s 20c, Coal up to 50c".
+local function upToText(tree)
+  local parts = {}
+  for _, e in ipairs(ns.Planner.ShoppingList(tree)) do
+    if e.src == "ah" and e.top then
+      table.insert(parts, Util.ItemName(e.id) .. " up to " .. Util.Money(e.top))
+      if #parts == 3 then break end
+    end
+  end
+  return #parts > 0 and (" (" .. table.concat(parts, ", ") .. ")") or ""
+end
+
+-- Detail lines for the cheap batch: its size, the AH prices it reaches, average and first-craft profit.
+function UI.BatchLines(r)
+  local out = {}
+  local function line(label, k, capped, avg, first, total, tree)
+    local why = ""
+    if capped then
+      why = k >= PL.BATCH_CAP and string.format(" (the search stops at %d)", PL.BATCH_CAP)
+        or " (the snapshot's price steps end here; may be more)"
+    end
+    table.insert(out, string.format("|cffffd100%s:|r %s%d craft%s%s%s  |  avg profit %s (first craft %s)  |  batch "
+      .. "profit %s", label, capped and "at least " or "", k, k == 1 and "" or "s", why, upToText(tree),
+      Util.Money(avg), Util.Money(first), Util.Money(total)))
+  end
+  if r.batch then
+    line("Cheap batch", r.batch, r.batchCapped, r.profit, r.profit1, r.batchProfit, r.batchTree)
+  end
+  if r.vendorBatch and (r.where ~= "vendor") then
+    line("Vendor batch", r.vendorBatch, r.vendorBatchCapped, r.vendorProfit, r.vendorProfit1, r.vendorBatchProfit,
+      r.vendorBatchTree)
+  end
+  if #out > 0 then
+    table.insert(out, "|cff808080  Buy the batch, craft it, let the AH restock, repeat. Beyond the batch a craft earns "
+      .. "less than 75% of the first one's profit. Profit, AH g/h and vendor g/h above are batch averages.|r")
+  end
+  return out
 end
 
 local function confText(level)
@@ -436,6 +520,7 @@ function UI.DetailText(r)
       .. "no AH needed.", Util.Money(math.floor(s.vendor * r.n)), r.vendorEst and " ~" or "", Util.Money(r.vendorProfit),
       r.vendorWorst and string.format(" (worst case (%d) %s)", r.outMin, Util.Money(r.vendorWorst)) or ""))
   end
+  for _, l in ipairs(UI.BatchLines(r)) do table.insert(out, l) end
   local tl = UI.TimeLine(r)
   if tl then
     table.insert(out, tl)
@@ -451,16 +536,20 @@ function UI.DetailText(r)
   nodeLines(r.tree, 0, out)
   if r.whatIf then whatIfSteps(r, out) end
   table.insert(out, "")
-  table.insert(out, "|cffffd100Shopping list:|r")
-  for _, e in ipairs(ns.Planner.ShoppingList(r.tree)) do
-    table.insert(out, string.format("  %d x %s - %s%s%s  %s", e.qty, Util.ItemText(e.id), SRC_TEXT[e.src],
-      e.src == "vendor" and Util.VendorNPC(e.id) or "", e.est and " ~" or "", Util.Money(e.cost)))
+  table.insert(out, "|cffffd100Shopping list (first craft):|r")
+  for _, l in ipairs(UI.ShoppingLines(r.tree)) do table.insert(out, l) end
+  local k, _, vendor = UI.Batch(r)
+  local bt = vendor and r.vendorBatchTree or r.batchTree
+  if k and k > 1 and bt then
+    table.insert(out, "")
+    table.insert(out, string.format("|cffffd100%s shopping list (%d crafts):|r", vendor and "Vendor batch" or "Batch", k))
+    for _, l in ipairs(UI.ShoppingLines(bt)) do table.insert(out, l) end
   end
   if r.est then
     table.insert(out, "")
     table.insert(out, "~ = estimate: a vendor price from game data not yet seen at a merchant or not yet loaded by the "
-      .. "client, or more AH items than the snapshot's 20 cheapest price steps. Visit the vendor once, or rescan, to "
-      .. "make it exact.")
+      .. "client, or more AH items than the snapshot's " .. ns.Scanner.LADDER_STEPS .. " cheapest price steps. Visit the "
+      .. "vendor once, or rescan, to make it exact.")
   end
   return table.concat(out, "\n")
 end
@@ -527,6 +616,10 @@ function UI.StatusText()
   if (UI.salesHidden or 0) > 0 then
     table.insert(parts, string.format("%d hidden: under %s sold/day", UI.salesHidden,
       ns.Sales.Format(ns.settings.minSoldPerDay)))
+  end
+  if (UI.batchHidden or 0) > 0 then
+    table.insert(parts, string.format("%d hidden: %scheap batch under %d", UI.batchHidden,
+      ns.settings.vendorShuffles and "vendor " or "", ns.settings.minBatch))
   end
   table.insert(parts, ns.Sales.StatusText())
   if not t then table.insert(parts, "|cffff8040open the AH and press Scan|r") end
@@ -715,6 +808,8 @@ local function cellText(r, key)
     return r.sell.listings and tostring(r.sell.listings) or "-"
   elseif key == "sold" then
     return ns.Sales.Format(r.sales and r.sales.perDay)
+  elseif key == "batch" then
+    return UI.BatchText(r)
   elseif key == "time" then
     if not r.time then return "—" end
     if r.timeUnknown then return "|cffff8040>" .. UI.TimeText(r.time, true) .. "|r" end
@@ -842,6 +937,15 @@ local function build()
     local n = tonumber(v)
     if n and n >= 0 then ns.settings.minSoldPerDay = n end
   end)
+  frame.minBatch = editBox(frame, 32, "Min batch", 742, function()
+    return tostring(ns.settings.minBatch or 1)
+  end, function(v)
+    local n = tonumber(v)
+    if n and n >= 1 then ns.settings.minBatch = math.floor(n) end
+  end)
+  hint(frame.minBatch, { "Min batch", "Hide crafts whose cheap batch is smaller: the crafts you can make from the "
+    .. "cheap AH listings before a craft earns less than 75% of the first one's profit. 1 = off.",
+    "Buy the batch, craft it, let the AH restock, repeat. With Vendor shuffles on it uses the vendor batch." })
   hint(frame.minSold, { "Min sold/day", "Hide crafts sold on the AH whose item sells fewer than this many per day "
     .. "in your region (TradeSkillMaster), or that TSM has no data for. 0 = off.",
     "Vendor sales are never hidden. Profit is not changed." })
@@ -920,6 +1024,12 @@ local function build()
       if var then table.insert(lines, var) end
       local shuffle = UI.ShuffleHint(r)
       if shuffle then table.insert(lines, shuffle) end
+      local k, capped, vendor = UI.Batch(r)
+      if k then
+        table.insert(lines, string.format("%s %s%d craft%s at %s average profit (first craft %s)",
+          vendor and "Vendor batch" or "Cheap batch", capped and "at least " or "", k, k == 1 and "" or "s",
+          Util.Money(vendor and r.vendorProfit or r.profit), Util.Money(vendor and r.vendorProfit1 or r.profit1)))
+      end
       local tl = UI.TimeLine(r)
       if tl then
         table.insert(lines, tl)
@@ -996,7 +1106,7 @@ function UI.Refresh()
   end
   local n = #UI.view
   frame.footer:SetText(n > 0 and string.format("%d-%d of %d   (scroll with the mouse wheel; [L] = not learned yet; "
-    .. "[1-5] = random count; [V] = vendor shuffle)", UI.offset + 1, math.min(UI.offset + ROWS, n), n)
+    .. "[1-5] = random count; [V] = vendor shuffle; 50+ = batch may be bigger)", UI.offset + 1, math.min(UI.offset + ROWS, n), n)
     or (ns.settings.vendorShuffles and "no vendor shuffles with these filters" or "nothing profitable with these filters"))
   detail:SetText(UI.DetailText(UI.selected))
   frame.detailChild:SetHeight(math.max(detail:GetStringHeight() + 10, 10))
