@@ -102,6 +102,9 @@ local DEFAULTS = {
     -- Hide results sold on the AH whose output sells fewer than this many per day in the region (TSM); 0 = off.
     -- Vendor sales are never hidden; an output with no TSM data counts as below.
     minSoldPerDay = 1,
+    -- Show only vendor shuffles: crafts that make a profit when the output is sold to a vendor. Min profit then
+    -- applies to the vendor profit; Min sold/day and Min AH listings do not apply.
+    vendorShuffles = false,
     sort = "profit",
     sortDesc = true,
     mode = "char",         -- results window: "char" (this character) or "whatIf"

@@ -82,7 +82,7 @@ The first `/crafter dump` file (2026-11-12): client 1.60.1.70888, toc 16001, a H
 
 | Topic | What we know | Used |
 |---|---|---|
-| Vendor sell prices | DB2 and the Wowhead tooltips disagree for about 1 in 5 crafted items (above) | Client price first; DB2 only as an estimate (`~`) |
+| Vendor sell prices | DB2 and the Wowhead tooltips disagree for about 1 in 5 crafted items (above) | Client price first; DB2 only as an estimate (`~`). The same price drives **Vend. profit** and the `[V]` vendor shuffle marker, so a shuffle on a `~` price shows `~` in that column |
 | AH cut | No constant in the Forever UI code | 5% until the addon measures it from a sale invoice in the mailbox (`consignment / bid`), or `/crafter cut <pct>` |
 | AH deposit | `CalculateCommodityDeposit(item, 1, 1)` per item, after each scan | Subtracted from the AH value as a cost (it is lost if the item does not sell) |
 | `BuyPrice` and `VendorStackCount` | DB2 `BuyPrice` read as the price of one vendor bundle of `VendorStackCount` items | Unit cost = `BuyPrice / VendorStackCount`, marked `~` until the merchant is seen |

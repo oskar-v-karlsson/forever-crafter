@@ -251,6 +251,12 @@ local function evaluate(spell, r, line, cost)
     res.var = true
     res.tree.var = true
   end
+  -- Vendor shuffle: the profit when the output goes to a vendor, even if the AH pays more (vendorProfit <= profit).
+  if value.vendor then
+    res.vendorProfit = math.floor(value.vendor * n) - total
+    res.vendorEst = value.vendorEst or false
+    if hi > lo then res.vendorWorst = math.floor(value.vendor * lo) - total end
+  end
   return res
 end
 
