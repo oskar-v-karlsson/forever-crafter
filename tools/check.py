@@ -247,9 +247,10 @@ def check_sales_data(ns, keys, date):
 
 # Runtime ---------------------------------------------------------------------------------------------------------
 
-def new_runtime(remove=(), bad_events=()):
+def new_runtime(remove=(), bad_events=(), saved=None):
     """A fresh fake client with the addon loaded and ADDON_LOADED fired (not logged in). remove: global API tables
-    or functions to delete before loading (a client without them). bad_events: events RegisterEvent rejects."""
+    or functions to delete before loading (a client without them). bad_events: events RegisterEvent rejects.
+    saved: SavedVariables text from an earlier session (STUB.savedVariables), loaded before ADDON_LOADED."""
     lua = lupa_mod.LuaRuntime(unpack_returned_tuples=True)
     lua.execute(read(os.path.join(ROOT, "tools", "wow_stub.lua")))
     stub = lua.globals().STUB
@@ -271,6 +272,8 @@ def new_runtime(remove=(), bad_events=()):
             loader(rel, read(os.path.join(ADDON, rel)), ns)
         except Exception as e:  # noqa: BLE001
             problem(f"load {rel}: {e}")
+    if saved:
+        lua.execute(saved)
     stub.fire("ADDON_LOADED", NAME)
     return lua, ns, stub
 
@@ -572,7 +575,7 @@ def check_full_run():
     errs = list(ns.errors.values())
     expect(not errs, f"errors in the full run: {errs[:3]}")
     hidden = sales_hidden(lua, ns, stub, lambda: ns.Planner.Run(), "char")
-    return n, stats.evaluated, took, hidden
+    return n, stats.evaluated, took, hidden, shuffle_stats(list(res.values()))
 
 
 MINING, BLACKSMITHING, ENGINEERING, ALCHEMY, COOKING = 186, 164, 202, 171, 185
@@ -614,7 +617,8 @@ def check_random_output():
         expect(f"worst case (1) profit {ns.Util.Money(hd.worst)}, best case (5) profit {ns.Util.Money(hd.best)}" in t,
                "detail has no worst/best case line")
         expect("makes 1-5 each (avg 3)" in t, "chain tree does not show the range of the craft")
-        expect(ns.UI.CellText(hd, "name").startswith("|cffc080ff[1-5]|r "), "list has no [1-5] marker")
+        expect(ns.UI.CellText(hd, "name").replace("|cff40ff40[V]|r ", "").startswith("|cffc080ff[1-5]|r "),
+               "list has no [1-5] marker")
         expect("Worst case" in (ns.UI.RandomHint(hd) or ""), "row hint does not explain the random count")
 
     # 3. The profession window's schematic overrides the static range.
@@ -649,6 +653,105 @@ def check_random_output():
         expect(ns.UI.CellText(top, "name").startswith("|cffc080ff[rnd]|r "), "list has no [rnd] marker")
     errs = list(ns.errors.values())
     expect(not errs, f"errors in the random output checks: {errs[:3]}")
+
+
+def shuffle_stats(res):
+    """Vendor shuffles among results (each must have vendorProfit <= profit, equal when sold to a vendor).
+    → (shuffles, of them best sold on the AH, on estimated vendor prices, top 10 by vendor profit)"""
+    for r in res:
+        if r.vendorProfit is not None and not expect(
+                r.vendorProfit <= r.profit and (r.where != "vendor" or r.vendorProfit == r.profit),
+                f"result {r.spell}: vendor profit {r.vendorProfit}, profit {r.profit} ({r.where})"):
+            break
+    sh = [r for r in res if r.vendorProfit is not None and r.vendorProfit > 0]
+    top = sorted(sh, key=lambda r: (-r.vendorProfit, r.spell))[:10]
+    return len(sh), sum(1 for r in sh if r.where == "ah"), sum(1 for r in sh if r.vendorEst), top
+
+
+def shuffle_text(st):
+    return f"{st[0]} ({st[1]} best sold on the AH, {st[2]} on an estimated vendor price)"
+
+
+def check_vendor_shuffles():
+    lua, ns, stub = new_runtime()
+    g = lua.globals()
+    login(lua, stub, skills={TAILORING: 300})
+    expect(ns.settings.vendorShuffles is False, "Vendor shuffles must default to off")
+    R, OA, OB, OC, OD, OE = 990401, 990402, 990403, 990404, 990405, 990406
+    A, B, C, D, E = 991401, 991402, 991403, 991404, 991405
+    synthetic(lua, ns, stub, {A: (OA, [[R, 2]]), B: (OB, [[R, 2]]), C: (OC, [[R, 2]]), D: (OD, [[R, 2]]),
+                              E: (OE, [[R, 2]])}, [R, OA, OB, OC, OD, OE])
+    ns.Recipes[E].out[3] = 5                     # E makes 1-5 (avg 3)
+    for item, sell in ((OA, 50), (OC, 5), (OE, 30)):
+        stub["items"][item] = lua.table_from({"name": f"Test {item}", "sell": sell})   # seen by the client: exact
+    ns.Items[OB].sell = 100                      # game data only: an estimate
+    set_auctions(lua, stub, [(R, 20, 200), (OA, 1, 1000), (OC, 1, 1000), (OD, 1, 1000), (OE, 1, 1000)])
+    scan(lua, stub)
+    res, _ = results(ns)
+    ah = 999 * 95 // 100
+    want = {A: ("ah", ah - 20, 30, False), B: ("vendor", 80, 80, True), C: ("ah", ah - 20, -15, False),
+            D: ("ah", ah - 20, None, None), E: ("ah", ah * 3 - 20, 70, False)}
+    for spell, (where, profit, vprofit, est) in want.items():
+        r = res.get(spell)
+        if expect(r is not None, f"shuffle test recipe {spell} not evaluated"):
+            got = (r.where, r.profit, r.vendorProfit, r.vendorEst)
+            expect(got == (where, profit, vprofit, est), f"recipe {spell}: (where, profit, vendor profit, est) {got}")
+    expect(res[E].vendorWorst == 30 - 20 and res[A].vendorWorst is None, "vendor worst case of a random count")
+
+    # The window: off, the AH results with no TSM data are hidden by Min sold/day; on, only shuffles by vendor profit.
+    slash(lua, "")
+    frame = g.ForeverCrafterFrame
+    UI = ns.UI
+    view = lambda: [r.spell for r in UI.view.values()]
+    expect(not frame.shuffles.__checked and view() == [B], f"checkbox off: {view()}")
+    frame.shuffles.SetChecked(frame.shuffles, True)
+    frame.shuffles.Click(frame.shuffles)
+    expect(ns.settings.vendorShuffles is True and ns.settings.sort == "vprofit", "checkbox does not set the setting")
+    expect(view() == [B, E, A] and UI.salesHidden == 0, f"vendor shuffles (Min sold/day 1): {view()}")
+    expect("3 vendor shuffles" in frame.status.__text, f"status line {frame.status.__text!r}")
+    ns.settings.minListings = 5                  # A's single listing no longer counts: A sells to the vendor
+    UI.Recompute()
+    expect({r.spell: r.where for r in UI.results.values()}.get(A) == "vendor", "Min AH listings 5: A not sold to vendor")
+    expect(view() == [B, E, A] and UI.salesHidden == 0, f"vendor shuffles (Min AH listings 5): {view()}")
+    ns.settings.minListings = 1
+    UI.Recompute()
+    ns.settings.minProfit = 50
+    UI.ApplyFilter()
+    expect(view() == [B, E], f"Min profit 50 must apply to the vendor profit: {view()}")
+    ns.settings.minProfit = 0
+    UI.ApplyFilter()
+
+    # Column, marker, hint and detail.
+    by = {r.spell: r for r in UI.results.values()}
+    cell = UI.CellText
+    expect(cell(by[D], "vprofit") == "—" and cell(by[B], "vprofit").endswith(" ~")
+           and cell(by[A], "vprofit") == ns.Util.Money(30) and cell(by[C], "vprofit").startswith("|cff808080"),
+           f"Vend. profit cells {[cell(by[s], 'vprofit') for s in (A, B, C, D)]}")
+    expect(cell(by[A], "name").startswith("|cff40ff40[V]|r ") and "[V]" not in cell(by[C], "name")
+           and cell(by[E], "name").startswith("|cff40ff40[V]|r |cffc080ff[1-5]|r "), "[V] marker")
+    expect("no AH needed" in (UI.ShuffleHint(by[A]) or "") and UI.ShuffleHint(by[C]) is None
+           and "estimate" in UI.ShuffleHint(by[B]), "shuffle row hint")
+    t = UI.DetailText(by[A])
+    expect(f"Vendor shuffle:|r sell to a vendor instead for {ns.Util.Money(50)} -> profit {ns.Util.Money(30)}" in t,
+           "detail of an AH-best shuffle has no vendor shuffle line")
+    expect(f"(worst case (1) {ns.Util.Money(10)})" in UI.DetailText(by[E]), "detail has no vendor worst case")
+    expect("Vendor shuffle:" not in UI.DetailText(by[B]) and "Vendor shuffle:" not in UI.DetailText(by[C]),
+           "vendor shuffle line on a vendor-best result or a non-shuffle")
+    UI.Refresh()
+    expect("[V] = vendor shuffle" in frame.footer.__text, "footer legend has no [V]")
+
+    # Saved and restored with the other settings; turning it off goes back to sorting by profit.
+    saved = stub.savedVariables("ForeverCrafterDB")
+    lua2, ns2, stub2 = new_runtime(saved=saved)
+    login(lua2, stub2, skills={TAILORING: 300})
+    slash(lua2, "")
+    f2 = lua2.globals().ForeverCrafterFrame
+    expect(ns2.settings.vendorShuffles is True and f2.shuffles.__checked, "Vendor shuffles not restored")
+    f2.shuffles.SetChecked(f2.shuffles, False)
+    f2.shuffles.Click(f2.shuffles)
+    expect(ns2.settings.vendorShuffles is False and ns2.settings.sort == "profit", "checkbox off")
+    errs = list(ns.errors.values()) + list(ns2.errors.values())
+    expect(not errs, f"errors in the vendor shuffle checks: {errs[:3]}")
 
 
 def wi_run(lua, ns, **kw):
@@ -816,7 +919,8 @@ def check_what_if():
     expect(all(r.whatIf for r in ns.UI.view.values()) and len(ns.UI.view) > 0, "what-if view is empty or mixed")
     expect(frame.wi.cap.__shown and not frame.known.__shown, "what-if controls not swapped in")
     labels = [h.col.label for h in frame.headers.values() if h.col]
-    expect(labels == ["Recipe", "Profit", "%", "Profs", "Conf", "Sell", "Sold/d"], f"what-if columns {labels}")
+    expect(labels == ["Recipe", "Profit", "Vend. profit", "%", "Profs", "Conf", "Sell", "Sold/d"],
+           f"what-if columns {labels}")
     rows = [f for f in stub.frames.values() if f.result is not None and f.result.whatIf]
     if expect(rows, "what-if rows missing"):
         rows[0].Click(rows[0])
@@ -909,7 +1013,7 @@ def check_what_if_full():
     hidden = sales_hidden(lua, ns, stub, lambda: ns.Planner.Run(ltable(lua, {"whatIf": WI_DEFAULT})), "whatIf")
     return (f"what-if run (cap 150, max 2 primaries): {st.sets} sets, {st.evaluated} recipes evaluated, "
             f"{len(profit)} profitable, {took:.2f} s in one go (any number of primaries: {out[0][2]:.2f} s), "
-            f"slowest frame async {max(frames) * 1000:.0f} ms"), top, hidden
+            f"slowest frame async {max(frames) * 1000:.0f} ms"), top, hidden, shuffle_stats(list(res.values()))
 
 
 def sales_hidden(lua, ns, stub, run, mode):
@@ -1130,9 +1234,10 @@ def check_sales():
     view0 = [x.spell for x in ns.UI.view.values()]
     expect(ns.UI.salesHidden == 0 and view0, "filter 0 hides results")
     labels = [h.col.label for h in frame.headers.values() if h.col]
-    expect(labels == ["Recipe", "Profit", "%", "Sell", "Listed", "Sold/d"], f"My character columns {labels}")
+    expect(labels == ["Recipe", "Profit", "Vend. profit", "%", "Sell", "Listed", "Sold/d"],
+           f"My character columns {labels}")
     ns.UI.Refresh()
-    cells = [f.cells[6].__text for f in stub.frames.values() if f.cells is not None and f.result is not None]
+    cells = [f.cells[7].__text for f in stub.frames.values() if f.cells is not None and f.result is not None]
     expect(cells and all(c == S.Format(x.sales and x.sales.perDay) for c, x in
                          zip(cells, ns.UI.view.values())), f"Sold/d cells {cells}")
     frame.minSold.SetText(frame.minSold, "2.5")
@@ -1251,15 +1356,18 @@ def main():
         check_core_flow()
         check_solver_shapes()
         check_random_output()
+        check_vendor_shuffles()
         check_missing_apis()
         check_dump()
-        n, evaluated, took, hidden = check_full_run()
+        n, evaluated, took, hidden, shuffles = check_full_run()
         summary.append(f"full run: {evaluated} recipes evaluated, {n} profitable, {took:.2f} s")
         summary.append("  Min sold/day 1 hides (My character): " + hidden_text(hidden))
+        summary.append("  vendor shuffles (My character): " + shuffle_text(shuffles))
         check_what_if()
-        line, _, hidden = check_what_if_full()
+        line, _, hidden, shuffles = check_what_if_full()
         summary.append(line)
         summary.append("  Min sold/day 1 hides (What-if): " + hidden_text(hidden))
+        summary.append("  vendor shuffles (What-if): " + shuffle_text(shuffles))
         check_sales()
         check_zip()
     for p in problems:

@@ -20,6 +20,7 @@ local COLUMNS = {
   char = {
     { key = "name", label = "Recipe", width = 170 },
     { key = "profit", label = "Profit", width = 88 },
+    { key = "vprofit", label = "Vend. profit", width = 84 },
     { key = "pct", label = "%", width = 44 },
     { key = "where", label = "Sell", width = 46 },
     { key = "listings", label = "Listed", width = 46 },
@@ -28,6 +29,7 @@ local COLUMNS = {
   whatIf = {
     { key = "name", label = "Recipe", width = 130 },
     { key = "profit", label = "Profit", width = 76 },
+    { key = "vprofit", label = "Vend. profit", width = 76 },
     { key = "pct", label = "%", width = 38 },
     { key = "profs", label = "Profs", width = 70 },
     { key = "conf", label = "Conf", width = 48 },
@@ -35,7 +37,8 @@ local COLUMNS = {
     { key = "sold", label = "Sold/d", width = 44 },
   },
 }
-local MAX_COLUMNS = 7
+local MAX_COLUMNS = 8
+local LIST_W = 540
 local PL = ns.Planner
 
 local function whatIf()
@@ -98,11 +101,24 @@ function UI.RandomHint(r)
   end
 end
 
+-- Vendor shuffle: a craft that makes a profit when its output is sold to a vendor (whatever the AH pays).
+function UI.IsShuffle(r)
+  return r.vendorProfit ~= nil and r.vendorProfit > 0
+end
+
+-- Row hint for a vendor shuffle, else nil.
+function UI.ShuffleHint(r)
+  if not UI.IsShuffle(r) then return nil end
+  return string.format("Sells to a vendor for %s profit%s; no AH needed.", Util.Money(r.vendorProfit),
+    r.vendorEst and " (vendor price ~ estimate)" or "")
+end
+
 local function sortValue(r, key)
   if key == "name" then return r.name end
   if key == "profs" then return (r.primaries or 0) * 1000 + #(r.profs or {}) end
   if key == "conf" then return r.conf or 0 end
   if key == "pct" then return r.pct or -math.huge end
+  if key == "vprofit" then return r.vendorProfit or -math.huge end
   if key == "where" then return r.where end
   if key == "listings" then return r.sell.listings or 0 end
   if key == "sold" then return r.sales and r.sales.perDay or -1 end
@@ -128,10 +144,15 @@ function UI.ApplyFilter()
       ok = not r.whatIf and ((r.known and s.showKnown) or (r.learnable and s.showLearnable))
       if ok and s.profession ~= 0 and r.line ~= s.profession then ok = false end
     end
-    if ok and r.profit < math.max(s.minProfit or 0, 1) then ok = false end
-    if ok and not UI.SalesOK(r, s.minSoldPerDay) then
-      ok = false
-      salesHidden = salesHidden + 1
+    if s.vendorShuffles then
+      -- The output goes to a vendor: Min profit applies to the vendor profit; AH sales and listings do not matter.
+      if ok and not (UI.IsShuffle(r) and r.vendorProfit >= math.max(s.minProfit or 0, 1)) then ok = false end
+    else
+      if ok and r.profit < math.max(s.minProfit or 0, 1) then ok = false end
+      if ok and not UI.SalesOK(r, s.minSoldPerDay) then
+        ok = false
+        salesHidden = salesHidden + 1
+      end
     end
     if ok then table.insert(view, r) end
   end
@@ -340,6 +361,11 @@ function UI.DetailText(r)
     table.insert(out, "|cffc080ffRandom count:|r a step of the chain makes a random count; its cost uses the average "
       .. "(see the chain).")
   end
+  if UI.IsShuffle(r) and r.where == "ah" then
+    table.insert(out, string.format("|cff40ff40Vendor shuffle:|r sell to a vendor instead for %s%s -> profit %s%s; "
+      .. "no AH needed.", Util.Money(math.floor(s.vendor * r.n)), r.vendorEst and " ~" or "", Util.Money(r.vendorProfit),
+      r.vendorWorst and string.format(" (worst case (%d) %s)", r.outMin, Util.Money(r.vendorWorst)) or ""))
+  end
   table.insert(out, ns.Sales.DetailText(r.sales))
   if s.thin and r.where == "ah" then
     table.insert(out, "|cffff8040Thin market:|r few listings, the price may not hold.")
@@ -417,7 +443,11 @@ function UI.StatusText()
   local cut, label = ns.Pricing.Cut()
   table.insert(parts, string.format("AH cut %.1f%% (%s)", cut * 100, label))
   local st = UI.stats
-  table.insert(parts, string.format("%d profitable of %d recipes", #UI.view, st.evaluated or 0))
+  if ns.settings.vendorShuffles then
+    table.insert(parts, string.format("|cff40ff40%d vendor shuffles|r of %d recipes", #UI.view, st.evaluated or 0))
+  else
+    table.insert(parts, string.format("%d profitable of %d recipes", #UI.view, st.evaluated or 0))
+  end
   if (st.noPrice or 0) > 0 then table.insert(parts, st.noPrice .. " with an unpriced reagent") end
   if (UI.salesHidden or 0) > 0 then
     table.insert(parts, string.format("%d hidden: under %s sold/day", UI.salesHidden,
@@ -453,16 +483,17 @@ local function editBox(parent, width, label, x, get, set, y)
   return e
 end
 
-local function checkBox(parent, label, x, key)
+local function checkBox(parent, label, x, key, y, onClick)
   local c = CreateFrame("CheckButton", nil, parent, "UICheckButtonTemplate")
   c:SetSize(24, 24)
-  c:SetPoint("TOPLEFT", x, -36)
+  c:SetPoint("TOPLEFT", x, y or -36)
   local l = text(c, "small")
   l:SetPoint("LEFT", c, "RIGHT", 2, 0)
   l:SetText(label)
   c:SetChecked(ns.settings[key])
   c:SetScript("OnClick", function(self)
     ns.settings[key] = self:GetChecked() and true or false
+    if onClick then onClick(ns.settings[key]) end
     UI.ApplyFilter()
     UI.Refresh()
   end)
@@ -592,10 +623,15 @@ local function cellText(r, key)
     elseif r.var then
       name = "|cffc080ff[rnd]|r " .. name
     end
+    if UI.IsShuffle(r) then name = "|cff40ff40[V]|r " .. name end
     if ns.Planner.Steps(r.tree) > 1 then name = name .. " |cffaaaaaa+chain|r" end
     return name
   elseif key == "profit" then
     return Util.Money(r.profit)
+  elseif key == "vprofit" then
+    if not r.vendorProfit then return "—" end
+    local m = Util.Money(r.vendorProfit) .. (r.vendorEst and " ~" or "")
+    return r.vendorProfit > 0 and m or ("|cff808080" .. m .. "|r")
   elseif key == "pct" then
     return r.pct and (math.floor(r.pct * 100 + 0.5) .. "%") or "-"
   elseif key == "where" then
@@ -616,7 +652,7 @@ UI.CellText = cellText
 
 local function build()
   frame = CreateFrame("Frame", "ForeverCrafterFrame", UIParent, "BackdropTemplate")
-  frame:SetSize(860, 520)
+  frame:SetSize(940, 520)
   frame:SetPoint("CENTER")
   frame:SetFrameStrata("DIALOG")
   frame:SetToplevel(true)
@@ -683,6 +719,17 @@ local function build()
   hint(wi.max, { "Max primary professions", "The most primary professions a chain may need (1, 2, 3 or any).",
     "Cooking and First Aid are secondary and do not count." })
   frame.wi = wi
+  -- Title row, right end (free in both modes): show only crafts that profit at a vendor.
+  frame.shuffles = checkBox(frame, "Vendor shuffles", 772, "vendorShuffles", -7, function(on)
+    if on and ns.settings.sort == "profit" then
+      ns.settings.sort, ns.settings.sortDesc = "vprofit", true
+    elseif not on and ns.settings.sort == "vprofit" then
+      ns.settings.sort, ns.settings.sortDesc = "profit", true
+    end
+  end)
+  hint(frame.shuffles, { "Vendor shuffles", "Show only crafts that make a profit when the item is sold to a vendor "
+    .. "(the reagents may come from the AH, a vendor or other crafts), even when the AH pays more.",
+    "Min profit then applies to the vendor profit; Min sold/day and Min AH listings do not apply." })
 
   frame.prof = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
   frame.prof:SetSize(160, 22)
@@ -723,12 +770,12 @@ local function build()
 
   frame.status = text(frame, "small", 0.8, 0.8, 0.8)
   frame.status:SetPoint("TOPLEFT", 14, -66)
-  frame.status:SetWidth(830)
+  frame.status:SetWidth(910)
 
   -- List.
   local list = CreateFrame("Frame", nil, frame)
   list:SetPoint("TOPLEFT", 10, -86)
-  list:SetSize(460, (ROWS + 1) * ROW_H + 4)
+  list:SetSize(LIST_W, (ROWS + 1) * ROW_H + 4)
   list:EnableMouseWheel(true)
   list:SetScript("OnMouseWheel", function(_, delta)
     UI.offset = math.max(0, math.min(UI.offset - delta * 3, math.max(#UI.view - ROWS, 0)))
@@ -756,7 +803,7 @@ local function build()
   rows = {}
   for i = 1, ROWS do
     local row = CreateFrame("Button", nil, list)
-    row:SetSize(452, ROW_H)
+    row:SetSize(LIST_W - 8, ROW_H)
     row:SetPoint("TOPLEFT", 4, -i * ROW_H)
     row:SetHighlightTexture("Interface\\QuestFrame\\UI-QuestTitleHighlight")
     row.sel = row:CreateTexture(nil, "BACKGROUND")
@@ -783,6 +830,8 @@ local function build()
       end
       local var = UI.RandomHint(r)
       if var then table.insert(lines, var) end
+      local shuffle = UI.ShuffleHint(r)
+      if shuffle then table.insert(lines, shuffle) end
       UI.ShowHint(self, lines)
     end)
     row:SetScript("OnLeave", UI.HideHint)
@@ -793,7 +842,7 @@ local function build()
 
   -- Detail pane.
   local scroll = CreateFrame("ScrollFrame", "ForeverCrafterDetailScroll", frame, "UIPanelScrollFrameTemplate")
-  scroll:SetPoint("TOPLEFT", 480, -90)
+  scroll:SetPoint("TOPLEFT", LIST_W + 20, -90)
   scroll:SetPoint("BOTTOMRIGHT", -32, 30)
   local child = CreateFrame("Frame", nil, scroll)
   child:SetSize(340, 10)
@@ -829,6 +878,7 @@ function UI.Refresh()
   frame.prof:SetText(professionLabel())
   frame.known:SetChecked(ns.settings.showKnown)
   frame.learn:SetChecked(ns.settings.showLearnable)
+  frame.shuffles:SetChecked(ns.settings.vendorShuffles)
   frame.scan:SetEnabled(ns.Scanner.ahOpen and ns.Scanner.state == "idle")
   frame.status:SetText(statusText())
   for _, h in ipairs(frame.headers) do
@@ -853,7 +903,8 @@ function UI.Refresh()
   end
   local n = #UI.view
   frame.footer:SetText(n > 0 and string.format("%d-%d of %d   (scroll with the mouse wheel; [L] = not learned yet; "
-    .. "[1-5] = random count)", UI.offset + 1, math.min(UI.offset + ROWS, n), n) or "nothing profitable with these filters")
+    .. "[1-5] = random count; [V] = vendor shuffle)", UI.offset + 1, math.min(UI.offset + ROWS, n), n)
+    or (ns.settings.vendorShuffles and "no vendor shuffles with these filters" or "nothing profitable with these filters"))
   detail:SetText(UI.DetailText(UI.selected))
   frame.detailChild:SetHeight(math.max(detail:GetStringHeight() + 10, 10))
 end
