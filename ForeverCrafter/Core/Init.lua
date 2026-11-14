@@ -124,6 +124,7 @@ local CHAR_DEFAULTS = {
   listed = {},      -- skill line → { time, complete, ids = { [spellID] = true } } from the trade-skill window
   schematics = {},  -- spell ID → { skill, name, out = {id, min, max}, reagents = {{id, n}} } from GetRecipeSchematic
   difficulty = {},  -- spell ID → TradeskillRelativeDifficulty (0 optimal .. 3 trivial)
+  casts = {},       -- spell ID → cast time in ms (C_Spell.GetSpellInfo castTime, read at the profession window)
   sourceText = {},  -- spell ID → C_TradeSkillUI.GetRecipeSourceText of an unlearned recipe (the game's "how to learn")
 }
 

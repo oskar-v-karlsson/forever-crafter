@@ -20,8 +20,33 @@ function PL.Recipe(spell)
     trivLo = r and r.trivLo, trivHi = r and r.trivHi, out = s.out,
     reagents = (#s.reagents > 0 or not r) and s.reagents or r.reagents,
     how = r and r.how or {}, cost = r and r.cost or 0, items = r and r.items or {}, acquire = r and r.acquire,
-    known = r and r.known, runtime = true,
+    known = r and r.known, cast = r and r.cast, runtime = true,
   }
+end
+
+-- Cast time of one craft in ms: the game's C_Spell.GetSpellInfo castTime read at the profession window, else the
+-- DB2 (SpellMisc -> SpellCastTimes.Base). → ms or nil (unknown), "game" | "db2"
+function PL.CastMs(spell, r)
+  local c = ns.char and ns.char.casts and ns.char.casts[spell]
+  if c and c > 0 then return c, "game" end
+  r = r or PL.Recipe(spell)
+  if r and r.cast then return r.cast, "db2" end
+  return nil
+end
+
+-- Time to craft a chain: crafts x cast time summed over every craft node (the root and each crafted step; bought
+-- items take no time). → seconds, casts, unknown (a craft has no cast time; the seconds are then a lower bound)
+function PL.ChainTime(node)
+  local ms, casts, unknown = 0, 0, false
+  local function walk(n)
+    if n.src ~= "craft" then return end
+    local c = PL.CastMs(n.spell)
+    casts = casts + n.crafts
+    if c then ms = ms + c * n.crafts else unknown = true end
+    for _, k in ipairs(n.children or {}) do walk(k) end
+  end
+  walk(node)
+  return ms / 1000, casts, unknown
 end
 
 local function allSpells()
@@ -256,6 +281,13 @@ local function evaluate(spell, r, line, cost)
     res.vendorProfit = math.floor(value.vendor * n) - total
     res.vendorEst = value.vendorEst or false
     if hi > lo then res.vendorWorst = math.floor(value.vendor * lo) - total end
+  end
+  if value.ah then res.ahProfit = math.floor(value.ah * n) - total end
+  -- Crafting time and profit per hour (nil when the time is 0 or partly unknown). Profit itself is unchanged.
+  res.time, res.casts, res.timeUnknown = PL.ChainTime(res.tree)
+  if res.time > 0 and not res.timeUnknown then
+    res.ahPerHour = res.ahProfit and res.ahProfit / res.time * 3600
+    res.vendorPerHour = res.vendorProfit and res.vendorProfit / res.time * 3600
   end
   return res
 end

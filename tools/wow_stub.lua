@@ -11,8 +11,8 @@ STUB = {
   meta = {},        -- ForeverCrafter's TOC metadata (C_AddOns.GetAddOnMetadata)
   skills = {},      -- skill line → { rank, max } (C_SkillInfo.GetSkillLineInfoByID)
   known = {},       -- spell ID → true (C_SpellBook.IsSpellKnown)
-  -- trade-skill window: { line, rank, max, recipes = { [spell] = { learned, difficulty, schematic, source } },
-  --   showUnlearned = bool }; nil = closed
+  -- trade-skill window: { line, rank, max, recipes = { [spell] = { learned, difficulty, schematic, source,
+  --   cast } }, showUnlearned = bool }; nil = closed
   ts = nil,
   auctions = {},    -- { {itemID, stack, buyout}, ... } (C_AuctionHouse replicate list)
   replicateCalls = 0,
@@ -200,6 +200,14 @@ function C_TradeSkillUI.GetRecipeSchematic(id)
   end
   return { recipeID = id, name = s.name, outputItemID = s.out[1], quantityMin = s.out[2], quantityMax = s.out[3],
     reagentSlotSchematics = slots }
+end
+-- C_Spell.GetSpellInfo: only for recipes of the open window that set `cast` (castTime in ms); else nil.
+C_Spell = {}
+function C_Spell.GetSpellInfo(id)
+  local r = STUB.ts and STUB.ts.recipes[id]
+  if not r or not r.cast then return nil end
+  return { spellID = id, name = "spell " .. id, castTime = r.cast, minRange = 0, maxRange = 0, iconID = 0,
+    originalIconID = 0 }
 end
 function C_TradeSkillUI.GetRecipeSourceText(id)
   local r = STUB.ts and STUB.ts.recipes[id]

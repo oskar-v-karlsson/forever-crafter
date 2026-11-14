@@ -5,9 +5,10 @@ For each sampled recipe it fetches https://nether.wowhead.com/forever/tooltip/sp
 www.wowhead.com/forever pages) and compares with ForeverCrafter/Data:
   - reagents and counts (DB2 SpellReagents),
   - the created item (DB2 SpellEffect "Create Item"),
-  - the created item's vendor sell price (DB2 ItemSparse.SellPrice).
-Writes research/crosscheck_<date>.txt and exits 1 on a name, reagent or created-item mismatch. Sell price
-differences are listed but do not fail: DB2 ItemSparse.SellPrice and the tooltips disagree for some items.
+  - the created item's vendor sell price (DB2 ItemSparse.SellPrice),
+  - the cast time (DB2 SpellMisc.CastingTimeIndex -> SpellCastTimes.Base).
+Writes research/crosscheck_<date>.txt and exits 1 on a name, reagent, created-item or cast time mismatch. Sell
+price differences are listed but do not fail: DB2 ItemSparse.SellPrice and the tooltips disagree for some items.
 
 Usage: python3 tools/crosscheck_wowhead.py [N]     (N = sample size, default 40; network)
 """
@@ -23,7 +24,8 @@ import urllib.request
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA = os.path.join(ROOT, "ForeverCrafter", "Data")
 URL = "https://nether.wowhead.com/forever/tooltip/spell/{}"
-ALWAYS = [3170, 2963, 2385, 3275, 1244431]  # spot checks named in SOURCES.md
+ALWAYS = [3170, 2963, 2385, 3275, 1244431,  # spot checks named in SOURCES.md
+          10015, 3778, 3297, 3295, 3515, 3495, 2163, 3818, 3946]  # cast time spot checks
 
 
 def load_data():
@@ -32,7 +34,9 @@ def load_data():
                          r"reagents=\{(.*?)\},how=", open(os.path.join(DATA, "Recipes.lua"), encoding="utf-8").read(),
                          re.M):
         reagents = sorted((int(a), int(b)) for a, b in re.findall(r"\{(\d+),(\d+)\}", m.group(6)))
-        recipes[int(m.group(1))] = {"name": m.group(2), "out": int(m.group(3)), "reagents": reagents}
+        cast = re.search(r",cast=(\d+)", m.group(0) + m.string[m.end():m.string.find("\n", m.end())])
+        recipes[int(m.group(1))] = {"name": m.group(2), "out": int(m.group(3)), "reagents": reagents,
+                                    "cast": int(cast.group(1)) if cast else None}
     for line in open(os.path.join(DATA, "Items.lua"), encoding="utf-8"):
         m = re.match(r"^  \[(\d+)\]=\{.*?,sell=(\d+),", line)
         if m:
@@ -50,8 +54,11 @@ def fetch(spell):
 
 
 def parse(tooltip):
-    """→ (reagents [(id, n)], created item id or None, sell price copper or None)"""
-    reagents, created, sell = [], None, None
+    """→ (reagents [(id, n)], created item id or None, sell price copper or None, cast ms or None)"""
+    reagents, created, sell, cast = [], None, None, None
+    cm = re.search(r"<br\s*/?>\s*(?:([\d.]+) (sec|min) cast|(Instant))", tooltip)
+    if cm:
+        cast = 0 if cm.group(3) else round(float(cm.group(1)) * (60000 if cm.group(2) == "min" else 1000))
     m = re.search(r"Reagents:<br\s*/?>\s*<div class=\"indent[^\"]*\">(.*?)</div>", tooltip, re.S)
     if m:
         # Counts follow the link: "</a>&nbsp;(2)".
@@ -66,7 +73,7 @@ def parse(tooltip):
             sell = 0
             for unit, v in re.findall(r"money(gold|silver|copper)\">([\d,]+)<", sm.group(1)):
                 sell += int(v.replace(",", "")) * {"gold": 10000, "silver": 100, "copper": 1}[unit]
-    return sorted(reagents), created, sell
+    return sorted(reagents), created, sell, cast
 
 
 def main(argv):
@@ -88,7 +95,7 @@ def main(argv):
             lines.append(f"{spell} {r['name']}: FETCH ERROR {e}")
             bad += 1
             continue
-        reagents, created, sell = parse(d.get("tooltip", ""))
+        reagents, created, sell, cast = parse(d.get("tooltip", ""))
         issues, soft = [], []
         if html.unescape(d.get("name", "")) != r["name"].replace('\\"', '"'):
             issues.append(f"name {d.get('name')!r}")
@@ -101,6 +108,8 @@ def main(argv):
             issues.append(f"reagents wowhead {reagents} data {r['reagents']}")
         if created is not None and created != r["out"]:
             issues.append(f"creates wowhead {created} data {r['out']}")
+        if cast is not None and cast != r["cast"]:
+            issues.append(f"cast time wowhead {cast} ms data {r['cast']} ms")
         if sell is not None and sells.get(r["out"], 0) != sell:
             soft.append(f"sell price wowhead {sell} data {sells.get(r['out'], 0)}")
             sell_diff += 1
@@ -109,9 +118,9 @@ def main(argv):
             status = "MISMATCH " + "; ".join(issues + soft)
         else:
             status = "OK" + (" (" + "; ".join(soft) + ")" if soft else "")
-        lines.append(f"{spell} {r['name']}: {status}  (reagents {len(reagents)}, creates {created}, sell {sell})")
+        lines.append(f"{spell} {r['name']}: {status}  (reagents {len(reagents)}, creates {created}, sell {sell}, cast {cast} ms)")
         time.sleep(0.4)
-    lines += ["", f"{len(sample) - bad} OK, {bad} mismatch(es) in name, reagents or created item",
+    lines += ["", f"{len(sample) - bad} OK, {bad} mismatch(es) in name, reagents, created item or cast time",
               f"{sell_diff} sell price difference(s) (DB2 ItemSparse.SellPrice vs the tooltip; the addon prefers the "
               "client's price and marks DB2-only vendor values as estimates)"]
     out = os.path.join(ROOT, "research", f"crosscheck_{today}.txt")
