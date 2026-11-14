@@ -829,8 +829,8 @@ def check_cheap_batch():
     expect(view() == {T3, T5, TM} and UI.batchHidden == 4, f"Min batch 5: {view()} hidden {UI.batchHidden}")
     expect("4 hidden: cheap batch under 5" in frame.status.__text, f"status line {frame.status.__text!r}")
     by = {r.spell: r for r in UI.results.values()}
-    expect(UI.CellText(by[T3], "batch") == f"\u2265{cap}" and UI.CellText(by[T1], "batch") == "2"
-           and UI.CellText(by[T5], "batch") == f"\u2265{steps}", "Batch cells")
+    expect(UI.CellText(by[T3], "batch") == f"{cap}+" and UI.CellText(by[T1], "batch") == "2"
+           and UI.CellText(by[T5], "batch") == f"{steps}+", "Batch cells")
     t = UI.DetailText(by[T2])
     expect("Cheap batch:|r 3 crafts" in t and f"avg profit {ns.Util.Money(worth - 20)} (first craft "
            f"{ns.Util.Money(worth - 10)})" in t and "Batch shopping list (3 crafts):" in t
@@ -877,7 +877,7 @@ def batch_stats(ns, res):
     for label, lo, hi in buckets:
         rs = [r for r in prof if lo <= r.batch <= hi]
         capped = sum(1 for r in rs if r.batchCapped)
-        dist.append(f"{label}: {len(rs)}" + (f" ({capped} >=)" if capped else ""))
+        dist.append(f"{label}: {len(rs)}" + (f" ({capped} capped)" if capped else ""))
     hidden = sum(1 for r in prof if r.batch < 5)
     changed = sum(1 for r in prof if r.profit != r.profit1)
     ah = sorted([r for r in prof if r.ahPerHour is not None], key=lambda r: (-r.ahPerHour, r.spell))[:10]
@@ -889,7 +889,7 @@ def batch_stats(ns, res):
 def batch_text(ns, st, label):
     def fmt(r, v, k, capped):
         return (f"{r.name} {re.sub(r'[|]c[0-9a-f]{8}|[|]r', '', ns.UI.PerHourText(v))}/h "
-                f"(batch {'>=' if capped else ''}{k})")
+                f"(batch {k}{'+' if capped else ''})")
     return [f"  cheap batch ({label}): {st[0]}; hidden at Min batch 5: {st[1]}",
             "    top AH g/h: " + "; ".join(fmt(r, r.ahPerHour, r.batch, r.batchCapped) for r in st[2]),
             "    top Vend g/h: " + "; ".join(fmt(r, r.vendorPerHour, r.vendorBatch, r.vendorBatchCapped)

@@ -23,7 +23,7 @@ local VENDOR_HOUR_HINT = "Vendor profit per hour of crafting (the whole chain). 
   .. "crafting time; ~ = estimated vendor price."
 local BATCH_HINT = "Cheap batch: how many crafts you can make before the reagents' AH price steps cut a craft's own "
   .. "profit below 75% of the first craft's. Profit and g/h are the batch average. Buy the batch, craft it, let the AH "
-  .. "restock, repeat. \226\137\165 = the batch may be bigger (the snapshot's price steps or the search end there). With Vendor "
+  .. "restock, repeat. 50+ = the batch may be bigger (the snapshot's price steps or the search end there). With Vendor "
   .. "shuffles on: the vendor batch."
 local COLUMNS = {
   char = {
@@ -140,11 +140,11 @@ function UI.Batch(r)
   return r.batch, r.batchCapped, false
 end
 
--- "23", "≥50", "—".
+-- "23", "50+" (may be bigger), "—".
 function UI.BatchText(r)
   local k, capped = UI.Batch(r)
   if not k then return "—" end
-  return (capped and "≥" or "") .. k
+  return k .. (capped and "+" or "")
 end
 
 -- The Min batch filter. → true if the result stays
@@ -1106,7 +1106,7 @@ function UI.Refresh()
   end
   local n = #UI.view
   frame.footer:SetText(n > 0 and string.format("%d-%d of %d   (scroll with the mouse wheel; [L] = not learned yet; "
-    .. "[1-5] = random count; [V] = vendor shuffle; \226\137\165 = batch may be bigger)", UI.offset + 1, math.min(UI.offset + ROWS, n), n)
+    .. "[1-5] = random count; [V] = vendor shuffle; 50+ = batch may be bigger)", UI.offset + 1, math.min(UI.offset + ROWS, n), n)
     or (ns.settings.vendorShuffles and "no vendor shuffles with these filters" or "nothing profitable with these filters"))
   detail:SetText(UI.DetailText(UI.selected))
   frame.detailChild:SetHeight(math.max(detail:GetStringHeight() + 10, 10))
