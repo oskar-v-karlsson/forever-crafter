@@ -1,5 +1,10 @@
-# Every push to main: run the offline checks, build the addon zip and publish it as a GitHub Release
-# tagged v<TOC version>-<short commit>, e.g. v0.2.0-5f1a87c. The newest release is marked Latest.
+# Every push to main: run the offline checks, build the addon zip and publish it as a GitHub Release tagged vX.Y.Z,
+# marked Latest. tools/release_version.py picks the version: the patch of the higher of the newest vX.Y.Z tag and the
+# .toc ## Version, plus one (v0.1.1, v0.1.2, ...). For a minor/major bump, raise ## Version in the .toc in a PR
+# (e.g. 0.2.0): when it is above the newest tag it is used as is. Old v0.1.0-<commit> tags are ignored.
+# Nothing is committed back to main: the .toc in the repo keeps its base version and the zipped .toc gets the
+# release version. A re-run for a commit that already has a vX.Y.Z tag does nothing. The concurrency group runs one
+# release at a time, so two quick merges cannot pick the same version.
 name: Release
 
 on:
@@ -17,7 +22,11 @@ jobs:
   release:
     runs-on: ubuntu-latest
     steps:
+      # Full history with tags: the version comes from the existing vX.Y.Z tags.
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
 
       - uses: actions/setup-python@v5
         with:
@@ -27,25 +36,37 @@ jobs:
       - name: Install lupa
         run: python -m pip install lupa
 
+      - name: Version
+        id: version
+        run: |
+          version=$(python tools/release_version.py)
+          if [ -z "$version" ]; then
+            echo "HEAD already has a vX.Y.Z release tag (re-run): nothing to do."
+          else
+            echo "Next release: v$version"
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
       - name: Check
+        if: steps.version.outputs.version != ''
         run: make check PYTHON=python
 
       - name: Build zip
-        run: make zip PYTHON=python
+        if: steps.version.outputs.version != ''
+        run: make zip PYTHON=python RELEASE=${{ steps.version.outputs.version }}
 
       - name: Create release
+        if: steps.version.outputs.version != ''
         env:
           GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.version.outputs.version }}
         run: |
-          version=$(sed -n 's/^## Version: *//p' ForeverCrafter/ForeverCrafter.toc | tr -d '\r')
-          short=$(git rev-parse --short=7 "$GITHUB_SHA")
-          tag="v${version}-${short}"
+          tag="v${VERSION}"
           if gh release view "$tag" > /dev/null 2>&1; then
-            echo "Release $tag already exists (re-run): nothing to do."
-            exit 0
+            echo "::error::Release $tag already exists on another commit; push again to release the next version."
+            exit 1
           fi
           asset="dist/ForeverCrafter-${tag}.zip"
-          cp "dist/ForeverCrafter-v${version}.zip" "$asset"
 
           # Release notes: the commit messages of this push (newest last).
           jq -r '[.commits[]?.message] | if length == 0 then empty else .[] end | . + "\n"' \

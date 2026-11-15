@@ -70,12 +70,14 @@ def version():
     return toc()[0]["Version"]
 
 
-def build_zip(dist=None):
-    """dist/ForeverCrafter-v<version>.zip with ForeverCrafter/ at the top (unzip straight into AddOns)."""
+def build_zip(dist=None, release=None):
+    """dist/ForeverCrafter-v<version>.zip with ForeverCrafter/ at the top (unzip straight into AddOns).
+    release: the version of a release (tools/release_version.py); the zipped .toc gets it as its ## Version."""
     import zipfile
     dist = dist or os.path.join(ROOT, "dist")
     os.makedirs(dist, exist_ok=True)
-    path = os.path.join(dist, f"{NAME}-v{version()}.zip")
+    path = os.path.join(dist, f"{NAME}-v{release or version()}.zip")
+    toc_path = os.path.join(ADDON, NAME + ".toc")
     with zipfile.ZipFile(path, "w", zipfile.ZIP_DEFLATED) as z:
         for dirpath, dirs, files in os.walk(ADDON):
             dirs.sort()
@@ -83,6 +85,11 @@ def build_zip(dist=None):
                 if fn.startswith("."):
                     continue
                 full = os.path.join(dirpath, fn)
+                if release and full == toc_path:
+                    text, n = re.subn(r"^## Version: .*$", f"## Version: {release}", read(full), count=1, flags=re.M)
+                    assert n == 1, "no ## Version line in the .toc"
+                    z.writestr(os.path.relpath(full, ROOT), text)
+                    continue
                 z.write(full, os.path.relpath(full, ROOT))
         z.write(os.path.join(ROOT, "LICENSE"), f"{NAME}/LICENSE")
     return path
@@ -934,6 +941,19 @@ def check_cheap_batch():
     frame.minBatch.SetText(frame.minBatch, "2")
     frame.minBatch.__scripts.OnEnterPressed(frame.minBatch)
     expect(ns.settings.minBatch == 2 and view() == {T1, T2, T3, T4, T5, T6, TM}, f"Min batch 2: {view()}")
+    # Batch profit column: the whole batch's profit; sorted high first, no value last.
+    money = ns.Util.Money
+    expect(UI.CellText(by[T1], "bprofit") == money(2 * (worth - 10))
+           and UI.CellText(by[T4], "bprofit") == money(4 * (worth - 90)), "Batch profit cells")
+    order = lambda: [r.spell for r in UI.view.values()]
+    heads = {h.col.key: h for h in frame.headers.values() if h.col}
+    heads["bprofit"].Click(heads["bprofit"])
+    want = sorted((s for s in by if s in view()), key=lambda s: (-by[s].batchProfit, s))
+    expect(ns.settings.sort == "bprofit" and ns.settings.sortDesc and order() == want and want[0] == TM,
+           f"sorted by Batch profit: {order()} expected {want}")
+    none = ltable(lua, {"spell": 1})
+    expect(UI.CellText(none, "bprofit") == "—" and UI.SortValue(none, "bprofit") == -math.inf
+           and UI.SortValue(by[T1], "bprofit") > UI.SortValue(none, "bprofit"), "no batch profit: — and sorted last")
     frame.minBatch.SetText(frame.minBatch, "0")
     frame.minBatch.__scripts.OnEnterPressed(frame.minBatch)
     expect(ns.settings.minBatch == 2 and frame.minBatch.__text == "2", "Min batch below 1 accepted")
@@ -943,6 +963,11 @@ def check_cheap_batch():
     frame.shuffles.Click(frame.shuffles)
     expect(view() == set() and UI.batchHidden == 1 and UI.CellText(by[T4], "batch") == "2",
            f"vendor shuffles, Min batch 3: {view()} hidden {UI.batchHidden}")
+    expect(UI.CellText(by[T4], "bprofit") == money(600 - 60) and UI.SortValue(by[T4], "bprofit") == 540
+           and UI.CellText(by[T1], "bprofit") == "—", "vendor shuffles: Batch profit is the vendor batch's")
+    by[T4].vendorEst = True
+    expect(UI.CellText(by[T4], "bprofit") == money(540) + " ~", "estimated vendor price marked ~")
+    by[T4].vendorEst = False
     expect("vendor cheap batch under 3" in frame.status.__text, f"status line {frame.status.__text!r}")
     frame.shuffles.SetChecked(frame.shuffles, False)
     frame.shuffles.Click(frame.shuffles)
@@ -1363,8 +1388,8 @@ def check_what_if():
     expect(all(r.whatIf for r in ns.UI.view.values()) and len(ns.UI.view) > 0, "what-if view is empty or mixed")
     expect(frame.wi.cap.__shown and not frame.known.__shown, "what-if controls not swapped in")
     labels = [h.col.label for h in frame.headers.values() if h.col]
-    expect(labels == ["Recipe", "Profit", "Vend. profit", "%", "Profs", "Conf", "Sell", "Sold/d", "Batch", "Time",
-                     "AH g/h", "Vend g/h"],
+    expect(labels == ["Recipe", "Profit", "Vend. profit", "%", "Profs", "Conf", "Sell", "Sold/d", "Batch",
+                     "Batch profit", "Time", "AH g/h", "Vend g/h"],
            f"what-if columns {labels}")
     rows = [f for f in stub.frames.values() if f.result is not None and f.result.whatIf]
     if expect(rows, "what-if rows missing"):
@@ -1681,8 +1706,8 @@ def check_sales():
     view0 = [x.spell for x in ns.UI.view.values()]
     expect(ns.UI.salesHidden == 0 and view0, "filter 0 hides results")
     labels = [h.col.label for h in frame.headers.values() if h.col]
-    expect(labels == ["Recipe", "Profit", "Vend. profit", "%", "Sell", "Listed", "Sold/d", "Batch", "Time", "AH g/h",
-                     "Vend g/h"],
+    expect(labels == ["Recipe", "Profit", "Vend. profit", "%", "Sell", "Listed", "Sold/d", "Batch", "Batch profit",
+                     "Time", "AH g/h", "Vend g/h"],
            f"My character columns {labels}")
     ns.UI.Refresh()
     cells = [f.cells[7].__text for f in stub.frames.values() if f.cells is not None and f.result is not None]
@@ -1791,10 +1816,44 @@ def check_zip():
     _, files = toc()
     for rel in files:
         expect(f"{NAME}/{rel}" in names, f"zip: {rel} missing")
+    # A release zip carries the release version in its .toc; the rest is unchanged.
+    with tempfile.TemporaryDirectory() as tmp:
+        path = build_zip(tmp, release="0.1.4")
+        with zipfile.ZipFile(path) as z:
+            zipped = z.read(f"{NAME}/{NAME}.toc").decode("utf-8")
+            names2 = z.namelist()
+    want = read(os.path.join(ADDON, NAME + ".toc")).replace(f"## Version: {version()}", "## Version: 0.1.4")
+    expect(os.path.basename(path) == f"{NAME}-v0.1.4.zip" and zipped == want and names2 == names,
+           f"release zip: {os.path.basename(path)}")
+
+
+def check_release_version():
+    """tools/release_version.py: the vX.Y.Z of the next release (.github/workflows/release.yml)."""
+    from release_version import next_version
+    old = ["v0.1.0-dc1a6d3", "v0.1.0-f82da0b"]
+    cases = [
+        ("0.1.0", [], [], "0.1.1"),                                # first release: bump the .toc's patch
+        ("0.1.0", old, [], "0.1.1"),                               # old v<version>-<commit> tags are ignored
+        ("0.1.0", ["v0.1.0-abc", "v0.1.3"], [], "0.1.4"),          # bump the newest tag
+        ("0.1.0", ["v0.1.10", "v0.1.9", "v0.1.2"], [], "0.1.11"),  # numeric, not string, order
+        ("0.2.0", ["v0.1.3", "v0.1.4"], [], "0.2.0"),              # manual bump in the .toc: used as is
+        ("0.1.4", ["v0.1.4"], [], "0.1.5"),                        # .toc equal to the newest tag: bump
+        ("0.1.0", ["v0.1.3", "v0.1.4"], ["v0.1.4"], None),         # HEAD already released: skip
+        ("0.1.0", old, ["v0.1.0-f82da0b"], "0.1.1"),               # an old-style tag on HEAD is no release
+    ]
+    for toc_v, tags, head, want in cases:
+        got = next_version(toc_v, tags, head)
+        expect(got == want, f"next_version({toc_v!r}, {tags}, {head}) = {got!r}, want {want!r}")
+    try:
+        next_version("0.1", [])
+        expect(False, "a .toc version that is not X.Y.Z must fail")
+    except ValueError:
+        pass
 
 
 def main():
     check_toc()
+    check_release_version()
     check_policy()
     check_gen_data()
     lua, ns, _ = new_runtime()
