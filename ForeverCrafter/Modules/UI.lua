@@ -25,6 +25,8 @@ local BATCH_HINT = "Cheap batch: how many crafts you can make before the reagent
   .. "profit below 75% of the first craft's. Profit and g/h are the batch average. Buy the batch, craft it, let the AH "
   .. "restock, repeat. 50+ = the batch may be bigger (the snapshot's price steps or the search end there). With Vendor "
   .. "shuffles on: the vendor batch."
+local BATCH_PROFIT_HINT = "Profit of the whole cheap batch: every craft of the Batch column, sold at the price shown. "
+  .. "With Vendor shuffles on: the vendor batch sold to a vendor. — = not profitable; ~ = estimated vendor price."
 local COLUMNS = {
   char = {
     { key = "name", label = "Recipe", width = 162 },
@@ -35,6 +37,7 @@ local COLUMNS = {
     { key = "listings", label = "Listed", width = 46 },
     { key = "sold", label = "Sold/d", width = 46 },
     { key = "batch", label = "Batch", width = 40, hint = BATCH_HINT },
+    { key = "bprofit", label = "Batch profit", width = 84, hint = BATCH_PROFIT_HINT },
     { key = "time", label = "Time", width = 48, hint = "Crafting time of the chain. " .. TIME_HINT },
     { key = "ahgh", label = "AH g/h", width = 52, hint = AH_HOUR_HINT },
     { key = "vgh", label = "Vend g/h", width = 56, hint = VENDOR_HOUR_HINT },
@@ -49,13 +52,14 @@ local COLUMNS = {
     { key = "where", label = "Sell", width = 36 },
     { key = "sold", label = "Sold/d", width = 44 },
     { key = "batch", label = "Batch", width = 40, hint = BATCH_HINT },
+    { key = "bprofit", label = "Batch profit", width = 76, hint = BATCH_PROFIT_HINT },
     { key = "time", label = "Time", width = 46, hint = "Crafting time of the chain. " .. TIME_HINT },
     { key = "ahgh", label = "AH g/h", width = 50, hint = AH_HOUR_HINT },
     { key = "vgh", label = "Vend g/h", width = 56, hint = VENDOR_HOUR_HINT },
   },
 }
-local MAX_COLUMNS = 12
-local LIST_W = 720
+local MAX_COLUMNS = 13
+local LIST_W = 804
 local FRAME_W = LIST_W + 400
 local PL = ns.Planner
 
@@ -140,6 +144,16 @@ function UI.Batch(r)
   return r.batch, r.batchCapped, false
 end
 
+-- Total profit of the cheap batch the view uses. → copper, estimate (vendor price ~)  or nil (not profitable)
+function UI.BatchProfit(r)
+  if ns.settings.vendorShuffles then
+    if not r.vendorBatch then return nil end
+    return r.vendorBatchProfit, r.vendorEst or false
+  end
+  if not r.batch then return nil end
+  return r.batchProfit, (r.where == "vendor" and r.vendorEst) or false
+end
+
 -- "23", "50+" (may be bigger), "—".
 function UI.BatchText(r)
   local k, capped = UI.Batch(r)
@@ -217,6 +231,7 @@ local function sortValue(r, key)
   if key == "listings" then return r.sell.listings or 0 end
   if key == "sold" then return r.sales and r.sales.perDay or -1 end
   if key == "batch" then return UI.Batch(r) or -1 end
+  if key == "bprofit" then return UI.BatchProfit(r) or -math.huge end
   return r.profit
 end
 
@@ -811,6 +826,10 @@ local function cellText(r, key)
     return ns.Sales.Format(r.sales and r.sales.perDay)
   elseif key == "batch" then
     return UI.BatchText(r)
+  elseif key == "bprofit" then
+    local v, est = UI.BatchProfit(r)
+    if not v then return "—" end
+    return Util.Money(v) .. (est and " ~" or "")
   elseif key == "time" then
     if not r.time then return "—" end
     if r.timeUnknown then return "|cffff8040>" .. UI.TimeText(r.time, true) .. "|r" end
@@ -827,7 +846,7 @@ local function cellText(r, key)
   end
   return ""
 end
-UI.CellText = cellText
+UI.CellText, UI.SortValue = cellText, sortValue
 
 local function build()
   frame = CreateFrame("Frame", "ForeverCrafterFrame", UIParent, "BackdropTemplate")
@@ -1107,7 +1126,8 @@ function UI.Refresh()
   end
   local n = #UI.view
   frame.footer:SetText(n > 0 and string.format("%d-%d of %d   (scroll with the mouse wheel; [L] = not learned yet; "
-    .. "[1-5] = random count; [V] = vendor shuffle; 50+ = batch may be bigger)", UI.offset + 1, math.min(UI.offset + ROWS, n), n)
+    .. "[1-5] = random count; [V] = vendor shuffle; 50+ = batch may be bigger; Batch profit = the whole batch)",
+    UI.offset + 1, math.min(UI.offset + ROWS, n), n)
     or (ns.settings.vendorShuffles and "no vendor shuffles with these filters" or "nothing profitable with these filters"))
   detail:SetText(UI.DetailText(UI.selected))
   frame.detailChild:SetHeight(math.max(detail:GetStringHeight() + 10, 10))

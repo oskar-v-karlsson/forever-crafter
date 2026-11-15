@@ -22,9 +22,11 @@ crosscheck:
 tsm:
 	$(PYTHON) tools/gen_data.py tsm
 
-# dist/ForeverCrafter-v<version>.zip (unzip into the AddOns folder).
+# dist/ForeverCrafter-v<version>.zip (unzip into the AddOns folder). RELEASE=X.Y.Z (the release workflow) names the
+# zip after that version and writes it into the zipped .toc.
+RELEASE ?=
 zip: check
-	$(PYTHON) -c "import sys; sys.path.insert(0, 'tools'); import check; print('built', check.build_zip())"
+	$(PYTHON) -c "import sys; sys.path.insert(0, 'tools'); import check; print('built', check.build_zip(release='$(RELEASE)' or None))"
 
 clean:
 	rm -rf dist tools/__pycache__
