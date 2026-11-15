@@ -547,9 +547,10 @@ function UI.DetailText(r)
   end
   if r.est then
     table.insert(out, "")
-    table.insert(out, "~ = estimate: a vendor price from game data not yet seen at a merchant or not yet loaded by the "
-      .. "client, or more AH items than the snapshot's " .. ns.Scanner.LADDER_STEPS .. " cheapest price steps. Visit the "
-      .. "vendor once, or rescan, to make it exact.")
+    table.insert(out, "~ = estimate. A reagent bought from a vendor: its price from game data until you open a merchant "
+      .. "that sells it (the addon then records the exact price). A reagent bought on the AH: more than the snapshot's "
+      .. ns.Scanner.LADDER_STEPS .. " cheapest price steps (rescan). The crafted item's sell-to-vendor price: from game "
+      .. "data until the client has loaded the item; that happens by itself, a vendor visit does not change it.")
   end
   return table.concat(out, "\n")
 end

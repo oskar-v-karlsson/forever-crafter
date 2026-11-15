@@ -88,29 +88,96 @@ function P.SellValue(id)
   return out
 end
 
--- Merchant capture: any merchant the player opens gives exact prices for what it sells.
+-- Merchant capture: any merchant the player opens gives exact prices for what it sells. Forever loads the Mainline
+-- MerchantFrame, which reads C_MerchantFrame.GetItemInfo (a table); the global GetMerchantItemInfo is in the Classic
+-- (Vanilla/TBC) frames only, so it is just a fallback.
+local merchantAnnounce = false   -- one chat line per merchant visit
+local merchantFailed = {}        -- each kind of failure is recorded once per session
+
+-- Records a failure (once per session) and, on a new visit, says so in chat.
+local function merchantError(msg)
+  if not merchantFailed[msg] then
+    merchantFailed[msg] = true
+    ns.Error("merchant: " .. msg)
+  end
+  if merchantAnnounce then
+    merchantAnnounce = false
+    ns.Print(string.format("could not read the vendor prices from %s; see /crafter errors",
+      (UnitName and UnitName("npc")) or "this merchant"))
+  end
+end
+
+-- One merchant slot. → { price, stack, available, extended, currency } or nil, why
+local function merchantSlot(i)
+  if ns.API("C_MerchantFrame.GetItemInfo") then
+    local ok, info = ns.Call("C_MerchantFrame.GetItemInfo", i)
+    if not ok then return nil, "C_MerchantFrame.GetItemInfo: " .. tostring(info) end
+    if type(info) ~= "table" then return nil, "C_MerchantFrame.GetItemInfo returned " .. type(info) end
+    return { price = info.price, stack = info.stackCount, available = info.numAvailable,
+             extended = info.hasExtendedCost, currency = info.currencyID }
+  end
+  local r = { ns.Call("GetMerchantItemInfo", i) }
+  if not r[1] then return nil, "GetMerchantItemInfo: " .. tostring(r[2]) end
+  -- name, texture, price, stackCount, numAvailable, isPurchasable, isUsable, extendedCost, currencyID
+  return { price = r[4], stack = r[5], available = r[6], extended = r[9], currency = r[10] }
+end
+
+-- Item id of a merchant slot: GetMerchantItemID, else the id in GetMerchantItemLink. → id or nil
+local function merchantItemID(i)
+  local ok, id = ns.Call("GetMerchantItemID", i)
+  if ok and type(id) == "number" and id > 0 then return id end
+  local okL, link = ns.Call("GetMerchantItemLink", i)
+  if okL and type(link) == "string" then return tonumber(string.match(link, "item:(%d+)")) end
+  return nil
+end
+
 local function captureMerchant()
   if not ns.db then return end
   local okN, n = ns.Call("GetMerchantNumItems")
-  if not okN or not n then return end
+  if not okN or type(n) ~= "number" then
+    merchantError("cannot count the merchant's items (" .. tostring(n) .. ")")
+    return
+  end
+  if n == 0 then return end
+  if not ns.API("C_MerchantFrame.GetItemInfo") and not ns.API("GetMerchantItemInfo") then
+    merchantError("no API for merchant prices (C_MerchantFrame.GetItemInfo or GetMerchantItemInfo)")
+    return
+  end
+  if not ns.API("GetMerchantItemID") and not ns.API("GetMerchantItemLink") then
+    merchantError("no API for merchant item ids (GetMerchantItemID or GetMerchantItemLink)")
+    return
+  end
   local npc = UnitName and UnitName("npc") or nil
-  local count = 0
+  local count, failed, changed, why = 0, 0, false, nil
   for i = 1, n do
-    local okI, id = ns.Call("GetMerchantItemID", i)
-    local okV, _, _, price, stack, numAvailable, _, _, extendedCost = ns.Call("GetMerchantItemInfo", i)
-    if okI and id and okV and price and price > 0 and not extendedCost then
-      stack = (stack and stack > 0) and stack or 1
-      ns.db.vendorSeen[id] = {
-        unit = price / stack, stack = stack, limited = (numAvailable or -1) >= 0,
-        time = time(), npc = npc,
-      }
-      count = count + 1
+    local slot, err = merchantSlot(i)
+    if not slot then
+      failed, why = failed + 1, why or err
+    elseif type(slot.price) == "number" and slot.price > 0 and not slot.extended and not slot.currency then
+      local id = merchantItemID(i)
+      if id then
+        local stack = (type(slot.stack) == "number" and slot.stack > 0) and slot.stack or 1
+        -- numAvailable: -1 = unlimited, 0 = sold out, N = limited stock (the Mainline frame greys out 0 and shows N)
+        local unit, limited = slot.price / stack, (slot.available or -1) >= 0
+        local old = ns.db.vendorSeen[id]
+        if not old or old.unit ~= unit or old.limited ~= limited or old.stack ~= stack then changed = true end
+        ns.db.vendorSeen[id] = { unit = unit, stack = stack, limited = limited, time = time(), npc = npc }
+        count = count + 1
+      else
+        failed, why = failed + 1, why or "no item id"
+      end
     end
   end
-  if count > 0 then
-    ns.Debug(string.format("merchant %s: %d items", tostring(npc), count))
-    ns.Fire("DATA_CHANGED")
+  local who = npc or "this merchant"
+  if merchantAnnounce and count > 0 then
+    merchantAnnounce = false
+    ns.Print(string.format("%d vendor price%s from %s", count, count == 1 and "" or "s", who))
   end
+  if failed > 0 then
+    merchantError(string.format("could not read %d of %d items from %s (%s)", failed, n, who, tostring(why)))
+  end
+  ns.Debug(string.format("merchant %s: %d of %d items, %d failed", who, count, n, failed))
+  if changed then ns.Fire("DATA_CHANGED") end
 end
 
 local merchantPending = false
@@ -123,8 +190,12 @@ local function merchantSoon()
     if not ok then ns.Error("merchant: " .. tostring(err)) end
   end)
 end
-ns.On("MERCHANT_SHOW", merchantSoon)
+ns.On("MERCHANT_SHOW", function()
+  merchantAnnounce = true
+  merchantSoon()
+end)
 ns.On("MERCHANT_UPDATE", merchantSoon)
+ns.On("MERCHANT_CLOSED", function() merchantAnnounce = false end)
 
 -- AH sale invoices: consignment / sale price = the AH cut on this server.
 local function captureInvoices()
