@@ -682,8 +682,9 @@ def check_full_run():
     errs = list(ns.errors.values())
     expect(not errs, f"errors in the full run: {errs[:3]}")
     hidden = sales_hidden(lua, ns, stub, lambda: ns.Planner.Run(), "char")
+    check_gold_unchanged(ns, lambda: results(ns)[0], "full run")
     return n, stats.evaluated, took, hidden, shuffle_stats(list(res.values())), time_stats(list(res.values())), \
-        batch_stats(ns, list(res.values()))
+        batch_stats(ns, list(res.values())), fast_stats(ns, list(res.values()))
 
 
 MINING, BLACKSMITHING, ENGINEERING, ALCHEMY, COOKING = 186, 164, 202, 171, 185
@@ -1076,6 +1077,10 @@ def check_batch_depth():
                          f"slowest frame async {max(frames) * 1000:.0f} ms")
             lines += batch_text(ns, batch_stats(ns, char), "graded, My character")
             lines += batch_text(ns, batch_stats(ns, wi), "graded, What-if")
+            check_gold_unchanged(ns, lambda: results(ns)[0], "graded full run")
+            check_gold_unchanged(ns, lambda: wi_run(lua, ns)[0], "graded what-if")
+            lines += fast_text(fast_stats(ns, char), "graded, My character")
+            lines += fast_text(fast_stats(ns, wi), "graded, What-if")
         errs = list(ns.errors.values())
         expect(not errs, f"errors in the {kind} depth run: {errs[:3]}")
     return lines
@@ -1221,6 +1226,167 @@ def check_crafting_time():
     expect(ns2.char.casts[R_TOP] == 2500, "window cast times not saved")
     errs = list(ns.errors.values()) + list(ns2.errors.values())
     expect(not errs, f"errors in the crafting time checks: {errs[:3]}")
+
+
+FAST_MARK = "|cff66e0ff*|r"
+
+
+def gold_fields(ns, r):
+    """The most-gold path's numbers: they must not depend on the best-g/h paths."""
+    return (r.profit, r.cost, r.cost1, r.profit1, r.value, r.where, r.ahProfit, r.vendorProfit, r.vendorProfit1,
+            r.batch, r.batchCapped, r.batchProfit, r.vendorBatch, r.vendorBatchCapped, r.vendorBatchProfit, r.time,
+            r.casts, r.timeUnknown, r.ahPerHour, r.vendorPerHour, ns.Planner.PathSig(r.tree))
+
+
+def check_gold_unchanged(ns, run, label):
+    """run() → {spell: result}. The Profit-side fields with and without the best-g/h paths must be equal."""
+    on = run()
+    ns.Planner.FAST_PATHS = False
+    try:
+        off = run()
+    finally:
+        ns.Planner.FAST_PATHS = True
+    expect(set(on) == set(off), f"{label}: best-g/h paths change the result set")
+    for spell, r in on.items():
+        o = off.get(spell)
+        if o is None:
+            continue
+        if not expect(gold_fields(ns, r) == gold_fields(ns, o) and o.fastAH is None and o.fastVendor is None,
+                      f"{label}: result {spell} most-gold fields differ with best-g/h paths on"):
+            break
+    return on
+
+
+def fast_stats(ns, res):
+    """Best-g/h paths over the results: each one beats its most-gold path (Dinkelbach never does worse) and its
+    numbers add up. → (results, differ on AH, differ on vendor, top 10 by AH g/h, top 10 by vendor g/h)"""
+    PL = ns.Planner
+    for r in res:
+        ok = True
+        for side, gold, worth in (("fastAH", r.ahPerHour, r.ahProfit is not None and r.ahProfit + r.cost),
+                                  ("fastVendor", r.vendorPerHour, r.vendorProfit is not None and r.vendorProfit + (
+                                      r.cost if r.vendorBatch is None or r.vendorBatch == r.batch else 0))):
+            f = getattr(r, side)
+            if f is None:
+                continue
+            ok = (gold is not None and gold > 0 and f.perHour > gold and f.time > 0 and f.batch >= 1
+                  and f.profit1 >= f.profit > 0 and f.profit >= 0.75 * f.profit1 and f.cost1 + f.profit1 == f.cost + f.profit
+                  and abs(f.perHour - f.profit / f.time * 3600) < 1e-6 and PL.PathSig(f.tree) != PL.PathSig(r.tree))
+            if not ok:
+                break
+        bah, _ = PL.AHPerHour(r)
+        bv, _ = PL.VendorPerHour(r)
+        ok = ok and (r.ahPerHour is None or bah >= r.ahPerHour) and (r.vendorPerHour is None or bv >= r.vendorPerHour)
+        if not expect(ok, f"result {r.spell}: best-g/h path below or equal to the most-gold path"):
+            break
+    prof = [r for r in res if r.profit > 0]
+    ah = sorted([r for r in prof if PL.AHPerHour(r)[0] is not None], key=lambda r: (-PL.AHPerHour(r)[0], r.spell))[:10]
+    vend = sorted([r for r in prof if PL.VendorPerHour(r)[0] is not None],
+                  key=lambda r: (-PL.VendorPerHour(r)[0], r.spell))[:10]
+
+    def fmt(r, get):
+        v, f = get(r)
+        k, capped, t = (f.batch, f.batchCapped, f.time) if f else (r.batch, r.batchCapped, r.time)
+        return (f"{r.name} {re.sub(r'[|]c[0-9a-f]{8}|[|]r', '', ns.UI.PerHourText(v))}/h{'*' if f else ''} "
+                f"({ns.UI.TimeText(t)}, batch {k}{'+' if capped else ''})")
+    return (len(prof), sum(1 for r in prof if r.fastAH), sum(1 for r in prof if r.fastVendor),
+            [fmt(r, PL.AHPerHour) for r in ah], [fmt(r, PL.VendorPerHour) for r in vend])
+
+
+def fast_text(st, label):
+    return [f"  best-g/h paths ({label}): differ from the most-gold path for {st[1]} of {st[0]} profitable results on "
+            f"the AH, {st[2]} on the vendor",
+            "    top AH g/h (* = best-g/h path): " + "; ".join(st[3]),
+            "    top Vend g/h: " + "; ".join(st[4])]
+
+
+def check_fast_path():
+    """Best-g/h path: buying bars beats smelting them on g/h but not on gold; equal paths; no path when the
+    most-gold g/h is <= 0; a two-reagent mix against brute force; vendor-only output; the list and details."""
+    lua, ns, stub = new_runtime()
+    g = lua.globals()
+    PL = ns.Planner
+    login(lua, stub, skills={TAILORING: 300})
+    ORE, BAR, TOP, VTOP, BAR2, EQ, LOSS = 990601, 990602, 990603, 990604, 990605, 990606, 990607
+    A_ORE, A, B_ORE, B, MIX, SOLO = 990608, 990609, 990610, 990611, 990612, 990613
+    R_BAR, R_TOP, R_VTOP, R_BAR2, R_EQ, R_LOSS = 991601, 991602, 991603, 991604, 991605, 991606
+    R_A, R_B, R_MIX, R_SOLO = 991607, 991608, 991609, 991610
+    recipes = {R_BAR: (BAR, [[ORE, 1]]), R_TOP: (TOP, [[BAR, 2]]), R_VTOP: (VTOP, [[BAR, 2]]),
+               R_BAR2: (BAR2, [[ORE, 1]]), R_EQ: (EQ, [[BAR2, 1]]), R_LOSS: (LOSS, [[BAR, 2]]),
+               R_A: (A, [[A_ORE, 1]]), R_B: (B, [[B_ORE, 1]]), R_MIX: (MIX, [[A, 1], [B, 1]]), R_SOLO: (SOLO, [[ORE, 3]])}
+    synthetic(lua, ns, stub, recipes, [ORE, BAR, TOP, VTOP, BAR2, EQ, LOSS, A_ORE, A, B_ORE, B, MIX, SOLO])
+    casts = {R_BAR: 30000, R_TOP: 5000, R_VTOP: 5000, R_BAR2: 3000, R_EQ: 5000, R_LOSS: 5000, R_A: 20000,
+             R_B: 4000, R_MIX: 2000, R_SOLO: 5000}
+    for spell, ms in casts.items():
+        ns.Recipes[spell].cast = ms
+    stub["items"][VTOP] = lua.table_from({"name": "Test vendor top", "sell": 50000})
+    deep = lambda i, p: (i, 10000, p * 10000)
+    set_auctions(lua, stub, [deep(ORE, 10), deep(BAR, 30), (TOP, 1, 100000), deep(BAR2, 100000), (EQ, 1, 50000),
+                             (LOSS, 1, 20), deep(A_ORE, 10), deep(A, 400), deep(B_ORE, 10), deep(B, 2000),
+                             (MIX, 1, 3200), (SOLO, 1, 100000)])
+    scan(lua, stub)
+    res, _ = results(ns)
+    top, vtop, eq, loss, mix, solo = (res.get(s) for s in (R_TOP, R_VTOP, R_EQ, R_LOSS, R_MIX, R_SOLO))
+    if not expect(None not in (top, vtop, eq, loss, mix, solo), "best-g/h recipes not evaluated"):
+        return
+    # 1. Smelting 2 bars costs 20c and 60 s; buying them 60c and 0 s: Profit keeps smelting, AH g/h buys.
+    f = top.fastAH
+    expect(top.cost == 20 and top.tree.children[1].src == "craft" and top.time == 65, "TOP's most-gold path smelts")
+    if expect(f is not None, "TOP has no best-g/h path"):
+        expect(f.cost1 == 60 and f.time == 5 and f.tree.children[1].src == "ah" and f.profit == top.value - 60
+               and f.perHour == f.profit / 5 * 3600 and f.perHour > top.ahPerHour and f.batch == PL.BATCH_CAP
+               and f.batchCapped, f"TOP best-g/h path: cost {f.cost1} time {f.time} batch {f.batch}")
+        expect(PL.AHPerHour(top)[0] == f.perHour and top.fastVendor is None, "TOP's AH g/h is the best-g/h path's")
+        expect(top.profit == top.value - 20, "TOP's Profit must stay on the most-gold path")
+    # Vendor-only output: the vendor sale gets its own best-g/h path.
+    expect(vtop.where == "vendor" and vtop.fastAH is None and vtop.fastVendor is not None
+           and vtop.fastVendor.cost1 == 60 and vtop.fastVendor.perHour == (vtop.value - 60) / 5 * 3600,
+           "vendor-only output: best-g/h path for the vendor sale")
+    # 2. Equal: a bar from 10c of ore in 3 s against 100000c on the AH; and a recipe with nothing to craft.
+    expect(eq.profit > 0 and eq.fastAH is None and PL.AHPerHour(eq)[0] == eq.ahPerHour, "EQ: paths are equal")
+    expect(solo.profit > 0 and solo.fastAH is None, "SOLO: nothing crafted below the root, no best-g/h path")
+    # 3. lambda <= 0: an unprofitable craft gets no best-g/h path (buying would only lose faster).
+    expect(loss.profit <= 0 and loss.ahPerHour <= 0 and loss.fastAH is None, "LOSS: no best-g/h path at g/h <= 0")
+    # 4. Two reagents, each crafted or bought: Dinkelbach finds the best of the four by brute force.
+    w, best = mix.value, None
+    for buy_a in (False, True):
+        for buy_b in (False, True):
+            c = (400 if buy_a else 10) + (2000 if buy_b else 10)
+            t = 2 + (0 if buy_a else 20) + (0 if buy_b else 4)
+            gh = (w - c) / t * 3600
+            if best is None or gh > best[0]:
+                best = (gh, buy_a, buy_b)
+    expect(best[1:] == (True, False), f"MIX brute force should buy A and craft B: {best}")
+    fm = mix.fastAH
+    if expect(fm is not None, "MIX has no best-g/h path"):
+        expect(abs(fm.perHour - best[0]) < 1e-6 and [c.src for c in fm.tree.children.values()] == ["ah", "craft"]
+               and 1 <= fm.rounds <= PL.FAST_ROUNDS, f"MIX best-g/h path {fm.perHour} vs brute force {best[0]}")
+    # 5. The list: g/h cells marked *, sorted on the best-g/h path; the details show what differs.
+    cell = ns.UI.CellText
+    expect(cell(top, "ahgh") == ns.UI.PerHourText(f.perHour) + FAST_MARK and cell(eq, "ahgh") == ns.UI.PerHourText(
+        eq.ahPerHour) and cell(vtop, "vgh").endswith(FAST_MARK), "g/h cells and their * marker")
+    t = re.sub(r"[|]c[0-9a-f]{8}|[|]r", "", ns.UI.DetailText(top))
+    expect(f"Fastest path (AH): buy Test {BAR} on the AH instead of crafting it (Make {BAR}) -> profit" in t
+           and "(this path; a faster one below)" in t and "Fastest path (AH), 1 craft, 5 s:" in t
+           and f"Buy Test {BAR} x2 from AH" in t and "Its shopping list (first craft):" in t
+           and "Its batch shopping list (200 crafts):" in t, "details: the fastest path section")
+    expect("Fastest path" not in ns.UI.DetailText(eq), "details: no fastest path when the paths are equal")
+    ns.settings.minSoldPerDay = 0
+    ns.settings.minBatch = 0
+    slash(lua, "")
+    frame = g.ForeverCrafterFrame
+    heads = {h.col.key: h for h in frame.headers.values() if h.col}
+    heads["ahgh"].Click(heads["ahgh"])
+    view = [r for r in ns.UI.view.values()]
+    vals = [PL.AHPerHour(r)[0] for r in view if PL.AHPerHour(r)[0] is not None]
+    spells = [r.spell for r in view]
+    # TOP's most-gold g/h is below EQ's, its best-g/h path's above.
+    expect(len(vals) >= 4 and vals == sorted(vals, reverse=True) and top.ahPerHour < eq.ahPerHour < f.perHour
+           and spells.index(R_TOP) < spells.index(R_EQ), f"sorted on the best-g/h AH g/h: {spells}")
+    # The Profit side is the same with the best-g/h paths off.
+    check_gold_unchanged(ns, lambda: results(ns)[0], "best-g/h synthetic")
+    errs = list(ns.errors.values())
+    expect(not errs, f"errors in the best-g/h checks: {errs[:3]}")
 
 
 def wi_run(lua, ns, **kw):
@@ -1481,10 +1647,11 @@ def check_what_if_full():
     expect(not errs, f"errors in the what-if run: {errs[:3]}")
     top = sorted(profit, key=lambda r: -r.profit)[:10]
     hidden = sales_hidden(lua, ns, stub, lambda: ns.Planner.Run(ltable(lua, {"whatIf": WI_DEFAULT})), "whatIf")
+    check_gold_unchanged(ns, lambda: wi_run(lua, ns)[0], "what-if")
     return (f"what-if run (cap 150, max 2 primaries): {st.sets} sets, {st.evaluated} recipes evaluated, "
             f"{len(profit)} profitable, {took:.2f} s in one go (any number of primaries: {out[0][2]:.2f} s), "
             f"slowest frame async {max(frames) * 1000:.0f} ms"), top, hidden, shuffle_stats(list(res.values())), \
-        time_stats(list(res.values())), batch_stats(ns, list(res.values()))
+        time_stats(list(res.values())), batch_stats(ns, list(res.values())), fast_stats(ns, list(res.values()))
 
 
 def sales_hidden(lua, ns, stub, run, mode):
@@ -1865,23 +2032,26 @@ def main():
         check_random_output()
         check_vendor_shuffles()
         check_crafting_time()
+        check_fast_path()
         check_cheap_batch()
         check_merchant()
         check_missing_apis()
         check_dump()
-        n, evaluated, took, hidden, shuffles, times, batches = check_full_run()
+        n, evaluated, took, hidden, shuffles, times, batches, fasts = check_full_run()
         summary.append(f"full run: {evaluated} recipes evaluated, {n} profitable, {took:.2f} s")
         summary.append("  Min sold/day 1 hides (My character): " + hidden_text(hidden))
         summary.append("  vendor shuffles (My character): " + shuffle_text(shuffles))
         summary += time_text(ns, times, "My character")
         summary += batch_text(ns, batches, "My character")
+        summary += fast_text(fasts, "My character")
         check_what_if()
-        line, _, hidden, shuffles, times, batches = check_what_if_full()
+        line, _, hidden, shuffles, times, batches, fasts = check_what_if_full()
         summary.append(line)
         summary.append("  Min sold/day 1 hides (What-if): " + hidden_text(hidden))
         summary.append("  vendor shuffles (What-if): " + shuffle_text(shuffles))
         summary += time_text(ns, times, "What-if")
         summary += batch_text(ns, batches, "What-if")
+        summary += fast_text(fasts, "What-if")
         summary += check_batch_depth()
         check_sales()
         check_zip()
