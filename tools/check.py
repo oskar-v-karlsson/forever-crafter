@@ -540,6 +540,98 @@ def check_solver_shapes():
         expect(ns.Planner.Steps(res[992009].tree) == 9, "depth: C9 chain is not 9 crafts")
 
 
+def check_merchant():
+    """Merchant capture. Forever loads the Mainline MerchantFrame (C_MerchantFrame.GetItemInfo → a table); the
+    global GetMerchantItemInfo is a fallback. Failures go to /crafter errors and say so in chat."""
+    # id, price, stack, numAvailable (-1 unlimited, 0 sold out), extended cost, currency
+    items = [[THREAD, 12, 1], [DYE, 250, 5, 0], [LINEN, 30, 1, 3],
+             [VEST, 500, 1, -1, True], [BOOTS, 1000, 1, -1, False, 1792]]
+
+    def visit(lua, stub, npc="Rachel", event="MERCHANT_SHOW"):
+        n0 = len(stub.prints)
+        if event == "MERCHANT_SHOW":
+            stub.merchant = ltable(lua, {"npc": npc, "items": items})
+        stub.fire(event)
+        stub.runTimers()
+        return prints(stub, n0)
+
+    def captured(ns, how):
+        seen = ns.db.vendorSeen
+        t, d, l = seen[THREAD], seen[DYE], seen[LINEN]
+        expect(t and t.unit == 12 and t.stack == 1 and not t.limited and t.npc == "Rachel", f"{how}: unlimited item")
+        expect(d and d.unit == 50 and d.stack == 5 and d.limited, f"{how}: sold-out bundle of 5 (0 available)")
+        expect(l and l.unit == 30 and l.limited, f"{how}: limited stock (3 available)")
+        expect(seen[VEST] is None and seen[BOOTS] is None, f"{how}: extended-cost or currency item recorded")
+        expect(ns.Pricing.VendorUnit(THREAD) == (12, "merchant", False), f"{how}: VendorUnit does not use it")
+
+    def errors(ns):
+        return list(ns.errors.values())
+
+    # Forever: no global GetMerchantItemInfo.
+    lua, ns, stub = new_runtime(remove=("GetMerchantItemInfo",))
+    login(lua, stub)
+    changes = lua.eval('function(ns) local c = {n = 0}; ns.Listen("DATA_CHANGED", function() c.n = c.n + 1 end); '
+                       'return c end')(ns)
+    out = visit(lua, stub)
+    captured(ns, "C_MerchantFrame")
+    calls = dict(stub.merchantCalls.items())
+    expect(calls.get("C_MerchantFrame.GetItemInfo", 0) >= 5 and "GetMerchantItemInfo" not in calls,
+           f"C_MerchantFrame.GetItemInfo not used: {calls}")
+    expect(out == ["|cff33ccffForeverCrafter|r: 3 vendor prices from Rachel"], f"merchant chat line {out}")
+    expect(changes.n == 1 and not errors(ns), f"merchant: {changes.n} recomputes, errors {errors(ns)[:2]}")
+    out = visit(lua, stub, event="MERCHANT_UPDATE")
+    expect(not out and changes.n == 1, f"unchanged MERCHANT_UPDATE: chat {out}, {changes.n} recomputes")
+    stub.merchant["items"][1][2] = 15
+    out = visit(lua, stub, event="MERCHANT_UPDATE")
+    expect(not out and changes.n == 2 and ns.db.vendorSeen[THREAD].unit == 15,
+           f"price change on MERCHANT_UPDATE: chat {out}, {changes.n} recomputes")
+    stub.fire("MERCHANT_CLOSED")
+    expect(len(visit(lua, stub)) == 1, "no chat line on the next visit")
+    stub.merchant = ltable(lua, {"npc": "Empty", "items": []})
+    n0 = len(stub.prints)
+    stub.fire("MERCHANT_SHOW")
+    stub.runTimers()
+    expect(not prints(stub, n0) and not errors(ns), "a merchant with no items is not silent")
+    n0 = len(stub.prints)
+    slash(lua, "status")
+    expect(any("3 merchant prices captured" in p for p in prints(stub, n0)), "status does not count merchant prices")
+
+    # Legacy only (Classic frames), and the item id from the link.
+    lua, ns, stub = new_runtime(remove=("C_MerchantFrame", "GetMerchantItemID"))
+    login(lua, stub)
+    out = visit(lua, stub)
+    captured(ns, "GetMerchantItemInfo")
+    calls = dict(stub.merchantCalls.items())
+    expect(calls.get("GetMerchantItemInfo", 0) >= 5 and calls.get("GetMerchantItemLink", 0) >= 3,
+           f"legacy merchant API / item link not used: {calls}")
+    expect(len(out) == 1 and "3 vendor prices from Rachel" in out[0] and not errors(ns),
+           f"legacy path: chat {out}, errors {errors(ns)[:2]}")
+
+    # No price API at all: an error once per session and a chat line per visit.
+    lua, ns, stub = new_runtime(remove=("C_MerchantFrame", "GetMerchantItemInfo"))
+    login(lua, stub)
+    out = visit(lua, stub)
+    stub.fire("MERCHANT_CLOSED")
+    out2 = visit(lua, stub)
+    errs = errors(ns)
+    expect(len(errs) == 1 and "merchant: no API for merchant prices" in errs[0], f"missing price API errors {errs}")
+    expect(out == out2 == ["|cff33ccffForeverCrafter|r: could not read the vendor prices from Rachel; see /crafter errors"],
+           f"missing price API chat {out} {out2}")
+    expect(not dict(ns.db.vendorSeen.items()), "prices recorded without a price API")
+
+    # One slot fails: the rest are kept, the failure is visible.
+    lua, ns, stub = new_runtime()
+    login(lua, stub)
+    lua.execute('local f = C_MerchantFrame.GetItemInfo; '
+                'C_MerchantFrame.GetItemInfo = function(i) if i == 2 then error("boom") end return f(i) end')
+    out = visit(lua, stub)
+    errs = errors(ns)
+    expect(ns.db.vendorSeen[THREAD] and ns.db.vendorSeen[DYE] is None, "a failing slot stops the others")
+    expect(len(errs) == 1 and "could not read 1 of 5 items from Rachel (C_MerchantFrame.GetItemInfo:" in errs[0]
+           and "boom" in errs[0], f"failing slot errors {errs}")
+    expect(out == ["|cff33ccffForeverCrafter|r: 2 vendor prices from Rachel"], f"failing slot chat {out}")
+
+
 def check_missing_apis():
     lua, ns, stub = new_runtime(remove=("C_AuctionHouse", "C_SkillInfo", "C_TradeSkillUI", "GetMerchantNumItems"),
                                 bad_events=("REPLICATE_ITEM_LIST_UPDATE",))
@@ -554,8 +646,9 @@ def check_missing_apis():
     stub.runTimers()
     slash(lua, "")
     expect(lua.globals().ForeverCrafterFrame.__shown, "window does not open without the APIs")
-    errs = list(ns.errors.values())
+    errs = [e for e in ns.errors.values() if "merchant: cannot count the merchant's items" not in e]
     expect(not errs, f"errors without the APIs: {errs[:3]}")
+    expect(len(ns.errors) == 1, "a merchant without GetMerchantNumItems is not recorded once in /crafter errors")
 
 
 def check_full_run():
@@ -1714,6 +1807,7 @@ def main():
         check_vendor_shuffles()
         check_crafting_time()
         check_cheap_batch()
+        check_merchant()
         check_missing_apis()
         check_dump()
         n, evaluated, took, hidden, shuffles, times, batches = check_full_run()

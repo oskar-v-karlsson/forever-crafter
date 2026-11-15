@@ -17,7 +17,7 @@ STUB = {
   auctions = {},    -- { {itemID, stack, buyout}, ... } (C_AuctionHouse replicate list)
   replicateCalls = 0,
   deposits = {},    -- itemID → deposit
-  merchant = nil,   -- { npc, items = { {id, price, stack, available}, ... } }
+  merchant = nil,   -- { npc, items = { {id, price, stack, available, extendedCost, currencyID}, ... } }
   invoices = {},    -- { {kind, bid, consignment}, ... }
   items = {},       -- itemID → { name, quality, sell } (C_Item.GetItemInfo; nil = not cached)
   badEvents = {},   -- event → true: RegisterEvent throws, like the client does for unknown events
@@ -243,12 +243,35 @@ end
 function C_AuctionHouse.CalculateCommodityDeposit(id) return STUB.deposits[id] end
 
 -- Merchant and mail -------------------------------------------------------------------------------
+-- STUB.merchant.items = { {id, price, stack, available (-1 unlimited), extendedCost, currencyID}, ... }
+STUB.merchantCalls = {}
+local function merchantItem(name, i)
+  STUB.merchantCalls[name] = (STUB.merchantCalls[name] or 0) + 1
+  return STUB.merchant and STUB.merchant.items[i]
+end
 function GetMerchantNumItems() return STUB.merchant and #STUB.merchant.items or 0 end
-function GetMerchantItemID(i) local m = STUB.merchant.items[i]; return m and m[1] end
-function GetMerchantItemInfo(i)
-  local m = STUB.merchant.items[i]
+function GetMerchantItemID(i)
+  local m = merchantItem("GetMerchantItemID", i)
+  if m and not m[6] then return m[1] end
+end
+function GetMerchantItemLink(i)
+  local m = merchantItem("GetMerchantItemLink", i)
+  if m and not m[6] then return "|cffffffff|Hitem:" .. m[1] .. "::::::::1:::::::|h[item " .. m[1] .. "]|h|r" end
+end
+-- Forever (Mainline MerchantFrame): C_MerchantFrame.GetItemInfo → MerchantItemInfo
+C_MerchantFrame = {}
+function C_MerchantFrame.GetItemInfo(i)
+  local m = merchantItem("C_MerchantFrame.GetItemInfo", i)
   if not m then return nil end
-  return "item " .. m[1], 134400, m[2], m[3], m[4] or -1, true, true, false, nil
+  return { name = "item " .. m[1], texture = 134400, price = m[2], stackCount = m[3], numAvailable = m[4] or -1,
+           isPurchasable = true, isUsable = true, hasExtendedCost = m[5] or false, currencyID = m[6],
+           isQuestStartItem = false }
+end
+-- Classic frames: the legacy global
+function GetMerchantItemInfo(i)
+  local m = merchantItem("GetMerchantItemInfo", i)
+  if not m then return nil end
+  return "item " .. m[1], 134400, m[2], m[3], m[4] or -1, true, true, m[5] or false, m[6]
 end
 function GetInboxNumItems() return #STUB.invoices end
 function GetInboxInvoiceInfo(i)

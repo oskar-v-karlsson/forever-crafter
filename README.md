@@ -37,7 +37,10 @@ To update, delete the old `ForeverCrafter` folder and put the new one in its pla
    - Filters: profession (click to cycle), **Known** and **Learnable** recipes, **Min profit** in gold, **Min AH listings** (sell prices from thinner markets are ignored), **Min sold/day** (see "Sold per day" below), **Min batch** (see "Cheap batch" below).
    - Columns: name (in the skill-up colour: orange, yellow, green, grey), profit, **Vend. profit** (see "Vendor shuffles" below), profit %, where to sell (AH or vendor), AH listings, **Sold/d**, the **Batch** size (see "Cheap batch" below), and the crafting **Time** with **AH g/h** and **Vend g/h** (see "Crafting time" below). Click a header to sort; hover a header for what it means.
    - Click a row for the details: the sell price and how it was worked out, the chain of crafts as a tree, a **shopping list** of what to buy where, and for unlearned recipes how to learn them and the payback.
-   - `~` marks an estimate: a vendor price from game data that you have not seen at a merchant yet, or more AH items than the snapshot's 50 cheapest price steps. Visit the vendor once to make it exact.
+   - `~` marks an estimate. It has different causes, and only the first is fixed by visiting a vendor:
+     - **Reagents bought from a vendor:** the price comes from game data until you open a merchant that sells the reagent. Opening it records the exact price, and chat says e.g. `ForeverCrafter: 12 vendor prices from Rachel`. If it says it could not read them, `/crafter errors` has the reason; please report it.
+     - **Reagents bought on the AH:** you need more than the snapshot's 50 cheapest price steps. Rescan.
+     - **The crafted item's sell-to-vendor price** (**Vend. profit**, **Vend g/h**): it comes from game data until the client has loaded the item. That happens by itself (the addon asks for it) and shows the next time the list is worked out, e.g. when you reopen the window. Visiting or selling to a vendor does not change it.
    - **Random counts:** some crafts make a random number of items (e.g. Heavy Dynamite 1-5). The list marks them with the range, e.g. `[1-5]` (or `[rnd]` when a step of the chain is random). Profit uses the average count; the details show "Makes 1-5 (avg 3)" and the profit in the worst case (1 made) and the best case (5 made), and the chain tree shows a random step's range and how many crafts the worst case needs. The ranges are worked out from the game data (assumed, see [SOURCES.md](SOURCES.md)); once you open the profession window the game's own numbers are used.
 4. **Make it more exact over time:** open the merchants you buy reagents from; collect your AH sales from the mailbox (the addon measures the AH cut from the invoices); rescan before you buy.
 
@@ -74,7 +77,7 @@ A craft can be profitable on paper and still never sell. The **Sold/d** column s
 A vendor shuffle is a craft that makes a profit when you sell what it makes to a vendor: no AH, no waiting and no undercutting. The reagents can come from anywhere (AH, vendor or your own crafts, whichever is cheapest, as usual).
 
 - **`[V]`** in green before the name marks a shuffle, even when the AH pays more and the **Sell** column says AH. Hover the row for the vendor profit.
-- **Vend. profit** column: the profit if you sell to a vendor, in both modes. `—` means a vendor will not buy the item; `~` means the vendor price is an estimate from game data (sell the item to a vendor once to make it exact); grey means a loss.
+- **Vend. profit** column: the profit if you sell to a vendor, in both modes. `—` means a vendor will not buy the item; `~` means the vendor price is an estimate from game data (it becomes exact by itself once the client has loaded the item; see `~` above); grey means a loss.
 - **Vendor shuffles** checkbox (top right of the window; saved): shows only shuffles, sorted by vendor profit. **Min profit** then applies to the vendor profit, and **Min sold/day** and **Min AH listings** do not hide anything, as the items go to a vendor.
 - The details of a shuffle the AH pays more for also show the vendor sale and its profit, and for a random count (e.g. `[1-5]`) the vendor profit in the worst case.
 
@@ -124,7 +127,7 @@ These cannot be tested outside the game. Please go through them once and report 
 3. [ ] `/crafter scan` at the AH finishes with "snapshot done: N listings, M items used by recipes" in chat. Note how long it took, and what the game says if you scan again right away (the throttle).
 4. [ ] Cloth, herbs and ore (commodities) have prices after a scan (e.g. Linen Cloth in a Tailoring chain).
 5. [ ] A price in the window matches the AH for one item: the lowest buyout per item, not per stack.
-6. [ ] Open a reagent vendor (e.g. one selling Empty Vial or Coarse Thread): its price shows without `~` afterwards and matches the merchant. The shopping list names a vendor from Wowhead Forever (e.g. "vendor (NPC name, zone +N)"); check that one of them really sells it.
+6. [ ] Open a reagent vendor (e.g. one selling Empty Vial or Coarse Thread): chat says `ForeverCrafter: N vendor prices from <NPC>`, `/crafter status` counts them, and the reagent's price shows without `~` afterwards and matches the merchant. A limited-stock item (a number on its icon) and a sold-out one count as limited, an unlimited one does not (`numAvailable` -1). `/crafter errors` shows no `merchant:` line. The shopping list names a vendor from Wowhead Forever (e.g. "vendor (NPC name, zone +N)"); check that one of them really sells it.
 7. [ ] After an AH sale, open the mailbox: `/crafter status` shows the measured cut (e.g. `AH cut 5.0% (from 1 sale invoice(s))`).
 8. [ ] The minimap button and the compartment entry show a coin icon.
 9. [ ] `/crafter debug` lists no missing APIs or events.
