@@ -11,6 +11,9 @@ local Util = ns.Util
 PL.MAX_DEPTH = 8
 PL.BATCH_CAP = 200     -- the cheap batch search stops here
 PL.BATCH_KEEP = 0.75   -- a craft is in the cheap batch while its own profit is at least this share of the first's
+PL.FAST_ROUNDS = 6     -- Dinkelbach rounds for the best-g/h path
+PL.FAST_PATHS = true   -- false: no best-g/h paths (the checks compare the most-gold fields with and without)
+PL.FAST_PER_FRAME = 40 -- what-if: best-g/h paths solved per frame
 
 -- Effective recipe: the trade-skill window's schematic (authoritative) over the static data.
 function PL.Recipe(spell)
@@ -100,7 +103,11 @@ end
 PL.AvgOut = avgOut
 
 -- One solver run. Memoises cost(item, qty) unless the subtree hit the cycle guard or the depth limit.
-local function newSolver(usable, producers)
+-- Each node is chosen by its score = copper cost + lambda x crafting seconds of its subtree (buying takes 0 s; a
+-- recipe with no cast time counts as 0 s). lambda nil or 0: the cheapest in copper (the most-gold path). A positive
+-- lambda (copper per second) trades copper for time: the best-g/h path (see fastPath). sec: the subtree's seconds.
+local function newSolver(usable, producers, lambda)
+  lambda = lambda or 0
   local memo = {}
   local cost
   cost = function(id, qty, depth, visiting)
@@ -111,12 +118,16 @@ local function newSolver(usable, producers)
     local best
     local ah, est, top = ns.Pricing.AHBuy(id, qty)
     -- deep: more than the snapshot's price steps (the cost is a lower bound)
-    if ah then best = { id = id, qty = qty, cost = ah, src = "ah", est = est, h = 0, top = top, deep = est or nil } end
+    if ah then
+      best = { id = id, qty = qty, cost = ah, src = "ah", est = est, h = 0, top = top, deep = est or nil, sec = 0,
+        score = ah }
+    end
     local unit, label, limited = ns.Pricing.VendorUnit(id)
     if unit then
       local c = math.ceil(unit * qty)
-      if not best or c < best.cost then
-        best = { id = id, qty = qty, cost = c, src = "vendor", est = label == "estimate", limited = limited, h = 0 }
+      if not best or c < best.score then
+        best = { id = id, qty = qty, cost = c, src = "vendor", est = label == "estimate", limited = limited, h = 0,
+          sec = 0, score = c }
       end
     end
     local incomplete = false
@@ -130,6 +141,8 @@ local function newSolver(usable, producers)
           local lo, hi = PL.OutRange(r)
           local crafts = math.ceil(qty / ((lo + hi) / 2))
           local total, kids, ok, est, h, var, deep = 0, {}, true, PL.CountUnknown(r), 0, hi > lo, nil
+          local sec = crafts * (PL.CastMs(spell, r) or 0) / 1000
+          local score = lambda * sec
           for _, rg in ipairs(r.reagents) do
             local c, inc = cost(rg[1], rg[2] * crafts, depth + 1, visiting)
             if inc then incomplete = true end
@@ -138,16 +151,18 @@ local function newSolver(usable, producers)
               break
             end
             total = total + c.cost
+            score = score + c.score
+            sec = sec + c.sec
             if c.est then est = true end
             if c.var then var = true end
             if c.deep then deep = true end
             if c.h > h then h = c.h end
             table.insert(kids, c)
           end
-          if ok and (not best or total < best.cost) then
+          if ok and (not best or score < best.score) then
             best = { id = id, qty = qty, cost = total, src = "craft", spell = spell, crafts = crafts, children = kids,
               est = est, h = h + 1, var = var or nil, outMin = hi > lo and lo or nil, outMax = hi > lo and hi or nil,
-              deep = deep }
+              deep = deep, sec = sec, score = score }
           end
         end
       end
@@ -244,11 +259,12 @@ end
 -- crafting). → { cost, kids, est, var, deep, h } or nil (cannot be bought or made)
 local function solveCrafts(r, k, cost)
   local outID = r.out[1]
-  local s = { cost = 0, kids = {}, est = false, var = false, h = 0 }
+  local s = { cost = 0, kids = {}, est = false, var = false, h = 0, sec = 0 }
   for _, rg in ipairs(r.reagents) do
     local c = cost(rg[1], rg[2] * k, 0, { [outID] = true })
     if not c then return nil end
     s.cost = s.cost + c.cost
+    s.sec = s.sec + c.sec
     if c.est then s.est = true end
     if c.var then s.var = true end
     if c.deep then s.deep = true end
@@ -311,9 +327,143 @@ local function batchTree(spell, outID, n, k, s)
     h = s.h + 1 }
 end
 
+-- Best-g/h path ---------------------------------------------------------------------------------------------------
+-- The most-gold path (above) picks the cheapest copper at every node. Buying an intermediate instead of crafting it
+-- can cost a little more but save a long cast, so the path with the most gold per hour can differ. It is found by
+-- Dinkelbach's method: with lambda = a g/h (copper per second), solve for the least copper + lambda x seconds, take
+-- that path's real profit / time as the next lambda, and repeat until the path stops changing. The AH and the vendor
+-- sale each get their own (worth differs).
+
+-- How each item of a chain is got, as text (for "did the path change").
+local function pathSig(node, out)
+  table.insert(out, node.id .. node.src .. (node.spell or ""))
+  if node.src == "craft" then
+    for _, c in ipairs(node.children) do pathSig(c, out) end
+  end
+  return out
+end
+local function kidsSig(kids)
+  local out = {}
+  for _, c in ipairs(kids) do pathSig(c, out) end
+  return table.concat(out, ",")
+end
+
+function PL.PathSig(tree) return kidsSig(tree.children) end
+
+-- A chain with no crafted step below the root has nothing to trade: lambda only makes crafting dearer.
+local function hasCraftedStep(tree)
+  for _, c in ipairs(tree.children) do
+    if c.src == "craft" then return true end
+  end
+  return false
+end
+
+-- The best-g/h path for one sale: worth = copper per craft, goldPerHour = the most-gold path's g/h (batch average).
+-- The rounds work on the first craft; the found path then gets its own cheap batch (cheapBatch on the same lambda
+-- solver, so each batch size takes the best-g/h choice at that quantity) and its g/h is the batch-average profit over
+-- the first craft's time, as for the most-gold path. → { tree, cost1, profit1, cost, profit, time, casts, batch,
+-- batchCapped, batchProfit, batchTree, perHour, est, rounds } or nil when it is the most-gold path (or not better)
+local function fastPath(res, r, kit, worth, goldPerHour)
+  if not goldPerHour or goldPerHour <= 0 then return nil end
+  local rootSec = (PL.CastMs(res.spell, r) or 0) / 1000
+  local goldSig = kidsSig(res.tree.children)
+  local lambda, sig, solver, one, rounds = goldPerHour / 3600, goldSig, nil, nil, 0
+  for _ = 1, PL.FAST_ROUNDS do
+    rounds = rounds + 1
+    local c = newSolver(kit.usable, kit.producers, lambda)
+    local s = solveCrafts(r, 1, c)
+    if not s then break end
+    local sg = kidsSig(s.kids)
+    if sg == sig then break end
+    local t = rootSec + s.sec
+    if t <= 0 then break end
+    sig, solver, one = sg, c, s
+    local nl = (worth - s.cost) / t
+    if nl <= lambda then break end
+    lambda = nl
+  end
+  if not one or sig == goldSig then return nil end
+  local lo, hi = PL.OutRange(r)
+  local tree = { id = res.out, qty = res.n, cost = one.cost, src = "craft", spell = res.spell, crafts = 1,
+    children = one.kids, h = one.h + 1, var = res.tree.var, outMin = res.tree.outMin, outMax = res.tree.outMax }
+  local time, casts, unknown = PL.ChainTime(tree)
+  if unknown or time <= 0 then return nil end
+  local solved = { [1] = one }
+  local function at(k)
+    if k < 1 then return nil end
+    local s = solved[k]
+    if s == nil then
+      s = solveCrafts(r, k, solver) or false
+      solved[k] = s
+    end
+    return s or nil
+  end
+  local batch, capped = cheapBatch(worth, at)
+  if not batch then return nil end
+  local cost = batchCost(at, batch)
+  local perHour = (worth - cost) / time * 3600
+  if perHour <= goldPerHour then return nil end
+  return {
+    tree = tree, cost1 = one.cost, profit1 = worth - one.cost, cost = cost, profit = worth - cost, time = time,
+    casts = casts, batch = batch, batchCapped = capped,
+    batchProfit = batch * worth - math.max(batch * one.cost, at(batch).cost),
+    batchTree = batchTree(res.spell, res.out, res.n, batch, at(batch)), perHour = perHour,
+    est = one.est or PL.CountUnknown(r) or nil, rounds = rounds, outMin = hi > lo and lo or nil,
+  }
+end
+
+-- Best-g/h paths of a result for the AH sale (fastAH) and the vendor sale (fastVendor); nil = the most-gold path.
+-- kit = { usable, producers } of the run that made the result.
+local function addFast(res, r, kit)
+  if not PL.FAST_PATHS or not hasCraftedStep(res.tree) then return end
+  local v = res.sell
+  if v.ah and res.ahPerHour then
+    res.fastAH = fastPath(res, r, kit, math.floor(v.ah * res.n), res.ahPerHour)
+  end
+  if v.vendor and res.vendorPerHour then
+    res.fastVendor = fastPath(res, r, kit, math.floor(v.vendor * res.n), res.vendorPerHour)
+  end
+end
+
+-- The g/h shown and sorted on: the best-g/h path's when it beats the most-gold path's. → g/h or nil, fast path or nil
+function PL.AHPerHour(r)
+  if r.fastAH then return r.fastAH.perHour, r.fastAH end
+  return r.ahPerHour, nil
+end
+function PL.VendorPerHour(r)
+  if r.fastVendor then return r.fastVendor.perHour, r.fastVendor end
+  return r.vendorPerHour, nil
+end
+
+-- What the best-g/h path does differently: per item of its chain got another way than in the most-gold chain.
+-- → { { id, gold = node, fast = node }, ... } in chain order
+function PL.PathChanges(gold, fast)
+  local how = {}
+  local function index(node)
+    if not how[node.id] then how[node.id] = node end
+    if node.src == "craft" then
+      for _, c in ipairs(node.children) do index(c) end
+    end
+  end
+  for _, c in ipairs(gold.children) do index(c) end
+  local out, seen = {}, {}
+  local function walk(node)
+    local g = how[node.id]
+    if g and not seen[node.id] and (g.src ~= node.src or g.spell ~= node.spell) then
+      seen[node.id] = true
+      table.insert(out, { id = node.id, gold = g, fast = node })
+    end
+    if node.src == "craft" then
+      for _, c in ipairs(node.children) do walk(c) end
+    end
+  end
+  for _, c in ipairs(fast.children) do walk(c) end
+  return out
+end
+
 -- One recipe's craft: sell value of its output minus the cheapest reagents, as the average of its cheap batch (the
 -- first craft's numbers are kept as profit1, cost1). → result, or nil and the reason ("noValue" | "noPrice")
-local function evaluate(spell, r, line, cost)
+local function evaluate(spell, r, line, cost, kit)
   local outID = r.out[1]
   local value = ns.Pricing.SellValue(outID)
   if not value then return nil, "noValue" end
@@ -393,6 +543,7 @@ local function evaluate(spell, r, line, cost)
     res.ahPerHour = res.ahProfit and res.ahProfit / res.time * 3600
     res.vendorPerHour = res.vendorProfit and res.vendorProfit / res.time * 3600
   end
+  if kit then addFast(res, r, kit) end
   return res
 end
 
@@ -594,14 +745,19 @@ local function runWhatIf(opts, yield)
     local allowed = {}
     for _, line in ipairs(set) do allowed[line] = true end
     for _, line in ipairs(secondary) do allowed[line] = true end
-    local cost = newSolver(function(spell) return allowed[lineOf[spell]] and true or false end, producers)
+    local usable = function(spell) return allowed[lineOf[spell]] and true or false end
+    local kit = { usable = usable, producers = producers }
+    local cost = newSolver(usable, producers)
     for _, spell in ipairs(eligible) do
       if allowed[lineOf[spell]] then
         local r = PL.Recipe(spell)
         local res, why = evaluate(spell, r, lineOf[spell], cost)
         if res then
           local b = best[spell]
-          if not b or res.profit > b.profit then best[spell] = res end
+          if not b or res.profit > b.profit then
+            res.kit = kit
+            best[spell] = res
+          end
           outcome[spell] = "ok"
         elseif outcome[spell] ~= "ok" then
           outcome[spell] = why
@@ -613,6 +769,20 @@ local function runWhatIf(opts, yield)
   for _, why in pairs(outcome) do
     stats.evaluated = stats.evaluated + 1
     if why ~= "ok" then stats[why] = stats[why] + 1 end
+  end
+  -- Best-g/h paths only for the winning set of each recipe, a few per frame.
+  local winners = {}
+  for spell in pairs(best) do table.insert(winners, spell) end
+  table.sort(winners)
+  local done = 0
+  for _, spell in ipairs(winners) do
+    local res = best[spell]
+    if res.profit > 0 and hasCraftedStep(res.tree) then
+      addFast(res, PL.Recipe(spell), res.kit)
+      done = done + 1
+      if yield and done % PL.FAST_PER_FRAME == 0 then yield(#sets, #sets) end
+    end
+    res.kit = nil
   end
   for spell, res in pairs(best) do
     local r = PL.Recipe(spell)
@@ -635,7 +805,8 @@ function PL.Run(opts)
   local results, stats = {}, { noPrice = 0, noValue = 0, evaluated = 0, hidden = 0 }
   if not ns.char then return results, stats end
   local spells = allSpells()
-  local cost = newSolver(knownUsable, producersOf(spells))
+  local kit = { usable = knownUsable, producers = producersOf(spells) }
+  local cost = newSolver(kit.usable, kit.producers)
 
   for _, spell in ipairs(spells) do
     local r = PL.Recipe(spell)
@@ -646,7 +817,7 @@ function PL.Run(opts)
       if not known and ns.Professions.IsHidden(spell, line) then stats.hidden = stats.hidden + 1 end
       if known or learnable then
         stats.evaluated = stats.evaluated + 1
-        local res, why = evaluate(spell, r, line, cost)
+        local res, why = evaluate(spell, r, line, cost, kit)
         if not res then
           stats[why] = stats[why] + 1
         else

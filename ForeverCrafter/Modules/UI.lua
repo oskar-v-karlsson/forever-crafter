@@ -17,10 +17,13 @@ local COLORS = {
   orange = "ffff8040", yellow = "ffffff00", green = "ff40c040", grey = "ff808080", unknown = "ffffffff",
 }
 local TIME_HINT = "Casts only: buying the reagents, travel and the time between casts are not included."
-local AH_HOUR_HINT = "AH profit per hour of crafting (the whole chain). — = no AH price (none listed, or fewer than Min "
-  .. "AH listings) or no crafting time."
-local VENDOR_HOUR_HINT = "Vendor profit per hour of crafting (the whole chain). — = a vendor will not buy it or no "
-  .. "crafting time; ~ = estimated vendor price."
+local FAST_HINT = " * = a faster path than the Profit column's earns more per hour (e.g. buy an intermediate instead "
+  .. "of crafting it); the details show it."
+local AH_HOUR_HINT = "AH profit per hour of crafting (the whole chain), on the path with the most gold per hour. — = no "
+  .. "AH price (none listed, or fewer than Min AH listings) or no crafting time." .. FAST_HINT
+local VENDOR_HOUR_HINT = "Vendor profit per hour of crafting (the whole chain), on the path with the most gold per hour. "
+  .. "— = a vendor will not buy it or no crafting time; ~ = estimated vendor price." .. FAST_HINT
+local FAST_MARK = "|cff66e0ff*|r"
 local BATCH_HINT = "Cheap batch: how many crafts you can make before the reagents' AH price steps cut a craft's own "
   .. "profit below 75% of the first craft's. Profit and g/h are the batch average. Buy the batch, craft it, let the AH "
   .. "restock, repeat. 50+ = the batch may be bigger (the snapshot's price steps or the search end there). With Vendor "
@@ -215,7 +218,59 @@ function UI.TimeLine(r)
     if not v then return "—" end
     return Util.Money(math.floor(v + 0.5)) .. "/h" .. (est and " ~" or "")
   end
-  return string.format("%s  |  AH %s  |  vendor %s", t, hour(r.ahPerHour), hour(r.vendorPerHour, r.vendorEst))
+  return string.format("%s  |  AH %s  |  vendor %s%s", t, hour(r.ahPerHour), hour(r.vendorPerHour, r.vendorEst),
+    (r.fastAH or r.fastVendor) and "  (this path; a faster one below)" or "")
+end
+
+-- What a best-g/h path does differently: "buy Iron Bar on the AH instead of crafting it (Smelt Iron)", at most 3.
+function UI.PathChangeText(gold, fast)
+  local function recipe(node)
+    local r = PL.Recipe(node.spell)
+    return r and r.name or tostring(node.spell)
+  end
+  local parts = {}
+  local changes = PL.PathChanges(gold, fast)
+  for i, c in ipairs(changes) do
+    if i > 3 then
+      table.insert(parts, string.format("%d more", #changes - 3))
+      break
+    end
+    local item, f, g = Util.ItemName(c.id), c.fast, c.gold
+    local now = f.src == "ah" and ("buy " .. item .. " on the AH") or f.src == "vendor"
+      and ("buy " .. item .. " from a vendor") or ("craft " .. item .. " with " .. recipe(f))
+    local was = g.src == "ah" and "buying it on the AH" or g.src == "vendor" and "buying it from a vendor"
+      or ("crafting it (" .. recipe(g) .. ")")
+    table.insert(parts, now .. " instead of " .. was)
+  end
+  return table.concat(parts, "; ")
+end
+
+-- The best-g/h paths that differ from the most-gold path: { { label, fast, gold g/h, est }, ... }. The AH and vendor
+-- paths share one entry when they take the same chain.
+function UI.FastPaths(r)
+  local out = {}
+  local a, v = r.fastAH, r.fastVendor
+  if a and v and PL.PathSig(a.tree) == PL.PathSig(v.tree) then
+    table.insert(out, { label = "AH and vendor", fast = a, gold = r.ahPerHour, vfast = v })
+    return out
+  end
+  if a then table.insert(out, { label = "AH", fast = a, gold = r.ahPerHour }) end
+  if v then table.insert(out, { label = "vendor", fast = v, gold = r.vendorPerHour, est = r.vendorEst }) end
+  return out
+end
+
+-- "Fastest path (AH): buy ... instead of ... -> profit 1g per craft, time 25 s, 144g/h (+60g/h vs the most-gold path)"
+local function fastLine(r, e)
+  local f = e.fast
+  local function hour(v, est) return Util.Money(math.floor(v + 0.5)) .. "/h" .. (est and " ~" or "") end
+  local s = string.format("|cff66e0ffFastest path (%s):|r %s -> profit %s per craft (batch %d%s), time %s, %s (+%s vs "
+    .. "the most-gold path)", e.label, UI.PathChangeText(r.tree, f.tree), Util.Money(f.profit), f.batch,
+    f.batchCapped and "+" or "", UI.TimeText(f.time), hour(f.perHour, e.est), hour(f.perHour - e.gold))
+  if e.vfast then
+    s = s .. string.format("; vendor %s (+%s)", hour(e.vfast.perHour, r.vendorEst),
+      hour(e.vfast.perHour - r.vendorPerHour))
+  end
+  return s
 end
 
 local function sortValue(r, key)
@@ -225,8 +280,8 @@ local function sortValue(r, key)
   if key == "pct" then return r.pct or -math.huge end
   if key == "vprofit" then return r.vendorProfit or -math.huge end
   if key == "time" then return (r.timeUnknown or not r.time) and math.huge or r.time end
-  if key == "ahgh" then return r.ahPerHour or -math.huge end
-  if key == "vgh" then return r.vendorPerHour or -math.huge end
+  if key == "ahgh" then return PL.AHPerHour(r) or -math.huge end
+  if key == "vgh" then return PL.VendorPerHour(r) or -math.huge end
   if key == "where" then return r.where end
   if key == "listings" then return r.sell.listings or 0 end
   if key == "sold" then return r.sales and r.sales.perDay or -1 end
@@ -541,6 +596,8 @@ function UI.DetailText(r)
     table.insert(out, tl)
     table.insert(out, "|cff808080  " .. TIME_HINT .. "|r")
   end
+  local fasts = UI.FastPaths(r)
+  for _, e in ipairs(fasts) do table.insert(out, fastLine(r, e)) end
   table.insert(out, ns.Sales.DetailText(r.sales))
   if s.thin and r.where == "ah" then
     table.insert(out, "|cffff8040Thin market:|r few listings, the price may not hold.")
@@ -559,6 +616,24 @@ function UI.DetailText(r)
     table.insert(out, "")
     table.insert(out, string.format("|cffffd100%s shopping list (%d crafts):|r", vendor and "Vendor batch" or "Batch", k))
     for _, l in ipairs(UI.ShoppingLines(bt)) do table.insert(out, l) end
+  end
+  for _, e in ipairs(fasts) do
+    local f = e.fast
+    table.insert(out, "")
+    local steps = PL.Steps(f.tree)
+    table.insert(out, string.format("|cff66e0ffFastest path (%s), %d craft%s, %s:|r", e.label, steps,
+      steps == 1 and "" or "s", UI.TimeText(f.time)))
+    nodeLines(f.tree, 0, out)
+    table.insert(out, "|cff66e0ffIts shopping list (first craft):|r")
+    for _, l in ipairs(UI.ShoppingLines(f.tree)) do table.insert(out, l) end
+    if f.batch > 1 then
+      table.insert(out, string.format("|cff66e0ffIts batch shopping list (%d crafts):|r", f.batch))
+      for _, l in ipairs(UI.ShoppingLines(f.batchTree)) do table.insert(out, l) end
+    end
+  end
+  if #fasts > 0 then
+    table.insert(out, "|cff808080  The fastest path earns the most gold per hour of crafting: buying a step can cost "
+      .. "more but save its cast time. AH g/h and Vend g/h in the list use it (marked *); Profit uses the path above.|r")
   end
   if r.est then
     table.insert(out, "")
@@ -835,9 +910,11 @@ local function cellText(r, key)
     if r.timeUnknown then return "|cffff8040>" .. UI.TimeText(r.time, true) .. "|r" end
     return UI.TimeText(r.time, true)
   elseif key == "ahgh" then
-    return UI.PerHourText(r.ahPerHour)
+    local v, fast = PL.AHPerHour(r)
+    return UI.PerHourText(v) .. (fast and FAST_MARK or "")
   elseif key == "vgh" then
-    return UI.PerHourText(r.vendorPerHour, r.vendorPerHour and r.vendorEst)
+    local v, fast = PL.VendorPerHour(r)
+    return UI.PerHourText(v, v and r.vendorEst) .. (fast and FAST_MARK or "")
   elseif key == "profs" then
     return UI.ProfsText(r)
   elseif key == "conf" then
@@ -1126,7 +1203,8 @@ function UI.Refresh()
   end
   local n = #UI.view
   frame.footer:SetText(n > 0 and string.format("%d-%d of %d   (scroll with the mouse wheel; [L] = not learned yet; "
-    .. "[1-5] = random count; [V] = vendor shuffle; 50+ = batch may be bigger; Batch profit = the whole batch)",
+    .. "[1-5] = random count; [V] = vendor shuffle; 50+ = batch may be bigger; Batch profit = the whole batch; "
+    .. "* = g/h of a faster path)",
     UI.offset + 1, math.min(UI.offset + ROWS, n), n)
     or (ns.settings.vendorShuffles and "no vendor shuffles with these filters" or "nothing profitable with these filters"))
   detail:SetText(UI.DetailText(UI.selected))
