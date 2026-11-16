@@ -1,0 +1,58 @@
+{
+  "_about": "Amounts the game data does not hold. src user: given by the user from third-party guides on 2026-11-16, not checked in game (verified false); the addon learns the real values on turn-in. src wh_tt: the Forever Delivery Receipt tooltip (crates.json, 262902).",
+  "writRep": {
+    "value": {
+      "Journeyman": 75,
+      "Expert": 125,
+      "Artisan": 150
+    },
+    "src": "user",
+    "verified": false,
+    "note": "reputation per Craftsman's Writ turn-in, by writ tier"
+  },
+  "pouch": {
+    "value": {
+      "Journeyman": 1200,
+      "Expert": 3600,
+      "Artisan": 7456
+    },
+    "src": "user",
+    "verified": false,
+    "note": "average copper of the writ's Coin Pouch reward (Journeyman: midpoint of 5-19s), taken off the writ cost"
+  },
+  "favor": {
+    "value": {
+      "Apprentice": {
+        "white": 5,
+        "green": 10
+      },
+      "Journeyman": {
+        "white": 10,
+        "green": 20
+      },
+      "Expert": {
+        "white": 20,
+        "green": 30
+      },
+      "Artisan": {
+        "white": null,
+        "green": null
+      }
+    },
+    "src": "user",
+    "verified": false,
+    "note": "[tier] = {white, green}: Merchant's Favor per sealed crate turned in; Artisan unknown (learned in game)"
+  },
+  "receiptFavor": {
+    "value": 15,
+    "src": "user",
+    "verified": false,
+    "note": "Merchant's Favor price of one Forged Delivery Receipt"
+  },
+  "crateRep": {
+    "value": 50,
+    "src": "wh_tt",
+    "verified": "2026-11-16",
+    "note": "reputation for an empty Waylaid Crate with a Forged Delivery Receipt (the receipt's tooltip)"
+  }
+}

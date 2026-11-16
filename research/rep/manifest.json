@@ -1,0 +1,59 @@
+{
+  "build": "1.60.1.70938",
+  "fetched": "2026-11-16",
+  "product": "wowf",
+  "tables": {
+    "CurrencyTypes": {
+      "columns": [
+        "ID",
+        "Name_lang"
+      ],
+      "full_rows": 9,
+      "full_sha256": "8f595fb88d2a970c8bfc25b8b75808e2c6dd75b9564200dfb9db31f3e81e76da",
+      "snapshot_rows": 1,
+      "snapshot_sha256": "6c56762c16e618755c8e993c9ce773e48ff76fd0ff140fa07a660c77cdf75166",
+      "url": "https://wago.tools/db2/CurrencyTypes/csv?build=1.60.1.70938"
+    },
+    "Faction": {
+      "columns": [
+        "ID",
+        "Name_lang"
+      ],
+      "full_rows": 253,
+      "full_sha256": "8d83f21f58cd2835a49085d58fab481305220d1d26c5e99d148583a48a137d6c",
+      "snapshot_rows": 2,
+      "snapshot_sha256": "d9203e0e45931d7f97fb4f786b6d2b6ba5c7242412400966e53a8c699e447fb9",
+      "url": "https://wago.tools/db2/Faction/csv?build=1.60.1.70938"
+    },
+    "ItemSparse": {
+      "columns": [
+        "ID",
+        "Display_lang",
+        "OverallQualityID",
+        "SellPrice",
+        "BuyPrice",
+        "VendorStackCount",
+        "Stackable",
+        "Bonding",
+        "StartQuestID"
+      ],
+      "full_rows": 19325,
+      "full_sha256": "fdc65396e8a1103ea5f552ea59aaebc0e73ba572612a3412c50e636b54c90b41",
+      "snapshot_rows": 447,
+      "snapshot_sha256": "5e522fd8c8615990adec941bce5370fc58320054cb9ad24ea84552e35e68daa4",
+      "url": "https://wago.tools/db2/ItemSparse/csv?build=1.60.1.70938"
+    }
+  },
+  "tooltips": {
+    "crates.json": {
+      "fetched": "2026-11-16",
+      "sha256": "25a61eafdc00147120b6c1ee31d5c111e345f4b402491a5167c7a48718dac7b5",
+      "source": "Waylaid Crate items, the receipt and 275642: https://nether.wowhead.com/forever/tooltip/item/<id> as [name, tooltip text]"
+    },
+    "writs.json": {
+      "fetched": "2026-11-16",
+      "sha256": "2d36fcd5bfb68000da7695a96da28c349c477b762a561990dc11d200ac83a4d3",
+      "source": "Craftsman's Writ items 264011-264160: https://nether.wowhead.com/forever/tooltip/item/<writ> and the quest it starts, https://nether.wowhead.com/forever/tooltip/quest/<quest>"
+    }
+  }
+}

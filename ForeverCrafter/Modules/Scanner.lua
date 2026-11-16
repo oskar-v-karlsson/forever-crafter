@@ -1,5 +1,5 @@
 -- Modules/Scanner.lua: one full auction house snapshot with C_AuctionHouse.ReplicateItems.
--- For every item the recipes use it keeps the lowest unit buyout, the quantity and listing count, and a
+-- For every item the recipes use (and the reputation planner's writs, crates and items) it keeps the lowest unit buyout, the quantity and listing count, and a
 -- price ladder (cheapest steps first) so the planner can price buying N of an item.
 -- The ladder is flat to keep memory and SavedVariables small: steps = { unit1, qty1, unit2, qty2, ... }.
 local _, ns = ...
@@ -93,7 +93,7 @@ local function read()
         end
         buyout = tonumber(buyout) or 0
         stack = tonumber(stack) or 0
-        if itemID and ns.Items[itemID] and buyout > 0 and stack > 0 then
+        if itemID and (ns.Items[itemID] or ns.RepItems[itemID]) and buyout > 0 and stack > 0 then
           raw[itemID] = raw[itemID] or {}
           table.insert(raw[itemID], { math.ceil(buyout / stack), stack })
           count = count + 1

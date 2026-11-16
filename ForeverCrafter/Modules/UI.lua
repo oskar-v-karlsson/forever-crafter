@@ -1,6 +1,7 @@
 -- Modules/UI.lua: the results window. Filters on top, a sortable list of crafts on the left and the selected
 -- craft's chain, shopping list and how to learn it on the right. Two modes: "My character" (this character's
--- recipes and skill) and "What-if" (every profession at a skill cap, chains across professions).
+-- recipes and skill) and "What-if" (every profession at a skill cap, chains across professions). A Reputation tab
+-- (Modules/Reputation.lua) lists the ways to gain Durotar Supply and Logistics reputation and today's plan.
 local _, ns = ...
 local UI = {}
 ns.UI = UI
@@ -61,19 +62,40 @@ local COLUMNS = {
     { key = "vgh", label = "Vend g/h", width = 56, hint = VENDOR_HOUR_HINT },
   },
 }
+COLUMNS.rep = ns.Reputation.COLUMNS
 local MAX_COLUMNS = 13
 local LIST_W = 804
 local FRAME_W = LIST_W + 400
 local PL = ns.Planner
 
+local function repMode()
+  return ns.settings.tab == "rep"
+end
+
 local function whatIf()
-  return ns.settings.mode == "whatIf"
+  return not repMode() and ns.settings.mode == "whatIf"
 end
 
 UI.COLUMNS, UI.ROW_W = COLUMNS, LIST_W - 8
 
 local function columns()
+  if repMode() then return COLUMNS.rep end
   return COLUMNS[whatIf() and "whatIf" or "char"]
+end
+
+-- The list's sort: the Reputation tab keeps its own.
+local function sortSetting()
+  local s = ns.settings
+  if repMode() then return s.repSort or "rper", s.repSortDesc == true end
+  return s.sort or "profit", s.sortDesc ~= false
+end
+
+local function setSort(key, desc)
+  if repMode() then
+    ns.settings.repSort, ns.settings.repSortDesc = key, desc
+  else
+    ns.settings.sort, ns.settings.sortDesc = key, desc
+  end
 end
 
 local frame, rows, detail
@@ -290,7 +312,26 @@ local function sortValue(r, key)
   return r.profit
 end
 
+local function applyRep()
+  local view = {}
+  for _, o in ipairs(UI.results) do table.insert(view, o) end
+  local key, desc = sortSetting()
+  local R = ns.Reputation
+  table.sort(view, function(a, b)
+    local x, y = R.SortValue(a, key), R.SortValue(b, key)
+    if x ~= y then
+      if desc then return x > y end
+      return x < y
+    end
+    return a.spell < b.spell
+  end)
+  UI.view, UI.salesHidden, UI.batchHidden = view, 0, 0
+  local maxOffset = math.max(#view - ROWS, 0)
+  if UI.offset > maxOffset then UI.offset = maxOffset end
+end
+
 function UI.ApplyFilter()
+  if repMode() then return applyRep() end
   local s = ns.settings
   local view = {}
   local wi = whatIf()
@@ -353,6 +394,18 @@ end
 
 -- What-if runs are spread over frames (Planner.RunAsync); the list keeps the last results until the new ones are in.
 function UI.Recompute()
+  if repMode() then
+    PL.CancelAsync()
+    UI.calculating = nil
+    local ok, options, plan, standing = pcall(ns.Reputation.Run)
+    if not ok then
+      ns.Error("reputation: " .. tostring(options))
+      options, plan = {}, { steps = {}, shopping = {}, inPlan = {}, gained = 0, cash = 0, message = "error" }
+    end
+    UI.repPlan, UI.repStanding = plan, standing
+    apply(options, {})
+    return
+  end
   if whatIf() then
     UI.calculating = "0 / " .. PL.WhatIfSets(PL.WhatIfOptions())
     PL.RunAsync({ whatIf = ns.settings.whatIf }, function(i, n)
@@ -525,6 +578,10 @@ local function whatIfSteps(r, out)
 end
 
 function UI.DetailText(r)
+  if repMode() then
+    return ns.Reputation.DetailText(r, UI.repPlan or { steps = {}, shopping = {}, inPlan = {}, gained = 0, cash = 0 },
+      UI.repStanding)
+  end
   if not r then
     if whatIf() then
       return "Select a craft on the left.\n\nWhat-if: a character with every profession at the skill cap (and any "
@@ -677,6 +734,9 @@ local function maxPrimariesText(n)
 end
 
 function UI.StatusText()
+  if repMode() then
+    return ns.Reputation.StatusText(UI.repPlan or { inPlan = {} }, UI.repStanding, #UI.view)
+  end
   local _, t = ns.Scanner.Prices()
   local parts = {}
   if whatIf() then
@@ -772,9 +832,22 @@ local function hint(owner, lines)
   owner:SetScript("OnLeave", UI.HideHint)
 end
 
+-- mode: "char" | "whatIf" | "rep" (the Reputation tab; the crafting mode is kept for when you go back)
 function UI.SetMode(mode)
-  ns.settings.mode = mode == "whatIf" and "whatIf" or "char"
+  if mode == "rep" then
+    ns.settings.tab = "rep"
+  else
+    ns.settings.tab = "craft"
+    ns.settings.mode = mode == "whatIf" and "whatIf" or "char"
+  end
   UI.selected, UI.offset = nil, 0
+  if UI.overrides and not whatIf() then UI.overrides:Hide() end
+  if repMode() then
+    UI.results, UI.stats = {}, {}
+    UI.Recompute()
+    UI.Refresh()
+    return
+  end
   local line = ns.settings.profession
   if not whatIf() and line ~= 0 and not ns.Professions.Rank(line) then ns.settings.profession = 0 end
   if not whatIf() and UI.overrides then UI.overrides:Hide() end
@@ -844,7 +917,7 @@ local function buildOverrides()
 end
 
 local function layoutColumns()
-  local mode = ns.settings.mode
+  local mode = repMode() and "rep" or ns.settings.mode
   if frame.layoutMode == mode then return end
   frame.layoutMode = mode
   local cols = columns()
@@ -873,6 +946,7 @@ local function layoutColumns()
 end
 
 local function cellText(r, key)
+  if repMode() then return ns.Reputation.CellText(r, key, UI.repPlan) end
   if key == "name" then
     local col = COLORS[r.color] or COLORS.unknown
     local name = "|c" .. col .. r.name .. "|r"
@@ -923,7 +997,11 @@ local function cellText(r, key)
   end
   return ""
 end
-UI.CellText, UI.SortValue = cellText, sortValue
+UI.CellText = cellText
+UI.SortValue = function(r, key)
+  if repMode() then return ns.Reputation.SortValue(r, key) end
+  return sortValue(r, key)
+end
 
 local function build()
   frame = CreateFrame("Frame", "ForeverCrafterFrame", UIParent, "BackdropTemplate")
@@ -1006,6 +1084,24 @@ local function build()
     .. "(the reagents may come from the AH, a vendor or other crafts), even when the AH pays more.",
     "Min profit then applies to the vendor profit; Min sold/day and Min AH listings do not apply." })
 
+  frame.repTab = button(frame, 110, "Reputation", function()
+    UI.SetMode(repMode() and ns.settings.mode or "rep")
+  end)
+  frame.repTab:SetPoint("TOPRIGHT", -40, -8)
+  hint(frame.repTab, { "Reputation", "The cheapest ways to gain reputation with " .. select(2, ns.Reputation.Faction())
+    .. " from AH and vendor prices: Craftsman's Writs and, from Friendly, notarised Waylaid Crates. Also: /crafter rep" })
+  frame.repGoal = editBox(frame, 54, "Rep goal", 14, function()
+    local g = ns.settings.repGoal or 0
+    return g > 0 and tostring(g) or ""
+  end, function(v)
+    local n = tonumber(v)
+    if v == "" or (n and n >= 0) then
+      ns.settings.repGoal = n and math.floor(n) or 0
+      UI.Recompute()
+    end
+  end)
+  hint(frame.repGoal, { "Rep goal", "Reputation points today's plan works toward. Blank = up to the next standing." })
+
   frame.prof = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
   frame.prof:SetSize(160, 22)
   frame.prof:SetPoint("TOPLEFT", 12, -36)
@@ -1074,11 +1170,13 @@ local function build()
     h.text:SetPoint("LEFT", 2, 0)
     h:SetScript("OnClick", function(self)
       local key = self.col.key
-      if ns.settings.sort == key then
-        ns.settings.sortDesc = not ns.settings.sortDesc
+      local cur, desc = sortSetting()
+      if cur == key then
+        setSort(key, not desc)
+      elseif repMode() then
+        setSort(key, key == "rtier" or key == "rrep")
       else
-        ns.settings.sort, ns.settings.sortDesc = key, key ~= "name" and key ~= "profs" and key ~= "conf"
-          and key ~= "time"
+        setSort(key, key ~= "name" and key ~= "profs" and key ~= "conf" and key ~= "time")
       end
       UI.ApplyFilter()
       UI.Refresh()
@@ -1112,6 +1210,12 @@ local function build()
     row:SetScript("OnEnter", function(self)
       local r = self.result
       if not r then return end
+      if repMode() then
+        local lines = {}
+        ns.Reputation.OptionLines(r, lines)
+        UI.ShowHint(self, lines)
+        return
+      end
       local lines = { r.name, Util.LineName(r.line) .. (r.known and "" or " - not learned yet"),
         "Cost " .. Util.Money(r.cost) .. ", sells for " .. Util.Money(r.value) }
       if r.whatIf then
@@ -1161,9 +1265,17 @@ end
 
 function UI.Refresh()
   if not frame or not frame:IsShown() then return end
-  local wi = whatIf()
+  local wi, rm = whatIf(), repMode()
   layoutColumns()
   frame.mode:SetText(wi and "Mode: What-if" or "Mode: My character")
+  frame.repTab:SetText(rm and "Back to crafts" or "Reputation")
+  for _, c in ipairs({ frame.mode, frame.shuffles, frame.prof, frame.minProfit, frame.minListings, frame.minSold,
+    frame.minBatch }) do
+    c:SetShown(not rm)
+    if c.label then c.label:SetShown(not rm) end
+  end
+  frame.repGoal:SetShown(rm)
+  frame.repGoal.label:SetShown(rm)
   for _, c in pairs(frame.wi) do c:SetShown(wi) end
   frame.wi.cap.label:SetShown(wi)
   if wi then
@@ -1173,8 +1285,8 @@ function UI.Refresh()
   elseif UI.overrides then
     UI.overrides:Hide()
   end
-  frame.known:SetShown(not wi)
-  frame.learn:SetShown(not wi)
+  frame.known:SetShown(not wi and not rm)
+  frame.learn:SetShown(not wi and not rm)
   frame.prof:SetText(professionLabel())
   frame.known:SetChecked(ns.settings.showKnown)
   frame.learn:SetChecked(ns.settings.showLearnable)
@@ -1184,7 +1296,8 @@ function UI.Refresh()
   for _, h in ipairs(frame.headers) do
     if h.col then
       local mark = ""
-      if ns.settings.sort == h.col.key then mark = ns.settings.sortDesc and " v" or " ^" end
+      local key, desc = sortSetting()
+      if key == h.col.key then mark = desc and " v" or " ^" end
       h.text:SetText(h.col.label .. mark)
     end
   end
@@ -1202,6 +1315,13 @@ function UI.Refresh()
     end
   end
   local n = #UI.view
+  if rm then
+    frame.footer:SetText(string.format("%d-%d of %d   (%s)", math.min(UI.offset + 1, n), math.min(UI.offset + ROWS, n),
+      n, ns.Reputation.FOOTER))
+    detail:SetText(UI.DetailText(UI.selected))
+    frame.detailChild:SetHeight(math.max(detail:GetStringHeight() + 10, 10))
+    return
+  end
   frame.footer:SetText(n > 0 and string.format("%d-%d of %d   (scroll with the mouse wheel; [L] = not learned yet; "
     .. "[1-5] = random count; [V] = vendor shuffle; 50+ = batch may be bigger; Batch profit = the whole batch; "
     .. "* = g/h of a faster path)",

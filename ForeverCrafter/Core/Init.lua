@@ -111,15 +111,24 @@ local DEFAULTS = {
     sort = "profit",
     sortDesc = true,
     mode = "char",         -- results window: "char" (this character) or "whatIf"
+    tab = "craft",         -- results window tab: "craft" (the mode above) or "rep" (Reputation)
     -- What-if mode: every profession at a skill cap. overrides = { [skill line] = cap }; minConf = the least sure
     -- confidence level a recipe may have (1 Confirmed .. 5 Unknown); maxPrimaries = 0 for any number.
     whatIf = { cap = 150, overrides = {}, minConf = 4, maxPrimaries = 2 },
+    -- Reputation tab: plan this many reputation points (0 = up to the next standing) and the tab's sort
+    repGoal = 0,
+    repSort = "rper",
+    repSortDesc = false,
   },
   realms = {},      -- realm key → { time, items = { [itemID] = { min, qty, n, steps = {unit1, qty1, ...} } } }
   vendorSeen = {},  -- itemID → { unit, stack, limited, time, npc } from MERCHANT_SHOW (authoritative)
   deposit = {},     -- itemID → deposit for one item, 12 h (C_AuctionHouse.CalculateCommodityDeposit)
   -- cutSeen = { pct, n, time } from sale invoices (GetInboxInvoiceInfo)
   chars = {},       -- "Name-Realm" → per-character state
+  -- Durotar Supply and Logistics / Azeroth Commerce Authority amounts seen in game (account-wide; they replace the
+  -- unverified ones in Data/Reputation.lua): quest = { [writ quest] = rep }, favor / sealedRep = { [sealed crate] = n },
+  -- crateRep = rep for a notarised crate
+  rep = { learned = { quest = {}, favor = {}, sealedRep = {} } },
 }
 local CHAR_DEFAULTS = {
   skills = {},      -- skill line → { rank, max, time }
@@ -196,6 +205,8 @@ local function help()
   ns.Print("/crafter cut <pct>    - set the AH cut in percent (blank: back to the measured/assumed one)")
   ns.Print("/crafter cap [<profession>] <n|clear> - what-if skill cap, for all or one profession")
   ns.Print("/crafter minimap      - show or hide the minimap button")
+  ns.Print("/crafter rep          - reputation planner (Durotar Supply and Logistics / Azeroth Commerce Authority)")
+  ns.Print("/crafter rep forget   - clear the reputation and favor amounts learned in game")
   ns.Print("/crafter status       - professions, snapshot age, AH cut")
   ns.Print("/crafter reset        - forget prices, merchant data and this character's recipe data")
   ns.Print("/crafter dump         - save the open profession's recipes and item data for the addon's data files")

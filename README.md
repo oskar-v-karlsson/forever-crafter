@@ -8,6 +8,7 @@ A profession profit finder for **World of Warcraft: Forever**. It reads your pro
 - **Selling:** the AH value is the lowest buyout minus 1 copper, after the AH cut and the deposit; the vendor value is the item's sell price. The better of the two is used. Bind-on-pickup items count as vendor only.
 - **Learns from the game:** opening a profession window reads your real recipe list and reagents; opening any merchant records its exact prices; AH sale invoices in your mailbox measure the AH cut. All of this overrides the static data.
 - **Does it sell?** How many of each crafted item sell per day in your region, from [TradeSkillMaster](https://tradeskillmaster.com), so crafts that are profitable on paper but hardly ever sell can be hidden.
+- **Reputation planner:** the cheapest way to gain reputation with Durotar Supply and Logistics (Horde) or the Azeroth Commerce Authority (Alliance) from AH and vendor prices: Craftsman's Writs and notarised Waylaid Crates, plus a plan for today.
 - **Advisor only:** it never buys or posts anything.
 
 All game facts come from World of Warcraft: Forever sources only (the Forever client data tables, Wowhead Forever, the Forever UI code, TradeSkillMaster's Forever region data), never Classic or Retail. See [SOURCES.md](SOURCES.md), which also lists what can only be checked in the game or in a browser.
@@ -117,6 +118,17 @@ Every reagent of a chain can be bought on the AH, bought from a vendor, or craft
 - How: each step is priced at its copper cost plus the current g/h times its casting time (Dinkelbach's method for the best ratio). The g/h of the chosen path becomes the new rate and the search repeats until the path stops changing (at most 6 rounds; usually 2). The best-g/h path is never shown unless it beats the most-gold path's g/h.
 - Its g/h is also a batch average: its own cheap batch, priced along the same path, divided by its casting time. Unknown cast times count as 0 s here, as in the g/h columns. In **What-if** it is worked out for the results shown (the best set per recipe) after the scan of all sets.
 
+### Reputation planner
+
+The **Reputation** button at the top right of the window (or `/crafter rep`) switches to the Durotar Supply and Logistics tab (the Azeroth Commerce Authority on an Alliance character); **Back to crafts** switches back. Everything is priced from the AH snapshot and merchant prices only, never by crafting.
+
+- **Writs:** each of the 150 Craftsman's Writs (Journeyman, Expert, Artisan): the writ plus the item its quest wants (e.g. 200 Crafted Solid Shot), less the average Coin Pouch the quest gives (Journeyman about 12s, Expert 36s, Artisan 74s 56c; below 0 means the turn-in earns gold). Each writ can be turned in once per day; a writ done today is greyed out (`done`). Sealed (random) writs are left out.
+- **Notarised crate:** an empty Waylaid Crate (the cheapest of the unidentified one and the identified ones) plus a Forged Delivery Receipt for 50 reputation. The receipt costs 15 Merchant's Favor, priced at the cheapest copper per favor of all crates. Crates are not recommended below Friendly (`needs Friendly`, greyed out).
+- **Fill rows:** each identified Waylaid Crate with its cheapest fill bundle, and the Merchant's Favor its sealed crate gives (white crates take raw materials, green crates processed ones): Apprentice 5 white / 10 green, Journeyman 10 / 20, Expert 20 / 30, Artisan unknown (`?`). They sort as the notarised crate they would pay for.
+- **Columns:** Option, Tier, Cost, Gives (reputation, or favor for a fill), **Cost/rep** (copper per reputation point; fills show copper per favor), where to buy, and **Today** (`plan`, `done`, `needs Friendly`). Click a header to sort; the default is Cost/rep, cheapest first.
+- **Today's plan** (in the details): the cheapest copper per reputation first, step by step, priced after what the plan already bought (the AH price steps rise), up to the next standing or the **Rep goal** box. Notarised crates come first when they are cheaper, using any Merchant's Favor you already have. Below Friendly the plan uses writs until it reaches Friendly. It ends with the shopping list, what you spend and roughly what the Coin Pouches give back.
+- **Unverified amounts:** the writ reputation (75, 125, 150), the Coin Pouch averages, the favor per crate and the receipt price come from guides, not from Forever game data. They show in orange. The addon learns the real numbers when you turn in (the reputation or favor that changes within 3 seconds of a writ quest, a sealed crate or a receipt leaving your bags) and uses them from then on, on every character. `/crafter rep forget` clears what it learned.
+
 ### Commands
 
 | Command | What it does |
@@ -128,7 +140,8 @@ Every reagent of a chain can be bought on the AH, bought from a vendor, or craft
 | `/crafter cap [<profession>] <n\|clear>` | What-if skill cap: `/crafter cap 150` for all professions, `/crafter cap mining 200` for one (name or short name, e.g. `bs`, `first aid`), `/crafter cap mining clear` to drop the override; `/crafter cap` prints them |
 | `/crafter minimap` | Show or hide the minimap button |
 | `/crafter dump` | Save the open profession window's full recipe list (learned and unlearned), reagents, outputs, the game's "how to learn" text (empty in Forever so far) and item info, for the data in this addon (see below); `/crafter dump clear` removes it |
-| `/crafter reset` | Forget prices, merchant data and this character's recipe data |
+| `/crafter rep` | The reputation planner (see "Reputation planner" above); `/crafter rep forget` clears the learned reputation and favor amounts |
+| `/crafter reset` | Forget prices, merchant data and this character's recipe data (not the learned reputation amounts) |
 | `/crafter debug` | Toggle debug output (also prints any API the client lacks) |
 
 The minimap button and the addon compartment entry: left click opens the window, right click scans.
@@ -158,6 +171,12 @@ These cannot be tested outside the game. Please go through them once and report 
 19. [ ] **Cast times:** open a profession window, then check a few crafts in the details: Heavy Dynamite should take 5.1 s per craft and Truesilver Champion 1 min, as on the game's own cast bar. If a gear item or buff changes your crafting speed, note whether the addon's time follows it (it reads `C_Spell.GetSpellInfo(spell).castTime`).
 20. [ ] **Best-g/h path:** with Engineering or Alchemy, find a result whose **AH g/h** or **Vend g/h** ends in `*` (e.g. a crafted shot or rocket where buying the powder or bars is faster). The `*` fits in the cell without cutting off the number (e.g. `12345g*`), the footer line with "* = g/h of a faster path" is not cut off, and the details' "Fastest path" section reads sensibly (what to buy instead, its chain tree and shopping list).
 21. [ ] **Help the recipe data:** open each profession window and type `/crafter dump` (on each character, for each profession, both factions if you can). Then `/reload` or log out, and send `_forever_\WTF\Account\<account>\SavedVariables\ForeverCrafter.lua` (the file also holds your character names, skills and saved prices; the import reads only its `dump` part and keeps the recipes, items, faction and date, and which recipes some character knows, but not which character). A recipe a character knows counts as existing even if Wowhead Forever lists it nowhere, and the game's reagents come before the DB2 ones. The game's recipe list itself holds every recipe in the client data, learnable or not, so it is not used to add recipes. The dump also notes items the game knows nothing about.
+22. [ ] **Reputation tab:** the **Reputation** button fits at the right of the title row (left of the close button), and in the tab the 7 columns fit the list without cut-off text (e.g. a long writ name, `1g 23s 45c ~`, `needs Friendly`). The status line shows your standing, e.g. `Durotar Supply and Logistics: Friendly 500/6000`, and your Merchant's Favor. On an Alliance character it names the Azeroth Commerce Authority, and the writs and crates are the same; please report if they are not.
+23. [ ] **Writ reputation:** turn in a Journeyman, an Expert and an Artisan writ. Is it 75, 125 and 150 reputation? After each, the writ's **Gives** turns white (learned). Note the Coin Pouch's gold, so the averages (Journeyman 5-19s, about 12s; Expert 36s; Artisan 74s 56c) can be checked.
+24. [ ] **Once per day:** a writ you turned in shows `done` until the daily reset, and then not (it reads `C_QuestLog.IsQuestFlaggedCompleted` for the writ's quest).
+25. [ ] **Merchant's Favor:** hand in a sealed crate: is it 5 / 10 (Apprentice white / green), 10 / 20 (Journeyman), 20 / 30 (Expert)? What does an Artisan crate give (the addon shows `?`)? Does handing it in also give reputation (the details then show it)? Are white crates the raw materials and green ones the processed ones?
+26. [ ] **Notarised crate:** does a Forged Delivery Receipt cost 15 Merchant's Favor, does an empty crate with a receipt give 50 reputation, and does a receipt work on the unidentified Waylaid Crate (248549) as well as on an identified one? Are crates really for Friendly and above?
+27. [ ] **Learning:** after a turn-in, chat in `/crafter debug` says "reputation: learned ...", and the number matches what the game showed. Report it if it learned a wrong number (`/crafter rep forget` clears it).
 
 ## Development
 

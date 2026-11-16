@@ -24,6 +24,12 @@ STUB = {
   faction = "Alliance",
   regionName = "EU", -- GetCurrentRegionName()
   region = 3,       -- GetCurrentRegion()
+  -- faction ID → FactionData { reaction, currentStanding, currentReactionThreshold, nextReactionThreshold }
+  -- (C_Reputation.GetFactionDataByID; nil = not met)
+  factions = {},
+  currency = {},    -- currency ID → quantity (C_CurrencyInfo.GetCurrencyInfo)
+  questsDone = {},  -- quest ID → true (C_QuestLog.IsQuestFlaggedCompleted)
+  bags = {},        -- item ID → count (C_Item.GetItemCount)
 }
 
 -- Frames ------------------------------------------------------------------------------------------
@@ -288,6 +294,25 @@ function C_Item.GetItemInfo(id)
   return d.name, "|Hitem:" .. id .. "|h", d.quality or 1, 1, 1, "Trade Goods", "", 20, "", 134400, d.sell or 0, 7, 5, 0
 end
 function C_Item.RequestLoadItemDataByID() end
+function C_Item.GetItemCount(id) return STUB.bags[id] or 0 end
+
+-- Reputation, currency, quests --------------------------------------------------------------------
+FACTION_STANDING_LABEL4, FACTION_STANDING_LABEL5, FACTION_STANDING_LABEL6 = "Neutral", "Friendly", "Honored"
+C_Reputation = {}
+function C_Reputation.GetFactionDataByID(id)
+  local f = STUB.factions[id]
+  if not f then return nil end
+  return { factionID = id, name = "faction " .. id, reaction = f.reaction, currentStanding = f.currentStanding,
+           currentReactionThreshold = f.currentReactionThreshold, nextReactionThreshold = f.nextReactionThreshold }
+end
+C_CurrencyInfo = {}
+function C_CurrencyInfo.GetCurrencyInfo(id)
+  local q = STUB.currency[id]
+  if q == nil then return nil end
+  return { name = "currency " .. id, quantity = q }
+end
+C_QuestLog = {}
+function C_QuestLog.IsQuestFlaggedCompleted(id) return STUB.questsDone[id] == true end
 
 -- SavedVariables ----------------------------------------------------------------------------------
 -- The text the client writes for a saved global at logout: `name = { ["key"] = value, [1] = value, ... }`.
