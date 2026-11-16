@@ -1,0 +1,448 @@
+ID,Display_lang,OverallQualityID,SellPrice,BuyPrice,VendorStackCount,Stackable,Bonding,StartQuestID
+765,Silverleaf,1,10,40,1,20,0,0
+785,Mageroyal,1,20,80,1,20,0,0
+2317,Dark Leather Tunic,2,689,3446,1,1,2,0
+2318,Light Leather,1,15,60,1,20,0,0
+2319,Medium Leather,1,50,200,1,20,0,0
+2447,Peacebloom,1,10,40,1,20,0,0
+2449,Earthroot,1,20,80,1,20,0,0
+2450,Briarthorn,1,25,100,1,20,0,0
+2453,Bruiseweed,1,25,100,1,20,0,0
+2589,Linen Cloth,1,13,55,1,20,0,0
+2592,Wool Cloth,1,33,135,1,20,0,0
+2770,Copper Ore,1,5,20,1,20,0,0
+2771,Tin Ore,1,25,100,1,20,0,0
+2772,Iron Ore,1,150,600,1,20,0,0
+2775,Silver Ore,2,75,300,1,20,0,0
+2776,Gold Ore,2,500,2000,1,20,0,0
+2840,Copper Bar,1,10,40,1,20,0,0
+2841,Bronze Bar,1,50,200,1,20,0,0
+2842,Silver Bar,2,100,400,1,20,0,0
+2865,Rough Bronze Leggings,2,577,2885,1,1,2,0
+2996,Bolt of Linen Cloth,1,40,160,1,20,0,0
+2997,Bolt of Woolen Cloth,1,100,400,1,20,0,0
+3355,Wild Steelbloom,1,50,200,1,20,0,0
+3356,Kingsblood,1,30,120,1,20,0,0
+3357,Liferoot,1,75,300,1,20,0,0
+3358,Khadgar's Whisker,1,175,700,1,20,0,0
+3369,Grave Moss,1,25,100,1,20,0,0
+3383,Elixir of Wisdom,1,100,400,1,20,0,0
+3385,Lesser Mana Potion,1,30,120,1,5,0,0
+3387,Limited Invulnerability Potion,1,30,120,1,5,0,0
+3388,Lesser Troll's Blood Elixir,1,40,160,1,20,0,0
+3390,Elixir of Lesser Agility,1,35,140,1,20,0,0
+3391,Elixir of Ogre Strength,1,20,80,1,20,0,0
+3484,Green Iron Boots,2,1767,8837,1,1,2,0
+3485,Green Iron Gauntlets,2,1295,6477,1,1,2,0
+3491,Heavy Bronze Mace,2,2741,13709,1,1,2,0
+3575,Iron Bar,1,200,800,1,20,0,0
+3576,Tin Bar,1,35,140,1,20,0,0
+3577,Gold Bar,2,600,2400,1,20,0,0
+3818,Fadeleaf,1,125,500,1,20,0,0
+3819,Wintersbite,1,100,400,1,20,0,0
+3820,Stranglekelp,1,100,400,1,20,0,0
+3821,Goldthorn,1,150,600,1,20,0,0
+3823,Lesser Invisibility Potion,1,100,400,1,5,0,0
+3824,Shadow Oil,1,150,600,1,5,0,0
+3827,Mana Potion,1,120,480,1,5,0,0
+3837,Golden Scale Coif,2,3084,15420,1,1,2,0
+3848,Big Bronze Knife,2,915,3660,1,1,2,0
+3853,Moonsteel Broadsword,2,8615,34460,1,1,2,0
+3858,Mithril Ore,1,250,1000,1,20,0,0
+3859,Steel Bar,1,60,240,1,20,0,0
+3860,Mithril Bar,1,400,1600,1,20,0,0
+4231,Cured Light Hide,1,110,440,1,20,0,0
+4233,Cured Medium Hide,1,200,800,1,20,0,0
+4234,Heavy Leather,1,150,600,1,20,0,0
+4236,Cured Heavy Hide,1,225,900,1,20,0,0
+4245,Small Silk Pack,1,2000,8000,1,1,0,0
+4252,Dark Leather Shoulders,2,1457,7286,1,1,2,0
+4254,Barbaric Gloves,2,1071,5356,1,1,2,0
+4304,Thick Leather,1,300,1200,1,20,0,0
+4305,Bolt of Silk Cloth,1,600,2400,1,20,0,0
+4306,Silk Cloth,1,150,600,1,20,0,0
+4313,Red Woolen Boots,2,416,2083,1,1,2,0
+4317,Phoenix Pants,2,1076,5382,1,1,2,0
+4321,Spider Silk Slippers,2,1120,5600,1,1,2,0
+4329,Star Belt,2,2120,10603,1,1,2,0
+4338,Mageweave Cloth,1,250,1000,1,20,0,0
+4339,Bolt of Mageweave,1,1250,5000,1,20,0,0
+4359,Handful of Copper Bolts,1,12,50,1,20,0,0
+4361,Copper Tube,1,120,480,1,20,0,0
+4363,Copper Modulator,1,50,200,1,20,0,0
+4371,Bronze Tube,1,200,800,1,20,0,0
+4373,Shadow Goggles,2,722,3613,1,1,2,0
+4375,Whirring Bronze Gizmo,1,115,460,1,20,0,0
+4380,Big Bronze Bomb,1,500,2000,1,10,0,0
+4381,Minor Recombobulator,2,600,2400,1,1,0,0
+4382,Bronze Framework,1,600,2400,1,20,0,0
+4383,Moonsight Rifle,2,3183,15915,1,1,2,0
+4384,Explosive Sheep,1,1000,4000,1,5,0,0
+4387,Iron Strut,1,400,1600,1,20,0,0
+4392,Advanced Target Dummy,1,2500,10000,1,10,0,0
+4393,Craftsman's Monocle,2,2632,13162,1,1,2,0
+4395,Goblin Land Mine,1,1600,6400,1,10,0,0
+4396,Mechanical Dragonling,1,6000,24000,1,1,2,0
+4623,Lesser Stoneshield Potion,1,375,1500,1,5,0,0
+4625,Firebloom,1,250,1000,1,20,0,0
+4852,Flash Bomb,1,300,1200,1,5,0,0
+5507,Ornate Spyglass,1,600,2400,1,1,0,0
+5540,Pearl-handled Dagger,2,2107,10539,1,1,2,0
+5541,Iridescent Hammer,2,3693,18469,1,1,2,0
+5633,Great Rage Potion,1,150,600,1,5,0,0
+5634,Free Action Potion,1,75,300,1,5,0,0
+5766,Lesser Wizard's Robe,2,1338,6691,1,1,2,0
+5958,Fine Leather Pants,2,829,4145,1,1,2,0
+5965,Guardian Cloak,2,2536,12680,1,1,2,0
+5996,Draught of Water Breathing,1,95,380,1,20,0,0
+6037,Truesilver Bar,2,1250,5000,1,20,0,0
+6041,Steel Weapon Chain,1,1500,6000,1,5,0,0
+6048,Shadow Protection Potion,1,100,400,1,5,0,0
+6049,Fire Protection Potion,1,170,680,1,5,0,0
+6050,Frost Protection Potion,1,300,1200,1,5,0,0
+6052,Nature Protection Potion,1,300,1200,1,5,0,0
+6263,Blue Overalls,2,589,2947,1,1,2,0
+6264,Greater Adept's Robe,2,884,4420,1,1,2,0
+6712,Practice Lock,1,12,50,1,1,0,0
+7048,Azure Silk Hood,2,745,3725,1,1,2,0
+7061,Earthen Silk Belt,2,2017,10087,1,1,2,0
+7063,Crimson Silk Robe,2,4741,23707,1,1,2,0
+7284,Red Whelp Gloves,2,586,2933,1,1,2,0
+7349,Herbalist's Gloves,2,861,4308,1,1,2,0
+7358,Pilferer's Gloves,2,885,4428,1,1,2,0
+7371,Heavy Quiver,2,500,2000,1,1,0,0
+7378,Dusky Bracers,2,2146,10731,1,1,2,0
+7391,Swift Boots,2,4253,21266,1,1,2,0
+7506,Gnomish Universal Remote,2,500,2000,1,1,2,0
+7911,Truesilver Ore,2,500,2000,1,20,0,0
+7922,Steel Plate Helm,2,1944,7776,1,1,2,0
+7928,Ornate Mithril Shoulders,2,4857,24286,1,1,2,0
+7929,Orcish War Leggings,2,7739,38698,1,1,2,0
+7941,Heavy Mithril Axe,2,12520,62601,1,1,2,0
+7942,Blue Glittering Axe,2,14659,73296,1,1,2,0
+7943,Wicked Mithril Blade,2,15891,79459,1,1,2,0
+7947,Ebon Shiv,2,24892,124460,1,1,2,0
+7964,Solid Sharpening Stone,1,40,160,1,20,0,0
+7969,Mithril Spurs,2,250,1000,1,20,0,0
+8069,Crafted Solid Shot,1,0,300,200,200,0,0
+8170,Rugged Leather,1,500,2000,1,20,0,0
+8172,Cured Thick Hide,1,500,2000,1,20,0,0
+8174,Comfortable Leather Hat,2,4131,20657,1,1,2,0
+8189,Turtle Scale Breastplate,2,7567,37838,1,1,2,0
+8192,Nightscape Shoulders,2,4782,23914,1,1,2,0
+8200,Big Voodoo Robe,2,7275,36378,1,1,2,0
+8201,Big Voodoo Mask,2,5350,26754,1,1,2,0
+8210,Wild Leather Shoulders,2,5537,27685,1,1,2,0
+8214,Wild Leather Helmet,2,6230,31151,1,1,2,0
+8217,Quickdraw Quiver,2,1000,4000,1,1,0,0
+8218,Thick Leather Ammo Pouch,2,1000,4000,1,1,0,0
+8831,Purple Lotus,1,300,1200,1,20,0,0
+8836,Arthas' Tears,1,95,380,1,20,0,0
+8838,Sungrass,1,60,240,1,20,0,0
+8839,Blindweed,1,375,1500,1,20,0,0
+8845,Ghost Mushroom,1,375,1500,1,20,0,0
+8846,Gromsblood,1,250,1000,1,20,0,0
+8949,Elixir of Agility,1,200,800,1,20,0,0
+8951,Elixir of Defense,1,200,800,1,20,0,0
+9060,Inlaid Mithril Cylinder,1,1000,4000,1,20,0,0
+9061,Goblin Rocket Fuel,1,250,1000,1,20,0,0
+9088,Gift of Arthas,1,250,1000,1,20,0,0
+9144,Wildvine Potion,1,250,1000,1,5,0,0
+9224,Potion of Demon Slaying,1,700,2800,1,20,0,0
+9233,Draught of Detect Demon,1,500,2000,1,20,0,0
+9366,Golden Scale Gauntlets,2,3689,18446,1,1,2,0
+9998,Black Mageweave Vest,2,4815,24076,1,1,2,0
+10004,Shadoweave Robe,2,5738,28694,1,1,2,0
+10008,White Bandit Mask,2,3492,13968,1,1,2,0
+10009,Red Mageweave Pants,2,5284,26424,1,1,2,0
+10023,Shadoweave Gloves,2,3334,16672,1,1,2,0
+10025,Shadoweave Mask,2,6790,33952,1,1,2,0
+10036,Tuxedo Jacket,1,1741,8708,1,1,0,0
+10042,Cindercloth Robe,2,6644,33222,1,1,2,0
+10048,Colorful Kilt,2,935,4678,1,1,2,0
+10050,Mageweave Bag,1,2500,10000,1,1,0,0
+10052,Orange Martial Shirt,1,1500,6000,1,1,0,0
+10498,Gyromatic Micro-Adjustor,1,16,81,1,1,0,0
+10500,Fire Goggles,2,3478,17394,1,1,2,0
+10501,Catseye Ultra Goggles,2,4398,21993,1,1,2,0
+10504,Green Lens,3,7770,38852,1,1,2,0
+10514,Mithril Frag Bomb,1,750,3000,1,10,0,0
+10548,Sniper Scope,1,2500,10000,1,5,0,0
+10558,Gold Power Core,1,250,1000,1,20,0,0
+10559,Mithril Tube,1,750,3000,1,20,0,0
+10560,Unstable Trigger,1,1000,4000,1,20,0,0
+10561,Mithril Casing,1,1000,4000,1,20,0,0
+10592,Catseye Draught,1,150,600,1,20,0,0
+10620,Thorium Ore,1,250,1000,1,20,0,0
+10939,Greater Magic Essence,2,1,1,1,20,0,0
+10940,Strange Dust,1,1,800,1,20,0,0
+10978,Small Glimmering Shard,3,1,1,1,20,0,0
+11082,Greater Astral Essence,2,1,1,1,20,0,0
+11083,Soul Dust,1,1,1,1,20,0,0
+11084,Large Glimmering Shard,3,1,1,1,20,0,0
+11099,Dark Iron Ore,1,250,1000,1,10,0,0
+11128,Golden Rod,1,500,2000,1,1,0,0
+11135,Greater Mystic Essence,2,1,1,1,20,0,0
+11137,Vision Dust,1,1,1,1,20,0,0
+11138,Small Glowing Shard,3,1,1,1,20,0,0
+11139,Large Glowing Shard,3,1,1,1,20,0,0
+11144,Truesilver Rod,1,1000,4000,1,1,0,0
+11175,Greater Nether Essence,2,1,1,1,20,0,0
+11176,Dream Dust,1,1,1,1,20,0,0
+11177,Small Radiant Shard,3,1,1,1,20,0,0
+11178,Large Radiant Shard,3,1,1,1,20,0,0
+11370,Dark Iron Ore,1,500,2000,1,20,0,0
+11371,Dark Iron Bar,1,600,2400,1,20,0,0
+11590,Mechanical Repair Kit,1,250,1000,1,5,0,0
+12190,Dreamless Sleep Potion,1,250,1000,1,5,0,0
+12359,Thorium Bar,1,600,2400,1,20,0,0
+12416,Radiant Belt,2,7595,37979,1,1,2,0
+12417,Radiant Circlet,2,17034,85174,1,1,2,0
+12422,Imperial Plate Chest,2,16204,81021,1,1,2,0
+12775,Huge Thorium Battleaxe,2,39949,199746,1,1,2,0
+13457,Greater Fire Protection Potion,1,750,3000,1,5,0,0
+13463,Dreamfoil,1,100,400,1,20,0,0
+13464,Golden Sansam,1,100,400,1,20,0,0
+13465,Mountain Silversage,1,150,600,1,20,0,0
+13466,Plaguebloom,1,250,1000,1,20,0,0
+13467,Icecap,1,250,1000,1,20,0,0
+13513,Flask of Chromatic Resistance,1,5000,20000,1,20,0,0
+13864,Runecloth Boots,2,9553,47767,1,1,2,0
+14046,Runecloth Bag,1,5000,20000,1,1,0,0
+14047,Runecloth,1,400,1600,1,20,0,0
+14048,Bolt of Runecloth,1,2000,8000,1,20,0,0
+14108,Felcloth Boots,2,11112,55560,1,1,2,0
+14130,Wizardweave Turban,2,12768,63843,1,1,2,0
+14141,Ghostweave Vest,2,12859,64296,1,1,2,0
+14343,Small Brilliant Shard,3,1,1,1,20,0,0
+14344,Large Brilliant Shard,3,1,1,1,20,0,0
+15053,Volcanic Breastplate,2,9501,38005,1,1,2,0
+15071,Frostsaber Boots,2,11443,57218,1,1,2,0
+15075,Chimeric Vest,2,18449,92245,1,1,2,0
+15080,Heavy Scorpid Helm,2,18230,91152,1,1,2,0
+15084,Wicked Leather Bracers,2,7311,36555,1,1,2,0
+15087,Wicked Leather Pants,2,17892,89463,1,1,2,0
+15092,Runic Leather Bracers,2,7656,38283,1,1,2,0
+15094,Runic Leather Headband,2,14155,70777,1,1,2,0
+15869,Silver Skeleton Key,2,50,200,1,20,0,0
+15872,Arcanite Skeleton Key,2,625,2500,1,20,0,0
+15994,Thorium Widget,1,2500,10000,1,20,0,0
+15996,Lifelike Mechanical Toad,1,2500,10000,1,1,0,0
+16000,Thorium Tube,1,3750,15000,1,20,0,0
+16005,Dark Iron Bomb,1,1250,5000,1,10,0,0
+16023,Masterwork Target Dummy,1,10000,40000,1,10,0,0
+18232,Field Repair Bot 74A,1,10000,40000,1,1,0,0
+18253,Major Rejuvenation Potion,1,15,60,1,5,0,0
+18258,Gordok Ogre Suit,2,0,0,1,1,0,0
+18587,Goblin Jumper Cables XL,1,2000,8000,1,1,0,0
+18631,Truesilver Transformer,1,3000,12000,1,20,0,0
+18645,Gnomish Alarm-O-Bot,1,1500,6000,1,1,0,0
+18662,Heavy Leather Ball,1,5,20,1,5,0,0
+20549,Darkrune Gauntlets,3,11484,57421,1,1,2,0
+21277,Tranquil Mechanical Yeti,1,1250,5000,1,1,0,0
+21340,Soul Pouch,2,5000,20000,1,1,2,0
+22246,Enchanted Mageweave Pouch,2,2500,10000,1,1,2,0
+22251,Cenarion Herb Bag,2,10000,40000,1,1,2,0
+217273,Golden Scale Gauntlets,2,3689,18446,1,1,2,0
+217314,Moonsight Rifle,2,3183,15915,1,1,1,0
+246948,Distilled Firewater,1,200,1000,1,20,0,0
+248549,Waylaid Crate,2,0,0,1,20,0,0
+248682,Waylaid Crate: Apprentice Herbs,1,0,0,1,5,0,0
+248683,Waylaid Crate: Apprentice Ore,1,0,0,1,5,0,0
+248684,Waylaid Crate: Apprentice Textiles,1,0,0,1,5,0,0
+248685,Waylaid Crate: Apprentice Curiosities,1,0,0,1,5,0,0
+248686,Waylaid Crate: Journeyman Herbs,1,0,0,1,5,0,0
+248687,Waylaid Crate: Journeyman Ore,1,0,0,1,5,0,0
+248688,Waylaid Crate: Journeyman Textiles,1,0,0,1,5,0,0
+248689,Waylaid Crate: Journeyman Curiosities,1,0,0,1,5,0,0
+248690,Waylaid Crate: Earthly Expert Herbs,1,0,0,1,5,0,0
+248691,Waylaid Crate: Flowering Expert Herbs,1,0,0,1,5,0,0
+248692,Waylaid Crate: Expert Ore,1,0,0,1,5,0,0
+248693,Waylaid Crate: Expert Textiles,1,0,0,1,5,0,0
+248694,Waylaid Crate: Expert Curiosities,1,0,0,1,5,0,0
+248695,Waylaid Crate: Earthly Artisan Herbs,1,0,0,1,5,0,0
+248696,Waylaid Crate: Flowering Artisan Herbs,1,0,0,1,5,0,0
+248697,Waylaid Crate: Artisan Ore,1,0,0,1,5,0,0
+248698,Waylaid Crate: Artisan Textiles,1,0,0,1,5,0,0
+248699,Waylaid Crate: Artisan Curiosities,1,0,0,1,5,0,0
+248702,Waylaid Crate: Apprentice Fabrics,2,0,0,1,5,0,0
+248703,Waylaid Crate: Apprentice Ingots,2,0,0,1,5,0,0
+248704,Waylaid Crate: Apprentice Parts,2,0,0,1,5,0,0
+248705,Waylaid Crate: Journeyman Fabrics,2,0,0,1,5,0,0
+248706,Waylaid Crate: Journeyman Ingots,2,0,0,1,5,0,0
+248707,Waylaid Crate: Journeyman Parts,2,0,0,1,5,0,0
+248708,Waylaid Crate: Expert Fabrics,2,0,0,1,5,0,0
+248709,Waylaid Crate: Expert Ingots,2,0,0,1,5,0,0
+248710,Waylaid Crate: Expert Parts,2,0,0,1,5,0,0
+248711,Waylaid Crate: Artisan Fabrics,2,0,0,1,5,0,0
+248712,Waylaid Crate: Artisan Ingots,2,0,0,1,5,0,0
+248713,Waylaid Crate: Artisan Parts,2,0,0,1,5,0,0
+248765,Sealed Apprentice Crate,1,0,0,1,5,1,0
+248766,Sealed Journeyman Crate,1,0,0,1,5,1,0
+248767,Sealed Expert Crate,1,0,0,1,5,1,0
+248768,Sealed Artisan Crate,1,0,0,1,5,1,0
+248769,Sealed Elite Crate,1,0,0,1,5,1,0
+248770,Sealed Apprentice Crate,2,0,0,1,5,1,0
+248771,Sealed Journeyman Crate,2,0,0,1,5,1,0
+248772,Sealed Expert Crate,2,0,0,1,5,1,0
+248773,Sealed Artisan Crate,2,0,0,1,5,1,0
+248774,Sealed Elite Crate,2,0,0,1,5,1,0
+248775,Sealed Apprentice Crate,3,0,0,1,5,1,0
+248776,Sealed Journeyman Crate,3,0,0,1,5,1,0
+248777,Sealed Expert Crate,3,0,0,1,5,1,0
+248778,Sealed Artisan Crate,3,0,0,1,5,1,0
+248779,Sealed Elite Crate,3,0,0,1,5,1,0
+262902,Forged Delivery Receipt,1,0,0,1,20,1,0
+264011,Craftsman's Writ: Elixir of Ogre's Strength,3,1,5,1,1,0,94004
+264012,Craftsman's Writ: Elixir of Wisdom,3,1,5,1,1,0,94212
+264013,Craftsman's Writ: Lesser Mana Potion,3,1,5,1,1,0,94213
+264014,Craftsman's Writ: Shadow Protection Potion,3,1,5,1,1,0,94214
+264015,Craftsman's Writ: Free Action Potion,3,1,5,1,1,0,94215
+264016,Craftsman's Writ: Elixir of Lesser Agility,3,1,5,1,1,0,94216
+264017,Craftsman's Writ: Lesser Troll's Blood Elixir,3,1,5,1,1,0,94217
+264018,Craftsman's Writ: Elixir of Defense,3,1,5,1,1,0,94218
+264019,Craftsman's Writ: Draught of Water Breathing,3,1,5,1,1,0,94219
+264020,Craftsman's Writ: Pearl-Handled Dagger,3,1,5,1,1,0,94220
+264021,Craftsman's Writ: Golden Rod,3,1,5,1,1,0,94221
+264022,Craftsman's Writ: Iridescent Hammer,3,1,5,1,1,0,94222
+264023,Craftsman's Writ: Silver Skeleton Key,3,1,5,1,1,0,94223
+264024,Craftsman's Writ: Heavy Bronze Mace,3,1,5,1,1,0,94224
+264025,Craftsman's Writ: Rough Bronze Leggings,3,1,5,1,1,0,94225
+264026,Craftsman's Writ: Green Iron Gauntlets,3,1,5,1,1,0,94226
+264027,Craftsman's Writ: Big Bronze Knife,3,1,5,1,1,0,94227
+264028,Craftsman's Writ: Green Iron Boots,3,1,5,1,1,0,94228
+264029,Craftsman's Writ: Ornate Spyglass,3,1,5,1,1,0,94229
+264030,Craftsman's Writ: Explosive Sheep,3,1,5,1,1,0,94230
+264031,Craftsman's Writ: Moonsight Rifle,3,1,5,1,1,0,94231
+264032,Craftsman's Writ: Minor Recombobulator,3,1,5,1,1,0,94232
+264033,Craftsman's Writ: Practice Lock,3,1,5,1,1,0,94233
+264034,Craftsman's Writ: Shadow Goggles,3,1,5,1,1,0,94234
+264035,Craftsman's Writ: Gnomish Universal Remote,3,1,5,1,1,0,94235
+264036,Craftsman's Writ: Big Bronze Bomb,3,1,5,1,1,0,94236
+264037,Craftsman's Writ: Crafted Solid Shot,3,1,5,1,1,0,94237
+264038,Craftsman's Writ: Heavy Leather Ball,3,1,5,1,1,0,94238
+264039,Craftsman's Writ: Fine Leather Pants,3,1,5,1,1,0,94239
+264040,Craftsman's Writ: Herbalist's Gloves,3,1,5,1,1,0,94240
+264041,Craftsman's Writ: Dark Leather Tunic,3,1,5,1,1,0,94241
+264042,Craftsman's Writ: Pilferer's Gloves,3,1,5,1,1,0,94242
+264043,Craftsman's Writ: Heavy Quiver,3,1,5,1,1,0,94243
+264044,Craftsman's Writ: Dark Leather Shoulders,3,1,5,1,1,0,94244
+264045,Craftsman's Writ: Barbaric Gloves,3,1,5,1,1,0,94245
+264046,Craftsman's Writ: Red Whelp Gloves,3,1,5,1,1,0,94246
+264047,Craftsman's Writ: Lesser Wizard's Robe,3,1,5,1,1,0,94247
+264048,Craftsman's Writ: Blue Overalls,3,1,5,1,1,0,94248
+264049,Craftsman's Writ: Azure Silk Hood,3,1,5,1,1,0,94249
+264050,Craftsman's Writ: Small Silk Pack,3,1,5,1,1,0,94250
+264051,Craftsman's Writ: Phoenix Pants,3,1,5,1,1,0,94251
+264052,Craftsman's Writ: Red Woolen Boots,3,1,5,1,1,0,94252
+264053,Craftsman's Writ: Colorful Kilt,3,1,5,1,1,0,94253
+264054,Craftsman's Writ: Greater Adept's Robe,3,1,5,1,1,0,94254
+264055,Craftsman's Writ: Spider Silk Slippers,3,1,5,1,1,0,94255
+264056,Craftsman's Writ: Frost Protection Potion,3,1,5,1,1,0,94256
+264057,Craftsman's Writ: Lesser Invisibility Potion,3,1,5,1,1,0,94257
+264058,Craftsman's Writ: Lesser Stoneshield Potion,3,1,5,1,1,0,94258
+264059,Craftsman's Writ: Nature Protection Potion,3,1,5,1,1,0,94259
+264060,Craftsman's Writ: Catseye Draught,3,1,5,1,1,0,94260
+264061,Craftsman's Writ: Great Rage Potion,3,1,5,1,1,0,94261
+264062,Craftsman's Writ: Mana Potion,3,1,5,1,1,0,94262
+264063,Craftsman's Writ: Fire Protection Potion,3,1,5,1,1,0,94263
+264064,Craftsman's Writ: Shadow Oil,3,1,5,1,1,0,94264
+264065,Craftsman's Writ: Goblin Rocket Fuel,3,1,5,1,1,0,94265
+264066,Craftsman's Writ: Elixir of Agility,3,1,5,1,1,0,94266
+264067,Craftsman's Writ: Wildvine Potion,3,1,5,1,1,0,94267
+264068,Craftsman's Writ: Steel Plate Helm,3,1,5,1,1,0,94268
+264069,Craftsman's Writ: Inlaid Mithril Cylinder,3,1,5,1,1,0,94269
+264070,Craftsman's Writ: Steel Weapon Chain,3,1,5,1,1,0,94270
+264071,Craftsman's Writ: Ornate Mithril Shoulders,3,1,5,1,1,0,94271
+264072,Craftsman's Writ: Blue Glittering Axe,3,1,5,1,1,0,94272
+264073,Craftsman's Writ: Moonsteel Broadsword,3,1,5,1,1,0,94273
+264074,Craftsman's Writ: Golden Scale Coif,3,1,5,1,1,0,94274
+264075,Craftsman's Writ: Solid Sharpening Stone,3,1,5,1,1,0,94275
+264076,Craftsman's Writ: Wicked Mithril Blade,3,1,5,1,1,0,94276
+264077,Craftsman's Writ: Truesilver Rod,3,1,5,1,1,0,94277
+264078,Craftsman's Writ: Golden Scale Gauntlets,3,1,5,1,1,0,94278
+264079,Craftsman's Writ: Heavy Mithril Axe,3,1,5,1,1,0,94279
+264080,Craftsman's Writ: Mechanical Dragonling,3,1,5,1,1,0,94280
+264081,Craftsman's Writ: Advanced Target Dummy,3,1,5,1,1,0,94281
+264082,Craftsman's Writ: Craftsman's Monocle,3,1,5,1,1,0,94282
+264083,Craftsman's Writ: Goblin Land Mine,3,1,5,1,1,0,94283
+264084,Craftsman's Writ: Catseye Ultra Goggles,3,1,5,1,1,0,94284
+264085,Craftsman's Writ: Unstable Trigger,3,1,5,1,1,0,94285
+264086,Craftsman's Writ: Flash Bomb,3,1,5,1,1,0,94286
+264087,Craftsman's Writ: Fire Goggles,3,1,5,1,1,0,94287
+264088,Craftsman's Writ: Mithril Frag Bomb,3,1,5,1,1,0,94288
+264089,Craftsman's Writ: Gyromatic Micro-Adjuster,3,1,5,1,1,0,94289
+264090,Craftsman's Writ: Mechanical Repair Kit,3,1,5,1,1,0,94290
+264091,Craftsman's Writ: Dark Iron Bomb,3,1,5,1,1,0,94291
+264092,Craftsman's Writ: Comfortable Leather Hat,3,1,5,1,1,0,94292
+264093,Craftsman's Writ: Guardian Cloak,3,1,5,1,1,0,94293
+264094,Craftsman's Writ: Dusky Bracers,3,1,5,1,1,0,94294
+264095,Craftsman's Writ: Wild Leather Helmet,3,1,5,1,1,0,94295
+264096,Craftsman's Writ: Wild Leather Shoulders,3,1,5,1,1,0,94296
+264097,Craftsman's Writ: Quickdraw Quiver,3,1,5,1,1,0,94297
+264098,Craftsman's Writ: Swift Boots,3,1,5,1,1,0,94298
+264099,Craftsman's Writ: Nightscape Shoulders,3,1,5,1,1,0,94299
+264100,Craftsman's Writ: Big Voodoo Mask,3,1,5,1,1,0,94300
+264101,Craftsman's Writ: Big Voodoo Robe,3,1,5,1,1,0,94301
+264102,Craftsman's Writ: Turtle Scale Breastplate,3,1,5,1,1,0,94302
+264103,Craftsman's Writ: Thick Leather Ammo Pouch,3,1,5,1,1,0,94303
+264104,Craftsman's Writ: Mageweave Bag,3,1,5,1,1,0,94304
+264105,Craftsman's Writ: Shadoweave Gloves,3,1,5,1,1,0,94305
+264106,Craftsman's Writ: Crimson Silk Robe,3,1,5,1,1,0,94306
+264107,Craftsman's Writ: Shadoweave Robe,3,1,5,1,1,0,94307
+264108,Craftsman's Writ: Enchanted Mageweave Pouch,3,1,5,1,1,0,94308
+264109,Craftsman's Writ: Star Belt,3,1,5,1,1,0,94309
+264110,Craftsman's Writ: Black Mageweave Vest,3,1,5,1,1,0,94310
+264111,Craftsman's Writ: Red Mageweave Pants,3,1,5,1,1,0,94311
+264112,Craftsman's Writ: Orange Martial Shirt,3,1,5,1,1,0,94312
+264113,Craftsman's Writ: White Bandit Mask,3,1,5,1,1,0,94313
+264114,Craftsman's Writ: Cindercloth Robe,3,1,5,1,1,0,94314
+264115,Craftsman's Writ: Earthen Silk Belt,3,1,5,1,1,0,94315
+264116,Craftsman's Writ: Potion of Demonslaying,3,1,5,1,1,0,94316
+264117,Craftsman's Writ: Dreamless Sleep Potion,3,1,5,1,1,0,94317
+264118,Craftsman's Writ: Greater Fire Protection Potion,3,1,5,1,1,0,94318
+264119,Craftsman's Writ: Draught of Detect Demon,3,1,5,1,1,0,94319
+264120,Craftsman's Writ: Gift of Arthas,3,1,5,1,1,0,94320
+264121,Craftsman's Writ: Flask of Chromatic Resistance,3,1,5,1,1,0,94321
+264122,Craftsman's Writ: Limited Invulnerability Potion,3,1,5,1,1,0,94322
+264123,Craftsman's Writ: Major Rejuvenation Potion,3,1,5,1,1,0,94323
+264124,Craftsman's Writ: Distilled Firewater,3,1,5,1,1,0,94324
+264125,Craftsman's Writ: Radiant Circlet,3,1,5,1,1,0,94325
+264126,Craftsman's Writ: Radiant Belt,3,1,5,1,1,0,94326
+264127,Craftsman's Writ: Orcish War Leggings,3,1,5,1,1,0,94327
+264128,Craftsman's Writ: Mithril Spurs,3,1,5,1,1,0,94328
+264129,Craftsman's Writ: Imperial Plate Chest,3,1,5,1,1,0,94329
+264130,Craftsman's Writ: Darkrune Gauntlets,3,1,5,1,1,0,94330
+264131,Craftsman's Writ: Huge Thorium Battleaxe,3,1,5,1,1,0,94331
+264132,Craftsman's Writ: Arcanite Skeleton Key,3,1,5,1,1,0,94332
+264133,Craftsman's Writ: Ebon Shiv,3,1,5,1,1,0,94333
+264134,Craftsman's Writ: Masterwork Target Dummy,3,1,5,1,1,0,94334
+264135,Craftsman's Writ: Green Lens,3,1,5,1,1,0,94335
+264136,Craftsman's Writ: Lifelike Mechanical Toad,3,1,5,1,1,0,94336
+264137,Craftsman's Writ: Gnomish Alarm-O-Bot,3,1,5,1,1,0,94337
+264138,Craftsman's Writ: Goblin Jumper Cables XL,3,1,5,1,1,0,94338
+264139,Craftsman's Writ: Field Repair Bot 74A,3,1,5,1,1,0,94339
+264140,Craftsman's Writ: Truesilver Transformer,3,1,5,1,1,0,94340
+264141,Craftsman's Writ: Sniper Scope,3,1,5,1,1,0,94341
+264142,Craftsman's Writ: Tranquil Mechanical Yeti,3,1,5,1,1,0,94342
+264143,Craftsman's Writ: Wicked Leather Pants,3,1,5,1,1,0,94343
+264144,Craftsman's Writ: Gordok Ogre Suit,3,1,5,1,1,0,94344
+264145,Craftsman's Writ: Volcanic Breastplate,3,1,5,1,1,0,94345
+264146,Craftsman's Writ: Runic Leather Headband,3,1,5,1,1,0,94346
+264147,Craftsman's Writ: Wicked Leather Bracers,3,1,5,1,1,0,94347
+264148,Craftsman's Writ: Chimeric Vest,3,1,5,1,1,0,94348
+264149,Craftsman's Writ: Heavy Scorpid Helm,3,1,5,1,1,0,94349
+264150,Craftsman's Writ: Runic Leather Bracers,3,1,5,1,1,0,94350
+264151,Craftsman's Writ: Frostsaber Boots,3,1,5,1,1,0,94351
+264152,Craftsman's Writ: Wizardweave Turban,3,1,5,1,1,0,94352
+264153,Craftsman's Writ: Runecloth Bag,3,1,5,1,1,0,94353
+264154,Craftsman's Writ: Runecloth Boots,3,1,5,1,1,0,94354
+264155,Craftsman's Writ: Tuxedo Jacket,3,1,5,1,1,0,94355
+264156,Craftsman's Writ: Felcloth Boots,3,1,5,1,1,0,94356
+264157,Craftsman's Writ: Cenarion Herb Bag,3,1,5,1,1,0,94357
+264158,Craftsman's Writ: Shadoweave Mask,3,1,5,1,1,0,94358
+264159,Craftsman's Writ: Ghostweave Vest,3,1,5,1,1,0,94359
+264160,Craftsman's Writ: Soul Pouch,3,1,5,1,1,0,94360
+275642,Waylaid Herbs,1,0,0,1,1,0,0
+287969,Lesser Mana Potion,1,30,120,1,20,1,0
+287976,Free Action Potion,1,75,300,1,20,1,0

@@ -26,6 +26,9 @@ Usage:
   python3 tools/gen_data.py tsm [--from DIR]     download the TradeSkillMaster region CSVs (or read
                                                  DIR/us.csv, DIR/eu.csv) and write Data/Sales.lua with
                                                  the recipe outputs' sold per day (network, daily data)
+  python3 tools/gen_data.py rep-import DIR      filter the full ItemSparse, Faction and CurrencyTypes CSVs
+                                                 (build 1.60.1.70938) and copy the writ and crate tooltips
+                                                 from DIR into research/rep/ (tools/gen_rep.py)
   python3 tools/gen_data.py [build]              generate Data/*.lua from research/
   python3 tools/gen_data.py verify               exit 1 if Data/*.lua differs from
                                                  what research/ would generate
@@ -42,6 +45,9 @@ import re
 import shutil
 import sys
 import urllib.request
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import gen_rep  # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ADDON = os.path.join(ROOT, "ForeverCrafter")
@@ -1270,9 +1276,14 @@ def main(argv):
         return cmd_client_dump(argv[1:])
     if mode == "tsm":
         return cmd_tsm(argv[1:])
+    if mode == "rep-import":
+        return gen_rep.cmd_rep_import(argv[1:])
     manifest, db, wh, client = load_research()
-    bad = verify_manifest(manifest)
+    bad = verify_manifest(manifest) + gen_rep.verify_rep_manifest()
     files, report = build(manifest, db, wh, client)
+    recipe_items = {int(i) for i in re.findall(r"^  \[(\d+)\]=", files["Data/Items.lua"], re.M)}
+    files["Data/Reputation.lua"], rep_report = gen_rep.build_rep(recipe_items)
+    report += rep_report
     if mode == "verify":
         for name, text in files.items():
             path = os.path.normpath(os.path.join(ADDON, name))

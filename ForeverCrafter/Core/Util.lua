@@ -43,6 +43,12 @@ local QUALITY_COLORS = {
   [0] = "ff9d9d9d", [1] = "ffffffff", [2] = "ff1eff00", [3] = "ff0070dd", [4] = "ffa335ee", [5] = "ffff8000",
 }
 
+-- Static item data: the recipe items (Data/Items.lua), else the reputation planner's (Data/Reputation.lua).
+local function itemData(id)
+  return ns.Items[id] or (ns.RepItems and ns.RepItems[id])
+end
+Util.ItemData = itemData
+
 -- Client item info (name, quality, sell price), cached once loaded.
 local info = {}
 local function clientInfo(id)
@@ -65,14 +71,14 @@ Util.ClientInfo = clientInfo
 function Util.ItemName(id)
   local c = clientInfo(id)
   if c and c.name then return c.name end
-  local d = ns.Items[id]
+  local d = itemData(id)
   if d and d.name and d.name ~= "" then return d.name end
   return "item:" .. tostring(id)
 end
 
 function Util.ItemText(id)
   local c = clientInfo(id)
-  local d = ns.Items[id]
+  local d = itemData(id)
   local q = (c and c.q) or (d and d.q) or 1
   return "|c" .. (QUALITY_COLORS[q] or QUALITY_COLORS[1]) .. Util.ItemName(id) .. "|r"
 end
@@ -83,13 +89,13 @@ end
 function Util.SellPrice(id)
   local c = clientInfo(id)
   if c and c.sell then return c.sell, "client" end
-  local d = ns.Items[id]
+  local d = itemData(id)
   if d and d.sell then return d.sell, d.missing and "wowhead" or "db2" end
   return nil
 end
 
 function Util.IsBoP(id)
-  local d = ns.Items[id]
+  local d = itemData(id)
   return d and d.bop or false
 end
 

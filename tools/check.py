@@ -141,7 +141,7 @@ def check_gen_data():
 
 def check_data(ns):
     keys = source_keys()
-    expect({"db2", "wh_list", "wh_tt", "wh_item", "ui", "in-game", "client", "tsm"} <= keys,
+    expect({"db2", "wh_list", "wh_tt", "wh_item", "ui", "in-game", "client", "tsm", "user"} <= keys,
            f"SOURCES.md sources table misses keys (has {sorted(keys)})")
     expect(ns.DATA_BUILD in read(os.path.join(ROOT, "SOURCES.md")), "SOURCES.md does not name the pinned DB2 build")
     date = re.compile(r"^\d{4}-\d{2}-\d{2}$")
@@ -219,7 +219,41 @@ def check_data(ns):
     got = sorted((rg[1], rg[2]) for rg in r.reagents.values()) if r else None
     expect(got == [(2447, 1), (2449, 2), (3371, 1)], f"Recipes[3170] reagents {got} differ from Wowhead Forever")
     counts.update(check_sales_data(ns, keys, date))
+    counts.update(check_rep_data(ns, keys, date))
     return counts
+
+
+def check_rep_data(ns, keys, date):
+    """Data/Reputation.lua: src + verified on every entry; the unverified amounts (src "user") say verified=false."""
+    expect(ns.Rep.build in read(os.path.join(ROOT, "SOURCES.md")), "SOURCES.md does not name the reputation DB2 build")
+    for table in ("RepWrits", "RepCrates", "RepSealed", "RepItems"):
+        for k, e in ns[table].items():
+            src = e.src or ""
+            expect(src and all(p in keys and p != "user" for p in src.split("+")), f"Data {table}[{k}] src {src!r}")
+            expect(isinstance(e.verified, str) and date.match(e.verified), f"Data {table}[{k}] has no verified date")
+    for k in ("factions", "currency"):
+        expect(ns.Rep[k].src in keys and date.match(ns.Rep[k].verified or ""), f"ns.Rep.{k} needs src + verified")
+    for k, e in ns.RepAmounts.items():
+        if e.src == "user":
+            expect(e.verified is False, f"RepAmounts.{k} is from the user: verified must be false")
+        else:
+            expect(e.src in keys and isinstance(e.verified, str) and date.match(e.verified),
+                   f"RepAmounts.{k} needs src + verified")
+    writs = list(ns.RepWrits.items())
+    expect(len(writs) == 150 and min(k for k, _ in writs) == 264011 and max(k for k, _ in writs) == 264160,
+           f"{len(writs)} writs, expected 264011-264160")
+    expect(len({w.quest for _, w in writs}) == 150, "writ quest IDs are not unique")
+    shot = ns.RepWrits[264037]
+    expect(shot and shot.item == 8069 and shot.n == 200, "Crafted Solid Shot writ should want 200 of item 8069")
+    # Names with two item IDs resolve to the classic (lower) one.
+    items = {w.item for _, w in writs}
+    expect({3385, 5634, 4383, 9366} <= items, "writ item names resolve to the wrong item IDs")
+    named = [i for i in items | {b[1] for c in ns.RepCrates.values() for b in c.bundles.values()}
+             if ns.Items[i] is None and ns.RepItems[i] is None]
+    expect(not named, f"writ/crate items without names: {named[:5]}")
+    crates = list(ns.RepCrates.values())
+    expect(len(crates) == 30 and sum(c.q == 1 for c in crates) == 18, "expected 18 white and 12 green crates")
+    return {"reputation writs": len(writs), "crates": len(crates)}
 
 
 def check_sales_data(ns, keys, date):
@@ -1903,6 +1937,228 @@ SOURCE_TEXT = ("|cFFFFD200Trainer: |rAny Tailoring trainer|n|cFFFFD200Cost: |r50
                "|TInterface\\MoneyFrame\\UI-SilverIcon:0:0:2:0|t")
 
 
+HORDE_REP = 2587
+W_FROST, W_INVIS, W_SHOT = 264056, 264057, 264037       # Expert, Expert, Journeyman (Solid Shot x200)
+Q_FROST, Q_INVIS = 94256, 94257
+C_ORE, C_INGOTS, C_EMPTY = 248683, 248703, 248549       # Apprentice white (5 favor) / green (10), unidentified
+S_INGOTS, RECEIPT = 248770, 262902                      # Sealed Apprentice Crate (green), Forged Delivery Receipt
+FRIENDLY_AT = {"reaction": 5, "currentStanding": 3500, "currentReactionThreshold": 3000, "nextReactionThreshold": 9000}
+
+
+def rep_world(standing=FRIENDLY_AT, goal=250, favor=None, bags=None, remove=()):
+    """A Horde character with a small AH: Frost writ 6000 - 3600 pouch = 2400 for 125 (19.2c/rep), Invisibility writ
+    17400 (139.2c/rep); green crate + 20 Copper Bars 900 for 10 favor, white crate + 20 Copper Ore 600 for 5; one
+    unidentified crate 100. One listing of each crate, so the plan's second notarised crate runs out."""
+    lua, ns, stub = new_runtime(remove=remove)
+    stub.faction = "Horde"
+    if standing:
+        stub.factions[HORDE_REP] = ltable(lua, standing)
+    if favor is not None:
+        stub.currency[3402] = favor
+    for i, n in (bags or {}).items():
+        stub.bags[i] = n
+    login(lua, stub)
+    set_auctions(lua, stub, [(W_FROST, 1, 1000), (6050, 1, 5000), (W_INVIS, 1, 1000), (3823, 1, 20000),
+                             (C_INGOTS, 1, 300), (2840, 20, 600), (C_ORE, 1, 200), (2770, 20, 400), (C_EMPTY, 1, 100)])
+    scan(lua, stub)
+    ns.settings.repGoal = goal
+    return lua, ns, stub
+
+
+def rep_options(ns, standing=True):
+    opts, plan, st = ns.Reputation.Run()
+    return {o.key: o for o in opts.values()}, plan, st
+
+
+def plan_steps(plan):
+    return [(s.kind, s.writ or s.n, s.cost, s.rep) for s in plan.steps.values()]
+
+
+def check_reputation():
+    lua, ns, stub = rep_world()
+    R = ns.Reputation
+    o, plan, st = rep_options(ns)
+    expect(st and st.reaction == 5 and st.label == "Friendly", f"standing {st and st.reaction}")
+    frost, invis, crate = o.get(f"writ:{W_FROST}"), o.get(f"writ:{W_INVIS}"), o.get("crate")
+    fg, fw = o.get(f"favor:{C_INGOTS}"), o.get(f"favor:{C_ORE}")
+    expect(len(o) == 181, f"{len(o)} options, expected 150 writs + 1 crate + 30 fills")
+    expect(frost.cost == 2400 and frost.rep == 125 and frost.per == 2400 / 125 and frost.repSrc == "user",
+           f"Frost writ {frost.cost} {frost.rep} {frost.per}")
+    expect(invis.cost == 17400 and invis.per == 17400 / 125, f"Invisibility writ {invis.cost}")
+    # Receipt = 15 x the cheapest copper per favor (green: 900 / 10) + the cheapest empty crate (100).
+    expect(crate.cost == 15 * 90 + 100 and crate.rep == 50 and not crate.gated and crate.empty.id == C_EMPTY,
+           f"notarised crate {crate.cost} {crate.rep}")
+    expect(fg.favor == 10 and fg.perFavor == 90 and fw.favor == 5 and fw.perFavor == 120, "white vs green favor")
+    expect(R.CellText(fg, "rtier") == "Apprentice (g)" and R.CellText(fw, "rtier") == "Apprentice (w)"
+           and R.CellText(fg, "rrep") == "10 fav" and R.CellText(fg, "rper").endswith(" /fav"), "fill cells")
+    art = o.get("favor:248697")
+    expect(art.favor is None and "? fav" in R.CellText(art, "rrep") and art.missing, "Artisan favor is unknown")
+    expect(R.CellText(frost, "rrep").startswith("|cffff8040"), "unverified writ rep is not orange")
+    shot = o.get(f"writ:{W_SHOT}")
+    expect(shot.missing and R.CellText(shot, "rper") == "—", "an unlisted writ is priced")
+    # Cheapest per rep first: Frost writ, then the crate (beats the Invisibility writ), then the fill it uses.
+    ranked = [x.key for x in sorted(o.values(), key=lambda x: (R.SortValue(x, "rper"), x.key))]
+    expect(ranked[:5] == [f"writ:{W_FROST}", "crate", f"favor:{C_INGOTS}", f"favor:{C_ORE}", f"writ:{W_INVIS}"],
+           f"cost/rep order {ranked[:5]}")
+    # Today plan, goal 250: Frost writ, then a crate (the green crate is used up: green 10 + white 5 favor, 1600 =
+    # 32c/rep, dearer than the option's 29), then the Invisibility writ.
+    expect(plan_steps(plan) == [("writ", W_FROST, 2400, 125), ("crate", 1, 1600, 50), ("writ", W_INVIS, 17400, 125)],
+           f"plan {plan_steps(plan)}")
+    expect(plan.reached and plan.gained == 300 and plan.cash == 6000 + 1600 + 21000 and plan.pouches == 7200
+           and plan.favorLeft == 0, f"plan totals {plan.gained} {plan.cash} {plan.pouches} {plan.favorLeft}")
+    shop = {(b.id, b.n) for b in plan.shopping.values()}
+    expect({(C_INGOTS, 1), (2840, 20), (C_ORE, 1), (2770, 20), (C_EMPTY, 1), (W_FROST, 1), (6050, 1)} <= shop,
+           f"shopping list {sorted(shop)}")
+    expect(plan.inPlan[f"favor:{C_INGOTS}"] == 1 and plan.inPlan.crate == 1, "inPlan counts")
+    expect(R.CellText(crate, "rtoday", plan).endswith("plan|r"), "plan marker")
+    # Goal 0 = up to the next standing; not enough on this AH.
+    ns.settings.repGoal = 0
+    _, plan, _ = rep_options(ns)
+    expect(plan.goal == 5500 and not plan.reached and plan.gained == 300, f"goal to the next standing {plan.goal}")
+    # Done today: the Frost writ is skipped.
+    stub.questsDone[Q_FROST] = True
+    ns.settings.repGoal = 250
+    o, plan, _ = rep_options(ns)
+    expect(o[f"writ:{W_FROST}"].done and R.CellText(o[f"writ:{W_FROST}"], "rtoday") == "|cff808080done|r"
+           and plan_steps(plan)[0][0] == "crate" and plan.inPlan[f"writ:{W_FROST}"] is None, "done today")
+    stub.questsDone[Q_FROST] = None
+    # Favor held is spent first (cost 0): the crate costs only the empty one, so it comes first.
+    stub.currency[3402] = 15
+    _, plan, _ = rep_options(ns)
+    expect(plan.favorHeld == 15 and plan_steps(plan)[0] == ("crate", 1, 100, 50), f"held favor {plan_steps(plan)}")
+    stub.currency[3402] = None
+
+    # Neutral, 100 short of Friendly: crates are greyed out, the plan unlocks them after 100 rep.
+    neutral = {"reaction": 4, "currentStanding": 2900, "currentReactionThreshold": 0, "nextReactionThreshold": 3000}
+    stub.factions[HORDE_REP] = ltable(lua, neutral)
+    o, plan, _ = rep_options(ns)
+    expect(o["crate"].gated and R.CellText(o["crate"], "rtoday") == "|cff808080needs Friendly|r"
+           and o[f"favor:{C_INGOTS}"].gated, "crates not gated below Friendly")
+    expect(plan.gatedUntil == 100 and [s[0] for s in plan_steps(plan)] == ["writ", "crate", "writ"],
+           f"Neutral plan {plan.gatedUntil} {plan_steps(plan)}")
+    expect("Crates only after 100 reputation" in R.DetailText(None, plan, R.Standing()), "gate line in the plan")
+    stub.factions[HORDE_REP] = ltable(lua, dict(neutral, reaction=3))
+    _, plan, _ = rep_options(ns)
+    expect(plan.gatedUntil is False and [s[0] for s in plan_steps(plan)] == ["writ", "writ"], "Unfriendly: writs only")
+
+    # Window: /crafter rep, sort by a header, Rep goal box, the detail pane, back to crafts.
+    stub.factions[HORDE_REP] = ltable(lua, FRIENDLY_AT)
+    ns.settings.repGoal = 0
+    slash(lua, "rep")
+    frame = lua.globals().ForeverCrafterFrame
+    UI = ns.UI
+    expect(frame.__shown and ns.settings.tab == "rep" and len(UI.view) == 181, "/crafter rep does not list options")
+    expect(UI.view[1].key == f"writ:{W_FROST}", f"rep tab sorts {UI.view[1].key} first")
+    expect("Durotar Supply and Logistics: Friendly 500/6000" in frame.status.__text, f"status {frame.status.__text!r}")
+    heads = {h.col.key: h for h in frame.headers.values() if h.col}
+    expect(set(heads) == {c.key for c in R.COLUMNS.values()}, "rep headers")
+    heads["rtier"].Click(heads["rtier"])
+    expect(ns.settings.repSort == "rtier" and ns.settings.repSortDesc and UI.view[1].tier == 4, "tier sort")
+    heads["rper"].Click(heads["rper"])
+    frame.repGoal.SetText(frame.repGoal, "250")
+    frame.repGoal.__scripts.OnEnterPressed(frame.repGoal)
+    expect(ns.settings.repGoal == 250 and UI.repPlan.goal == 250, "Rep goal box")
+    rows = [f for f in stub.frames.values() if f.result is not None and f.__shown]
+    rows[0].Click(rows[0])
+    d = frame.detail.__text
+    expect("Today's plan" in d and "Shopping list" in d and "Coin Pouch" in d, "rep detail pane")
+    frame.repTab.Click(frame.repTab)
+    expect(ns.settings.tab == "craft" and ns.settings.mode == "char", "Back to crafts")
+
+    # Learning (time() moves on between turn-ins so they are not matched with each other's gains).
+    stub.fire("QUEST_TURNED_IN", Q_FROST, 0, 0)
+    stub.factions[HORDE_REP] = ltable(lua, dict(FRIENDLY_AT, currentStanding=3630))
+    stub.fire("UPDATE_FACTION")
+    stub.now = stub.now + 10
+    stub.bags[S_INGOTS] = 2
+    stub.fire("BAG_UPDATE_DELAYED")
+    stub.bags[S_INGOTS] = 1
+    stub.fire("BAG_UPDATE_DELAYED")
+    stub.fire("CURRENCY_DISPLAY_UPDATE", 3402, 12, 12)
+    stub.now = stub.now + 10
+    stub.bags[RECEIPT] = 1
+    stub.fire("BAG_UPDATE_DELAYED")
+    stub.bags[RECEIPT] = 0
+    stub.fire("BAG_UPDATE_DELAYED")
+    stub.factions[HORDE_REP] = ltable(lua, dict(FRIENDLY_AT, currentStanding=3690))
+    stub.fire("FACTION_STANDING_CHANGED", HORDE_REP)
+    stub.now = stub.now + 10
+    stub.fire("QUEST_TURNED_IN", Q_INVIS, 0, 0)          # its rep comes too late to match
+    stub.now = stub.now + 10
+    stub.factions[HORDE_REP] = ltable(lua, dict(FRIENDLY_AT, currentStanding=3815))
+    stub.fire("UPDATE_FACTION")
+    stub.fire("QUEST_TURNED_IN", 12345, 0, 0)            # not a writ
+    stub.factions[HORDE_REP] = ltable(lua, dict(FRIENDLY_AT, currentStanding=3900))
+    stub.fire("UPDATE_FACTION")
+    learned = ns.db.rep.learned
+    expect(learned.quest[Q_FROST] == 130 and learned.quest[Q_INVIS] is None and learned.quest[12345] is None,
+           f"learned writ rep {dict(learned.quest.items())}")
+    expect(learned.favor[S_INGOTS] == 12 and learned.crateRep == 60 and learned.sealedRep[S_INGOTS] is None,
+           f"learned favor {dict(learned.favor.items())} crate {learned.crateRep}")
+    o, _, _ = rep_options(ns)
+    expect(o[f"writ:{W_FROST}"].rep == 130 and o[f"writ:{W_FROST}"].repSrc == "learned"
+           and o[f"favor:{C_INGOTS}"].favor == 12 and o["crate"].rep == 60
+           and not R.CellText(o[f"writ:{W_FROST}"], "rrep").startswith("|cffff8040"), "learned amounts not used")
+    # Kept across sessions and /crafter reset; /crafter rep forget clears them.
+    slash(lua, "reset")
+    lua2, ns2, stub2 = new_runtime(saved=stub.savedVariables("ForeverCrafterDB"))
+    login(lua2, stub2)
+    expect(ns2.db.rep.learned.quest[Q_FROST] == 130 and ns2.settings.repGoal == 250, "learned rep not saved")
+    slash(lua2, "rep forget")
+    expect(ns2.db.rep.learned.quest[Q_FROST] is None and ns2.db.rep.learned.crateRep is None, "rep forget")
+    errs = list(ns.errors.values()) + list(ns2.errors.values())
+    expect(not errs, f"errors in the reputation checks: {errs[:3]}")
+
+    # Without the reputation, currency and quest APIs: no errors, writs priced, the plan asks for a Rep goal.
+    lua, ns, stub = rep_world(standing=None, goal=0, remove=("C_Reputation", "C_CurrencyInfo", "C_QuestLog"))
+    o, plan, st = rep_options(ns)
+    expect(st is None and not o["crate"].gated and o[f"writ:{W_FROST}"].cost == 2400, "options without the APIs")
+    expect(plan.goal is None and "set a Rep goal" in plan.message, f"plan message {plan.message!r}")
+    ns.settings.repGoal = 250
+    _, plan, _ = rep_options(ns)
+    expect(plan.reached and plan.ungated, "plan with a Rep goal and no standing")
+    slash(lua, "rep")
+    for ev, args in (("UPDATE_FACTION", ()), ("CURRENCY_DISPLAY_UPDATE", (3402, 5, 5)),
+                     ("QUEST_TURNED_IN", (Q_FROST, 0, 0)), ("BAG_UPDATE_DELAYED", ())):
+        stub.fire(ev, *args)
+    expect("standing unknown" in lua.globals().ForeverCrafterFrame.status.__text, "status without the APIs")
+    expect(not list(ns.errors.values()), f"errors without the reputation APIs: {list(ns.errors.values())[:3]}")
+
+
+def rep_summary():
+    """Full-style snapshot: every writ, item, crate and bundle listed at a pseudo-random price (5-stacks plus a
+    single). → summary lines: the top options and a today plan from Friendly 500/6000."""
+    lua, ns, stub = new_runtime()
+    stub.faction = "Horde"
+    stub.factions[HORDE_REP] = ltable(lua, FRIENDLY_AT)
+    login(lua, stub)
+    ids = set(ns.RepWrits.keys()) | set(ns.RepCrates.keys()) | {C_EMPTY}
+    ids |= {w.item for w in ns.RepWrits.values()}
+    ids |= {b[1] for c in ns.RepCrates.values() for b in c.bundles.values()}
+    listings = []
+    for i in sorted(ids):
+        p = 100 + (i * 7919) % 50000
+        listings += [(i, 5, p * 5), (i, 1, p + 10)]
+    set_auctions(lua, stub, listings)
+    scan(lua, stub)
+    o, plan, _ = rep_options(ns)
+    R, U = ns.Reputation, ns.Util
+    strip = lambda t: re.sub(r"\|c\w{8}|\|r", "", t)
+    top = sorted((x for x in o.values() if not x.gated and not x.missing), key=lambda x: (R.SortValue(x, "rper"), x.key))
+    out = [f"reputation (test snapshot, {len(o)} options, Friendly 500/6000): top by cost/rep"]
+    for x in top[:6]:
+        out.append(f"  {strip(R.CellText(x, 'rname'))}: {strip(R.CellText(x, 'rcost'))} for "
+                   f"{strip(R.CellText(x, 'rrep'))} = {strip(R.CellText(x, 'rper'))}")
+    kinds = {}
+    for s in plan.steps.values():
+        kinds[s.kind] = kinds.get(s.kind, 0) + (s.n or 1)
+    out.append(f"  today plan: +{plan.gained} of {plan.goal} rep for {strip(U.Money(plan.cash))} "
+               f"(pouches back {strip(U.Money(plan.pouches or 0))}), {len(plan.steps)} steps: "
+               f"{kinds.get('writ', 0)} writs, {kinds.get('crate', 0)} notarised crate(s)")
+    expect(plan.reached and not list(ns.errors.values()), "full-style reputation plan")
+    return out
+
+
 def check_dump():
     """/crafter dump in the fake client -> SavedVariables text -> gen_data.py client-dump merge -> build."""
     import tempfile
@@ -2054,6 +2310,8 @@ def main():
         summary += fast_text(fasts, "What-if")
         summary += check_batch_depth()
         check_sales()
+        check_reputation()
+        summary += rep_summary()
         check_zip()
     for p in problems:
         print("FAIL", p)

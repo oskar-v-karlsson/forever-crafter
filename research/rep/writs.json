@@ -1,0 +1,3004 @@
+[
+ {
+  "writ": 264011,
+  "name": "Elixir of Ogre's Strength",
+  "quest": 94004,
+  "tier": "Journeyman",
+  "reqs": [
+   "Craftsman's Writ: Elixir of Ogre's Strength",
+   "Elixir of Ogre Strength"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Elixir of Ogre Strength",
+    "count": 1,
+    "ids": [
+     3391
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264012,
+  "name": "Elixir of Wisdom",
+  "quest": 94212,
+  "tier": "Journeyman",
+  "reqs": [
+   "Craftsman's Writ: Elixir of Wisdom",
+   "Elixir of Wisdom"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Elixir of Wisdom",
+    "count": 1,
+    "ids": [
+     3383
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264013,
+  "name": "Lesser Mana Potion",
+  "quest": 94213,
+  "tier": "Journeyman",
+  "reqs": [
+   "Craftsman's Writ: Lesser Mana Potion",
+   "Lesser Mana Potion"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Lesser Mana Potion",
+    "count": 1,
+    "ids": [
+     3385,
+     287969
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264014,
+  "name": "Shadow Protection Potion",
+  "quest": 94214,
+  "tier": "Journeyman",
+  "reqs": [
+   "Craftsman's Writ: Shadow Protection Potion",
+   "Shadow Protection Potion"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Shadow Protection Potion",
+    "count": 1,
+    "ids": [
+     6048
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264015,
+  "name": "Free Action Potion",
+  "quest": 94215,
+  "tier": "Journeyman",
+  "reqs": [
+   "Craftsman's Writ: Free Action Potion",
+   "Free Action Potion"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Free Action Potion",
+    "count": 1,
+    "ids": [
+     5634,
+     287976
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264016,
+  "name": "Elixir of Lesser Agility",
+  "quest": 94216,
+  "tier": "Journeyman",
+  "reqs": [
+   "Craftsman's Writ: Elixir of Lesser Agility",
+   "Elixir of Lesser Agility"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Elixir of Lesser Agility",
+    "count": 1,
+    "ids": [
+     3390
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264017,
+  "name": "Lesser Troll's Blood Elixir",
+  "quest": 94217,
+  "tier": "Journeyman",
+  "reqs": [
+   "Craftsman's Writ: Lesser Troll's Blood Elixir",
+   "Lesser Troll's Blood Elixir"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Lesser Troll's Blood Elixir",
+    "count": 1,
+    "ids": [
+     3388
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264018,
+  "name": "Elixir of Defense",
+  "quest": 94218,
+  "tier": "Journeyman",
+  "reqs": [
+   "Craftsman's Writ: Elixir of Defense",
+   "Elixir of Defense"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Elixir of Defense",
+    "count": 1,
+    "ids": [
+     8951
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264019,
+  "name": "Draught of Water Breathing",
+  "quest": 94219,
+  "tier": "Journeyman",
+  "reqs": [
+   "Craftsman's Writ: Draught of Water Breathing",
+   "Draught of Water Breathing"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Draught of Water Breathing",
+    "count": 1,
+    "ids": [
+     5996
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264020,
+  "name": "Pearl-Handled Dagger",
+  "quest": 94220,
+  "tier": "Journeyman",
+  "reqs": [
+   "Craftsman's Writ: Pearl-Handled Dagger",
+   "Pearl-handled Dagger"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Pearl-handled Dagger",
+    "count": 1,
+    "ids": [
+     5540
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264021,
+  "name": "Golden Rod",
+  "quest": 94221,
+  "tier": "Journeyman",
+  "reqs": [
+   "Craftsman's Writ: Golden Rod",
+   "Golden Rod"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Golden Rod",
+    "count": 1,
+    "ids": [
+     11128
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264022,
+  "name": "Iridescent Hammer",
+  "quest": 94222,
+  "tier": "Journeyman",
+  "reqs": [
+   "Craftsman's Writ: Iridescent Hammer",
+   "Iridescent Hammer"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Iridescent Hammer",
+    "count": 1,
+    "ids": [
+     5541
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264023,
+  "name": "Silver Skeleton Key",
+  "quest": 94223,
+  "tier": "Journeyman",
+  "reqs": [
+   "Craftsman's Writ: Silver Skeleton Key",
+   "Silver Skeleton Key"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Silver Skeleton Key",
+    "count": 1,
+    "ids": [
+     15869
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264024,
+  "name": "Heavy Bronze Mace",
+  "quest": 94224,
+  "tier": "Journeyman",
+  "reqs": [
+   "Craftsman's Writ: Heavy Bronze Mace",
+   "Heavy Bronze Mace"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Heavy Bronze Mace",
+    "count": 1,
+    "ids": [
+     3491
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264025,
+  "name": "Rough Bronze Leggings",
+  "quest": 94225,
+  "tier": "Journeyman",
+  "reqs": [
+   "Craftsman's Writ: Rough Bronze Leggings",
+   "Rough Bronze Leggings"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Rough Bronze Leggings",
+    "count": 1,
+    "ids": [
+     2865
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264026,
+  "name": "Green Iron Gauntlets",
+  "quest": 94226,
+  "tier": "Journeyman",
+  "reqs": [
+   "Craftsman's Writ: Green Iron Gauntlets",
+   "Green Iron Gauntlets"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Green Iron Gauntlets",
+    "count": 1,
+    "ids": [
+     3485
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264027,
+  "name": "Big Bronze Knife",
+  "quest": 94227,
+  "tier": "Journeyman",
+  "reqs": [
+   "Craftsman's Writ: Big Bronze Knife",
+   "Big Bronze Knife"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Big Bronze Knife",
+    "count": 1,
+    "ids": [
+     3848
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264028,
+  "name": "Green Iron Boots",
+  "quest": 94228,
+  "tier": "Journeyman",
+  "reqs": [
+   "Craftsman's Writ: Green Iron Boots",
+   "Green Iron Boots"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Green Iron Boots",
+    "count": 1,
+    "ids": [
+     3484
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264029,
+  "name": "Ornate Spyglass",
+  "quest": 94229,
+  "tier": "Journeyman",
+  "reqs": [
+   "Craftsman's Writ: Ornate Spyglass",
+   "Ornate Spyglass"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Ornate Spyglass",
+    "count": 1,
+    "ids": [
+     5507
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264030,
+  "name": "Explosive Sheep",
+  "quest": 94230,
+  "tier": "Journeyman",
+  "reqs": [
+   "Craftsman's Writ: Explosive Sheep",
+   "Explosive Sheep"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Explosive Sheep",
+    "count": 1,
+    "ids": [
+     4384
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264031,
+  "name": "Moonsight Rifle",
+  "quest": 94231,
+  "tier": "Journeyman",
+  "reqs": [
+   "Craftsman's Writ: Moonsight Rifle",
+   "Moonsight Rifle"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Moonsight Rifle",
+    "count": 1,
+    "ids": [
+     4383,
+     217314
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264032,
+  "name": "Minor Recombobulator",
+  "quest": 94232,
+  "tier": "Journeyman",
+  "reqs": [
+   "Craftsman's Writ: Minor Recombobulator",
+   "Minor Recombobulator"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Minor Recombobulator",
+    "count": 1,
+    "ids": [
+     4381
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264033,
+  "name": "Practice Lock",
+  "quest": 94233,
+  "tier": "Journeyman",
+  "reqs": [
+   "Craftsman's Writ: Practice Lock",
+   "Practice Lock"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Practice Lock",
+    "count": 1,
+    "ids": [
+     6712
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264034,
+  "name": "Shadow Goggles",
+  "quest": 94234,
+  "tier": "Journeyman",
+  "reqs": [
+   "Craftsman's Writ: Shadow Goggles",
+   "Shadow Goggles"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Shadow Goggles",
+    "count": 1,
+    "ids": [
+     4373
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264035,
+  "name": "Gnomish Universal Remote",
+  "quest": 94235,
+  "tier": "Journeyman",
+  "reqs": [
+   "Craftsman's Writ: Gnomish Universal Remote",
+   "Gnomish Universal Remote"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Gnomish Universal Remote",
+    "count": 1,
+    "ids": [
+     7506
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264036,
+  "name": "Big Bronze Bomb",
+  "quest": 94236,
+  "tier": "Journeyman",
+  "reqs": [
+   "Craftsman's Writ: Big Bronze Bomb",
+   "Big Bronze Bomb"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Big Bronze Bomb",
+    "count": 1,
+    "ids": [
+     4380
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264037,
+  "name": "Crafted Solid Shot",
+  "quest": 94237,
+  "tier": "Journeyman",
+  "reqs": [
+   "Craftsman's Writ: Crafted Solid Shot",
+   "Crafted Solid Shot x 200"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Crafted Solid Shot x 200",
+    "count": 1,
+    "ids": []
+   }
+  ]
+ },
+ {
+  "writ": 264038,
+  "name": "Heavy Leather Ball",
+  "quest": 94238,
+  "tier": "Journeyman",
+  "reqs": [
+   "Craftsman's Writ: Heavy Leather Ball",
+   "Heavy Leather Ball"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Heavy Leather Ball",
+    "count": 1,
+    "ids": [
+     18662
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264039,
+  "name": "Fine Leather Pants",
+  "quest": 94239,
+  "tier": "Journeyman",
+  "reqs": [
+   "Craftsman's Writ: Fine Leather Pants",
+   "Fine Leather Pants"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Fine Leather Pants",
+    "count": 1,
+    "ids": [
+     5958
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264040,
+  "name": "Herbalist's Gloves",
+  "quest": 94240,
+  "tier": "Journeyman",
+  "reqs": [
+   "Craftsman's Writ: Herbalist's Gloves",
+   "Herbalist's Gloves"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Herbalist's Gloves",
+    "count": 1,
+    "ids": [
+     7349
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264041,
+  "name": "Dark Leather Tunic",
+  "quest": 94241,
+  "tier": "Journeyman",
+  "reqs": [
+   "Craftsman's Writ: Dark Leather Tunic",
+   "Dark Leather Tunic"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Dark Leather Tunic",
+    "count": 1,
+    "ids": [
+     2317
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264042,
+  "name": "Pilferer's Gloves",
+  "quest": 94242,
+  "tier": "Journeyman",
+  "reqs": [
+   "Craftsman's Writ: Pilferer's Gloves",
+   "Pilferer's Gloves"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Pilferer's Gloves",
+    "count": 1,
+    "ids": [
+     7358
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264043,
+  "name": "Heavy Quiver",
+  "quest": 94243,
+  "tier": "Journeyman",
+  "reqs": [
+   "Craftsman's Writ: Heavy Quiver",
+   "Heavy Quiver"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Heavy Quiver",
+    "count": 1,
+    "ids": [
+     7371
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264044,
+  "name": "Dark Leather Shoulders",
+  "quest": 94244,
+  "tier": "Journeyman",
+  "reqs": [
+   "Craftsman's Writ: Dark Leather Shoulders",
+   "Dark Leather Shoulders"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Dark Leather Shoulders",
+    "count": 1,
+    "ids": [
+     4252
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264045,
+  "name": "Barbaric Gloves",
+  "quest": 94245,
+  "tier": "Journeyman",
+  "reqs": [
+   "Craftsman's Writ: Barbaric Gloves",
+   "Barbaric Gloves"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Barbaric Gloves",
+    "count": 1,
+    "ids": [
+     4254
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264046,
+  "name": "Red Whelp Gloves",
+  "quest": 94246,
+  "tier": "Journeyman",
+  "reqs": [
+   "Craftsman's Writ: Red Whelp Gloves",
+   "Red Whelp Gloves"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Red Whelp Gloves",
+    "count": 1,
+    "ids": [
+     7284
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264047,
+  "name": "Lesser Wizard's Robe",
+  "quest": 94247,
+  "tier": "Journeyman",
+  "reqs": [
+   "Craftsman's Writ: Lesser Wizard's Robe",
+   "Lesser Wizard's Robe"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Lesser Wizard's Robe",
+    "count": 1,
+    "ids": [
+     5766
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264048,
+  "name": "Blue Overalls",
+  "quest": 94248,
+  "tier": "Journeyman",
+  "reqs": [
+   "Craftsman's Writ: Blue Overalls",
+   "Blue Overalls"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Blue Overalls",
+    "count": 1,
+    "ids": [
+     6263
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264049,
+  "name": "Azure Silk Hood",
+  "quest": 94249,
+  "tier": "Journeyman",
+  "reqs": [
+   "Craftsman's Writ: Azure Silk Hood",
+   "Azure Silk Hood"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Azure Silk Hood",
+    "count": 1,
+    "ids": [
+     7048
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264050,
+  "name": "Small Silk Pack",
+  "quest": 94250,
+  "tier": "Journeyman",
+  "reqs": [
+   "Craftsman's Writ: Small Silk Pack",
+   "Small Silk Pack"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Small Silk Pack",
+    "count": 1,
+    "ids": [
+     4245
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264051,
+  "name": "Phoenix Pants",
+  "quest": 94251,
+  "tier": "Journeyman",
+  "reqs": [
+   "Craftsman's Writ: Phoenix Pants",
+   "Phoenix Pants"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Phoenix Pants",
+    "count": 1,
+    "ids": [
+     4317
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264052,
+  "name": "Red Woolen Boots",
+  "quest": 94252,
+  "tier": "Journeyman",
+  "reqs": [
+   "Craftsman's Writ: Red Woolen Boots",
+   "Red Woolen Boots"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Red Woolen Boots",
+    "count": 1,
+    "ids": [
+     4313
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264053,
+  "name": "Colorful Kilt",
+  "quest": 94253,
+  "tier": "Journeyman",
+  "reqs": [
+   "Craftsman's Writ: Colorful Kilt",
+   "Colorful Kilt"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Colorful Kilt",
+    "count": 1,
+    "ids": [
+     10048
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264054,
+  "name": "Greater Adept's Robe",
+  "quest": 94254,
+  "tier": "Journeyman",
+  "reqs": [
+   "Craftsman's Writ: Greater Adept's Robe",
+   "Greater Adept's Robe"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Greater Adept's Robe",
+    "count": 1,
+    "ids": [
+     6264
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264055,
+  "name": "Spider Silk Slippers",
+  "quest": 94255,
+  "tier": "Journeyman",
+  "reqs": [
+   "Craftsman's Writ: Spider Silk Slippers",
+   "Spider Silk Slippers"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Spider Silk Slippers",
+    "count": 1,
+    "ids": [
+     4321
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264056,
+  "name": "Frost Protection Potion",
+  "quest": 94256,
+  "tier": "Expert",
+  "reqs": [
+   "Craftsman's Writ: Frost Protection Potion",
+   "Frost Protection Potion"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Frost Protection Potion",
+    "count": 1,
+    "ids": [
+     6050
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264057,
+  "name": "Lesser Invisibility Potion",
+  "quest": 94257,
+  "tier": "Expert",
+  "reqs": [
+   "Craftsman's Writ: Lesser Invisibility Potion",
+   "Lesser Invisibility Potion"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Lesser Invisibility Potion",
+    "count": 1,
+    "ids": [
+     3823
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264058,
+  "name": "Lesser Stoneshield Potion",
+  "quest": 94258,
+  "tier": "Expert",
+  "reqs": [
+   "Craftsman's Writ: Lesser Stoneshield Potion",
+   "Lesser Stoneshield Potion"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Lesser Stoneshield Potion",
+    "count": 1,
+    "ids": [
+     4623
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264059,
+  "name": "Nature Protection Potion",
+  "quest": 94259,
+  "tier": "Expert",
+  "reqs": [
+   "Craftsman's Writ: Nature Protection Potion",
+   "Nature Protection Potion"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Nature Protection Potion",
+    "count": 1,
+    "ids": [
+     6052
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264060,
+  "name": "Catseye Draught",
+  "quest": 94260,
+  "tier": "Expert",
+  "reqs": [
+   "Craftsman's Writ: Catseye Draught",
+   "Catseye Draught"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Catseye Draught",
+    "count": 1,
+    "ids": [
+     10592
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264061,
+  "name": "Great Rage Potion",
+  "quest": 94261,
+  "tier": "Expert",
+  "reqs": [
+   "Craftsman's Writ: Great Rage Potion",
+   "Great Rage Potion"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Great Rage Potion",
+    "count": 1,
+    "ids": [
+     5633
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264062,
+  "name": "Mana Potion",
+  "quest": 94262,
+  "tier": "Expert",
+  "reqs": [
+   "Craftsman's Writ: Mana Potion",
+   "Mana Potion"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Mana Potion",
+    "count": 1,
+    "ids": [
+     3827
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264063,
+  "name": "Fire Protection Potion",
+  "quest": 94263,
+  "tier": "Expert",
+  "reqs": [
+   "Craftsman's Writ: Fire Protection Potion",
+   "Fire Protection Potion"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Fire Protection Potion",
+    "count": 1,
+    "ids": [
+     6049
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264064,
+  "name": "Shadow Oil",
+  "quest": 94264,
+  "tier": "Expert",
+  "reqs": [
+   "Craftsman's Writ: Shadow Oil",
+   "Shadow Oil"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Shadow Oil",
+    "count": 1,
+    "ids": [
+     3824
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264065,
+  "name": "Goblin Rocket Fuel",
+  "quest": 94265,
+  "tier": "Expert",
+  "reqs": [
+   "Craftsman's Writ: Goblin Rocket Fuel",
+   "Goblin Rocket Fuel"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Goblin Rocket Fuel",
+    "count": 1,
+    "ids": [
+     9061
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264066,
+  "name": "Elixir of Agility",
+  "quest": 94266,
+  "tier": "Expert",
+  "reqs": [
+   "Craftsman's Writ: Elixir of Agility",
+   "Elixir of Agility"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Elixir of Agility",
+    "count": 1,
+    "ids": [
+     8949
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264067,
+  "name": "Wildvine Potion",
+  "quest": 94267,
+  "tier": "Expert",
+  "reqs": [
+   "Craftsman's Writ: Wildvine Potion",
+   "Wildvine Potion"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Wildvine Potion",
+    "count": 1,
+    "ids": [
+     9144
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264068,
+  "name": "Steel Plate Helm",
+  "quest": 94268,
+  "tier": "Expert",
+  "reqs": [
+   "Craftsman's Writ: Steel Plate Helm",
+   "Steel Plate Helm"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Steel Plate Helm",
+    "count": 1,
+    "ids": [
+     7922
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264069,
+  "name": "Inlaid Mithril Cylinder",
+  "quest": 94269,
+  "tier": "Expert",
+  "reqs": [
+   "Craftsman's Writ: Inlaid Mithril Cylinder",
+   "Inlaid Mithril Cylinder"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Inlaid Mithril Cylinder",
+    "count": 1,
+    "ids": [
+     9060
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264070,
+  "name": "Steel Weapon Chain",
+  "quest": 94270,
+  "tier": "Expert",
+  "reqs": [
+   "Craftsman's Writ: Steel Weapon Chain",
+   "Steel Weapon Chain"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Steel Weapon Chain",
+    "count": 1,
+    "ids": [
+     6041
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264071,
+  "name": "Ornate Mithril Shoulders",
+  "quest": 94271,
+  "tier": "Expert",
+  "reqs": [
+   "Craftsman's Writ: Ornate Mithril Shoulders",
+   "Ornate Mithril Shoulders"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Ornate Mithril Shoulders",
+    "count": 1,
+    "ids": [
+     7928
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264072,
+  "name": "Blue Glittering Axe",
+  "quest": 94272,
+  "tier": "Expert",
+  "reqs": [
+   "Craftsman's Writ: Blue Glittering Axe",
+   "Blue Glittering Axe"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Blue Glittering Axe",
+    "count": 1,
+    "ids": [
+     7942
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264073,
+  "name": "Moonsteel Broadsword",
+  "quest": 94273,
+  "tier": "Expert",
+  "reqs": [
+   "Craftsman's Writ: Moonsteel Broadsword",
+   "Moonsteel Broadsword"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Moonsteel Broadsword",
+    "count": 1,
+    "ids": [
+     3853
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264074,
+  "name": "Golden Scale Coif",
+  "quest": 94274,
+  "tier": "Expert",
+  "reqs": [
+   "Craftsman's Writ: Golden Scale Coif",
+   "Golden Scale Coif"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Golden Scale Coif",
+    "count": 1,
+    "ids": [
+     3837
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264075,
+  "name": "Solid Sharpening Stone",
+  "quest": 94275,
+  "tier": "Expert",
+  "reqs": [
+   "Craftsman's Writ: Solid Sharpening Stone",
+   "Solid Sharpening Stone"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Solid Sharpening Stone",
+    "count": 1,
+    "ids": [
+     7964
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264076,
+  "name": "Wicked Mithril Blade",
+  "quest": 94276,
+  "tier": "Expert",
+  "reqs": [
+   "Craftsman's Writ: Wicked Mithril Blade",
+   "Wicked Mithril Blade"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Wicked Mithril Blade",
+    "count": 1,
+    "ids": [
+     7943
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264077,
+  "name": "Truesilver Rod",
+  "quest": 94277,
+  "tier": "Expert",
+  "reqs": [
+   "Craftsman's Writ: Truesilver Rod",
+   "Truesilver Rod"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Truesilver Rod",
+    "count": 1,
+    "ids": [
+     11144
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264078,
+  "name": "Golden Scale Gauntlets",
+  "quest": 94278,
+  "tier": "Expert",
+  "reqs": [
+   "Craftsman's Writ: Golden Scale Gauntlets",
+   "Golden Scale Gauntlets"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Golden Scale Gauntlets",
+    "count": 1,
+    "ids": [
+     9366,
+     217273
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264079,
+  "name": "Heavy Mithril Axe",
+  "quest": 94279,
+  "tier": "Expert",
+  "reqs": [
+   "Craftsman's Writ: Heavy Mithril Axe",
+   "Heavy Mithril Axe"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Heavy Mithril Axe",
+    "count": 1,
+    "ids": [
+     7941
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264080,
+  "name": "Mechanical Dragonling",
+  "quest": 94280,
+  "tier": "Expert",
+  "reqs": [
+   "Craftsman's Writ: Mechanical Dragonling",
+   "Mechanical Dragonling"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Mechanical Dragonling",
+    "count": 1,
+    "ids": [
+     4396
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264081,
+  "name": "Advanced Target Dummy",
+  "quest": 94281,
+  "tier": "Expert",
+  "reqs": [
+   "Craftsman's Writ: Advanced Target Dummy",
+   "Advanced Target Dummy"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Advanced Target Dummy",
+    "count": 1,
+    "ids": [
+     4392
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264082,
+  "name": "Craftsman's Monocle",
+  "quest": 94282,
+  "tier": "Expert",
+  "reqs": [
+   "Craftsman's Writ: Craftsman's Monocle",
+   "Craftsman's Monocle"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Craftsman's Monocle",
+    "count": 1,
+    "ids": [
+     4393
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264083,
+  "name": "Goblin Land Mine",
+  "quest": 94283,
+  "tier": "Expert",
+  "reqs": [
+   "Craftsman's Writ: Goblin Land Mine",
+   "Goblin Land Mine"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Goblin Land Mine",
+    "count": 1,
+    "ids": [
+     4395
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264084,
+  "name": "Catseye Ultra Goggles",
+  "quest": 94284,
+  "tier": "Expert",
+  "reqs": [
+   "Craftsman's Writ: Catseye Ultra Goggles",
+   "Catseye Ultra Goggles"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Catseye Ultra Goggles",
+    "count": 1,
+    "ids": [
+     10501
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264085,
+  "name": "Unstable Trigger",
+  "quest": 94285,
+  "tier": "Expert",
+  "reqs": [
+   "Craftsman's Writ: Unstable Trigger",
+   "Unstable Trigger"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Unstable Trigger",
+    "count": 1,
+    "ids": [
+     10560
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264086,
+  "name": "Flash Bomb",
+  "quest": 94286,
+  "tier": "Expert",
+  "reqs": [
+   "Craftsman's Writ: Flash Bomb",
+   "Flash Bomb"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Flash Bomb",
+    "count": 1,
+    "ids": [
+     4852
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264087,
+  "name": "Fire Goggles",
+  "quest": 94287,
+  "tier": "Expert",
+  "reqs": [
+   "Craftsman's Writ: Fire Goggles",
+   "Fire Goggles"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Fire Goggles",
+    "count": 1,
+    "ids": [
+     10500
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264088,
+  "name": "Mithril Frag Bomb",
+  "quest": 94288,
+  "tier": "Expert",
+  "reqs": [
+   "Craftsman's Writ: Mithril Frag Bomb",
+   "Mithril Frag Bomb"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Mithril Frag Bomb",
+    "count": 1,
+    "ids": [
+     10514
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264089,
+  "name": "Gyromatic Micro-Adjuster",
+  "quest": 94289,
+  "tier": "Expert",
+  "reqs": [
+   "Craftsman's Writ: Gyromatic Micro-Adjuster",
+   "Gyromatic Micro-Adjustor"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Gyromatic Micro-Adjustor",
+    "count": 1,
+    "ids": [
+     10498
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264090,
+  "name": "Mechanical Repair Kit",
+  "quest": 94290,
+  "tier": "Expert",
+  "reqs": [
+   "Craftsman's Writ: Mechanical Repair Kit",
+   "Mechanical Repair Kit"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Mechanical Repair Kit",
+    "count": 1,
+    "ids": [
+     11590
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264091,
+  "name": "Dark Iron Bomb",
+  "quest": 94291,
+  "tier": "Expert",
+  "reqs": [
+   "Craftsman's Writ: Dark Iron Bomb",
+   "Dark Iron Bomb"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Dark Iron Bomb",
+    "count": 1,
+    "ids": [
+     16005
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264092,
+  "name": "Comfortable Leather Hat",
+  "quest": 94292,
+  "tier": "Expert",
+  "reqs": [
+   "Craftsman's Writ: Comfortable Leather Hat",
+   "Comfortable Leather Hat"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Comfortable Leather Hat",
+    "count": 1,
+    "ids": [
+     8174
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264093,
+  "name": "Guardian Cloak",
+  "quest": 94293,
+  "tier": "Expert",
+  "reqs": [
+   "Craftsman's Writ: Guardian Cloak",
+   "Guardian Cloak"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Guardian Cloak",
+    "count": 1,
+    "ids": [
+     5965
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264094,
+  "name": "Dusky Bracers",
+  "quest": 94294,
+  "tier": "Expert",
+  "reqs": [
+   "Craftsman's Writ: Dusky Bracers",
+   "Dusky Bracers"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Dusky Bracers",
+    "count": 1,
+    "ids": [
+     7378
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264095,
+  "name": "Wild Leather Helmet",
+  "quest": 94295,
+  "tier": "Expert",
+  "reqs": [
+   "Craftsman's Writ: Wild Leather Helmet",
+   "Wild Leather Helmet"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Wild Leather Helmet",
+    "count": 1,
+    "ids": [
+     8214
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264096,
+  "name": "Wild Leather Shoulders",
+  "quest": 94296,
+  "tier": "Expert",
+  "reqs": [
+   "Craftsman's Writ: Wild Leather Shoulders",
+   "Wild Leather Shoulders"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Wild Leather Shoulders",
+    "count": 1,
+    "ids": [
+     8210
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264097,
+  "name": "Quickdraw Quiver",
+  "quest": 94297,
+  "tier": "Expert",
+  "reqs": [
+   "Craftsman's Writ: Quickdraw Quiver",
+   "Quickdraw Quiver"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Quickdraw Quiver",
+    "count": 1,
+    "ids": [
+     8217
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264098,
+  "name": "Swift Boots",
+  "quest": 94298,
+  "tier": "Expert",
+  "reqs": [
+   "Craftsman's Writ: Swift Boots",
+   "Swift Boots"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Swift Boots",
+    "count": 1,
+    "ids": [
+     7391
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264099,
+  "name": "Nightscape Shoulders",
+  "quest": 94299,
+  "tier": "Expert",
+  "reqs": [
+   "Craftsman's Writ: Nightscape Shoulders",
+   "Nightscape Shoulders"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Nightscape Shoulders",
+    "count": 1,
+    "ids": [
+     8192
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264100,
+  "name": "Big Voodoo Mask",
+  "quest": 94300,
+  "tier": "Expert",
+  "reqs": [
+   "Craftsman's Writ: Big Voodoo Mask",
+   "Big Voodoo Mask"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Big Voodoo Mask",
+    "count": 1,
+    "ids": [
+     8201
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264101,
+  "name": "Big Voodoo Robe",
+  "quest": 94301,
+  "tier": "Expert",
+  "reqs": [
+   "Craftsman's Writ: Big Voodoo Robe",
+   "Big Voodoo Robe"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Big Voodoo Robe",
+    "count": 1,
+    "ids": [
+     8200
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264102,
+  "name": "Turtle Scale Breastplate",
+  "quest": 94302,
+  "tier": "Expert",
+  "reqs": [
+   "Craftsman's Writ: Turtle Scale Breastplate",
+   "Turtle Scale Breastplate"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Turtle Scale Breastplate",
+    "count": 1,
+    "ids": [
+     8189
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264103,
+  "name": "Thick Leather Ammo Pouch",
+  "quest": 94303,
+  "tier": "Expert",
+  "reqs": [
+   "Craftsman's Writ: Thick Leather Ammo Pouch",
+   "Thick Leather Ammo Pouch"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Thick Leather Ammo Pouch",
+    "count": 1,
+    "ids": [
+     8218
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264104,
+  "name": "Mageweave Bag",
+  "quest": 94304,
+  "tier": "Expert",
+  "reqs": [
+   "Craftsman's Writ: Mageweave Bag",
+   "Mageweave Bag"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Mageweave Bag",
+    "count": 1,
+    "ids": [
+     10050
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264105,
+  "name": "Shadoweave Gloves",
+  "quest": 94305,
+  "tier": "Expert",
+  "reqs": [
+   "Craftsman's Writ: Shadoweave Gloves",
+   "Shadoweave Gloves"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Shadoweave Gloves",
+    "count": 1,
+    "ids": [
+     10023
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264106,
+  "name": "Crimson Silk Robe",
+  "quest": 94306,
+  "tier": "Expert",
+  "reqs": [
+   "Craftsman's Writ: Crimson Silk Robe",
+   "Crimson Silk Robe"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Crimson Silk Robe",
+    "count": 1,
+    "ids": [
+     7063
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264107,
+  "name": "Shadoweave Robe",
+  "quest": 94307,
+  "tier": "Expert",
+  "reqs": [
+   "Craftsman's Writ: Shadoweave Robe",
+   "Shadoweave Robe"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Shadoweave Robe",
+    "count": 1,
+    "ids": [
+     10004
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264108,
+  "name": "Enchanted Mageweave Pouch",
+  "quest": 94308,
+  "tier": "Expert",
+  "reqs": [
+   "Craftsman's Writ: Enchanted Mageweave Pouch",
+   "Enchanted Mageweave Pouch"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Enchanted Mageweave Pouch",
+    "count": 1,
+    "ids": [
+     22246
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264109,
+  "name": "Star Belt",
+  "quest": 94309,
+  "tier": "Expert",
+  "reqs": [
+   "Craftsman's Writ: Star Belt",
+   "Star Belt"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Star Belt",
+    "count": 1,
+    "ids": [
+     4329
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264110,
+  "name": "Black Mageweave Vest",
+  "quest": 94310,
+  "tier": "Expert",
+  "reqs": [
+   "Craftsman's Writ: Black Mageweave Vest",
+   "Black Mageweave Vest"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Black Mageweave Vest",
+    "count": 1,
+    "ids": [
+     9998
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264111,
+  "name": "Red Mageweave Pants",
+  "quest": 94311,
+  "tier": "Expert",
+  "reqs": [
+   "Craftsman's Writ: Red Mageweave Pants",
+   "Red Mageweave Pants"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Red Mageweave Pants",
+    "count": 1,
+    "ids": [
+     10009
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264112,
+  "name": "Orange Martial Shirt",
+  "quest": 94312,
+  "tier": "Expert",
+  "reqs": [
+   "Craftsman's Writ: Orange Martial Shirt",
+   "Orange Martial Shirt"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Orange Martial Shirt",
+    "count": 1,
+    "ids": [
+     10052
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264113,
+  "name": "White Bandit Mask",
+  "quest": 94313,
+  "tier": "Expert",
+  "reqs": [
+   "Craftsman's Writ: White Bandit Mask",
+   "White Bandit Mask"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "White Bandit Mask",
+    "count": 1,
+    "ids": [
+     10008
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264114,
+  "name": "Cindercloth Robe",
+  "quest": 94314,
+  "tier": "Expert",
+  "reqs": [
+   "Craftsman's Writ: Cindercloth Robe",
+   "Cindercloth Robe"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Cindercloth Robe",
+    "count": 1,
+    "ids": [
+     10042
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264115,
+  "name": "Earthen Silk Belt",
+  "quest": 94315,
+  "tier": "Expert",
+  "reqs": [
+   "Craftsman's Writ: Earthen Silk Belt",
+   "Earthen Silk Belt"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Earthen Silk Belt",
+    "count": 1,
+    "ids": [
+     7061
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264116,
+  "name": "Potion of Demonslaying",
+  "quest": 94316,
+  "tier": "Artisan",
+  "reqs": [
+   "Craftsman's Writ: Potion of Demonslaying",
+   "Potion of Demon Slaying"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Potion of Demon Slaying",
+    "count": 1,
+    "ids": [
+     9224
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264117,
+  "name": "Dreamless Sleep Potion",
+  "quest": 94317,
+  "tier": "Artisan",
+  "reqs": [
+   "Craftsman's Writ: Dreamless Sleep Potion",
+   "Dreamless Sleep Potion"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Dreamless Sleep Potion",
+    "count": 1,
+    "ids": [
+     12190
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264118,
+  "name": "Greater Fire Protection Potion",
+  "quest": 94318,
+  "tier": "Artisan",
+  "reqs": [
+   "Craftsman's Writ: Greater Fire Protection Potion",
+   "Greater Fire Protection Potion"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Greater Fire Protection Potion",
+    "count": 1,
+    "ids": [
+     13457
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264119,
+  "name": "Draught of Detect Demon",
+  "quest": 94319,
+  "tier": "Artisan",
+  "reqs": [
+   "Craftsman's Writ: Draught of Detect Demon",
+   "Draught of Detect Demon"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Draught of Detect Demon",
+    "count": 1,
+    "ids": [
+     9233
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264120,
+  "name": "Gift of Arthas",
+  "quest": 94320,
+  "tier": "Artisan",
+  "reqs": [
+   "Craftsman's Writ: Gift of Arthas",
+   "Gift of Arthas"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Gift of Arthas",
+    "count": 1,
+    "ids": [
+     9088
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264121,
+  "name": "Flask of Chromatic Resistance",
+  "quest": 94321,
+  "tier": "Artisan",
+  "reqs": [
+   "Craftsman's Writ: Flask of Chromatic Resistance",
+   "Flask of Chromatic Resistance"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Flask of Chromatic Resistance",
+    "count": 1,
+    "ids": [
+     13513
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264122,
+  "name": "Limited Invulnerability Potion",
+  "quest": 94322,
+  "tier": "Artisan",
+  "reqs": [
+   "Craftsman's Writ: Limited Invulnerability Potion",
+   "Limited Invulnerability Potion"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Limited Invulnerability Potion",
+    "count": 1,
+    "ids": [
+     3387
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264123,
+  "name": "Major Rejuvenation Potion",
+  "quest": 94323,
+  "tier": "Artisan",
+  "reqs": [
+   "Craftsman's Writ: Major Rejuvenation Potion",
+   "Major Rejuvenation Potion"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Major Rejuvenation Potion",
+    "count": 1,
+    "ids": [
+     18253
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264124,
+  "name": "Distilled Firewater",
+  "quest": 94324,
+  "tier": "Artisan",
+  "reqs": [
+   "Craftsman's Writ: Distilled Firewater",
+   "Distilled Firewater"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Distilled Firewater",
+    "count": 1,
+    "ids": [
+     246948
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264125,
+  "name": "Radiant Circlet",
+  "quest": 94325,
+  "tier": "Artisan",
+  "reqs": [
+   "Craftsman's Writ: Radiant Circlet",
+   "Radiant Circlet"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Radiant Circlet",
+    "count": 1,
+    "ids": [
+     12417
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264126,
+  "name": "Radiant Belt",
+  "quest": 94326,
+  "tier": "Artisan",
+  "reqs": [
+   "Craftsman's Writ: Radiant Belt",
+   "Radiant Belt"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Radiant Belt",
+    "count": 1,
+    "ids": [
+     12416
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264127,
+  "name": "Orcish War Leggings",
+  "quest": 94327,
+  "tier": "Artisan",
+  "reqs": [
+   "Craftsman's Writ: Orcish War Leggings",
+   "Orcish War Leggings"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Orcish War Leggings",
+    "count": 1,
+    "ids": [
+     7929
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264128,
+  "name": "Mithril Spurs",
+  "quest": 94328,
+  "tier": "Artisan",
+  "reqs": [
+   "Craftsman's Writ: Mithril Spurs",
+   "Mithril Spurs"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Mithril Spurs",
+    "count": 1,
+    "ids": [
+     7969
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264129,
+  "name": "Imperial Plate Chest",
+  "quest": 94329,
+  "tier": "Artisan",
+  "reqs": [
+   "Craftsman's Writ: Imperial Plate Chest",
+   "Imperial Plate Chest"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Imperial Plate Chest",
+    "count": 1,
+    "ids": [
+     12422
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264130,
+  "name": "Darkrune Gauntlets",
+  "quest": 94330,
+  "tier": "Artisan",
+  "reqs": [
+   "Craftsman's Writ: Darkrune Gauntlets",
+   "Darkrune Gauntlets"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Darkrune Gauntlets",
+    "count": 1,
+    "ids": [
+     20549
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264131,
+  "name": "Huge Thorium Battleaxe",
+  "quest": 94331,
+  "tier": "Artisan",
+  "reqs": [
+   "Craftsman's Writ: Huge Thorium Battleaxe",
+   "Huge Thorium Battleaxe"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Huge Thorium Battleaxe",
+    "count": 1,
+    "ids": [
+     12775
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264132,
+  "name": "Arcanite Skeleton Key",
+  "quest": 94332,
+  "tier": "Artisan",
+  "reqs": [
+   "Craftsman's Writ: Arcanite Skeleton Key",
+   "Arcanite Skeleton Key"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Arcanite Skeleton Key",
+    "count": 1,
+    "ids": [
+     15872
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264133,
+  "name": "Ebon Shiv",
+  "quest": 94333,
+  "tier": "Artisan",
+  "reqs": [
+   "Craftsman's Writ: Ebon Shiv",
+   "Ebon Shiv"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Ebon Shiv",
+    "count": 1,
+    "ids": [
+     7947
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264134,
+  "name": "Masterwork Target Dummy",
+  "quest": 94334,
+  "tier": "Artisan",
+  "reqs": [
+   "Craftsman's Writ: Masterwork Target Dummy",
+   "Masterwork Target Dummy"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Masterwork Target Dummy",
+    "count": 1,
+    "ids": [
+     16023
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264135,
+  "name": "Green Lens",
+  "quest": 94335,
+  "tier": "Artisan",
+  "reqs": [
+   "Craftsman's Writ: Green Lens",
+   "Green Lens"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Green Lens",
+    "count": 1,
+    "ids": [
+     10504
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264136,
+  "name": "Lifelike Mechanical Toad",
+  "quest": 94336,
+  "tier": "Artisan",
+  "reqs": [
+   "Craftsman's Writ: Lifelike Mechanical Toad",
+   "Lifelike Mechanical Toad"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Lifelike Mechanical Toad",
+    "count": 1,
+    "ids": [
+     15996
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264137,
+  "name": "Gnomish Alarm-O-Bot",
+  "quest": 94337,
+  "tier": "Artisan",
+  "reqs": [
+   "Craftsman's Writ: Gnomish Alarm-O-Bot",
+   "Gnomish Alarm-O-Bot"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Gnomish Alarm-O-Bot",
+    "count": 1,
+    "ids": [
+     18645
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264138,
+  "name": "Goblin Jumper Cables XL",
+  "quest": 94338,
+  "tier": "Artisan",
+  "reqs": [
+   "Craftsman's Writ: Goblin Jumper Cables XL",
+   "Goblin Jumper Cables XL"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Goblin Jumper Cables XL",
+    "count": 1,
+    "ids": [
+     18587
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264139,
+  "name": "Field Repair Bot 74A",
+  "quest": 94339,
+  "tier": "Artisan",
+  "reqs": [
+   "Craftsman's Writ: Field Repair Bot 74A",
+   "Field Repair Bot 74A"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Field Repair Bot 74A",
+    "count": 1,
+    "ids": [
+     18232
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264140,
+  "name": "Truesilver Transformer",
+  "quest": 94340,
+  "tier": "Artisan",
+  "reqs": [
+   "Craftsman's Writ: Truesilver Transformer",
+   "Truesilver Transformer"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Truesilver Transformer",
+    "count": 1,
+    "ids": [
+     18631
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264141,
+  "name": "Sniper Scope",
+  "quest": 94341,
+  "tier": "Artisan",
+  "reqs": [
+   "Craftsman's Writ: Sniper Scope",
+   "Sniper Scope"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Sniper Scope",
+    "count": 1,
+    "ids": [
+     10548
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264142,
+  "name": "Tranquil Mechanical Yeti",
+  "quest": 94342,
+  "tier": "Artisan",
+  "reqs": [
+   "Craftsman's Writ: Tranquil Mechanical Yeti",
+   "Tranquil Mechanical Yeti"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Tranquil Mechanical Yeti",
+    "count": 1,
+    "ids": [
+     21277
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264143,
+  "name": "Wicked Leather Pants",
+  "quest": 94343,
+  "tier": "Artisan",
+  "reqs": [
+   "Craftsman's Writ: Wicked Leather Pants",
+   "Wicked Leather Pants"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Wicked Leather Pants",
+    "count": 1,
+    "ids": [
+     15087
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264144,
+  "name": "Gordok Ogre Suit",
+  "quest": 94344,
+  "tier": "Artisan",
+  "reqs": [
+   "Craftsman's Writ: Gordok Ogre Suit",
+   "Gordok Ogre Suit"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Gordok Ogre Suit",
+    "count": 1,
+    "ids": [
+     18258
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264145,
+  "name": "Volcanic Breastplate",
+  "quest": 94345,
+  "tier": "Artisan",
+  "reqs": [
+   "Craftsman's Writ: Volcanic Breastplate",
+   "Volcanic Breastplate"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Volcanic Breastplate",
+    "count": 1,
+    "ids": [
+     15053
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264146,
+  "name": "Runic Leather Headband",
+  "quest": 94346,
+  "tier": "Artisan",
+  "reqs": [
+   "Craftsman's Writ: Runic Leather Headband",
+   "Runic Leather Headband"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Runic Leather Headband",
+    "count": 1,
+    "ids": [
+     15094
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264147,
+  "name": "Wicked Leather Bracers",
+  "quest": 94347,
+  "tier": "Artisan",
+  "reqs": [
+   "Craftsman's Writ: Wicked Leather Bracers",
+   "Wicked Leather Bracers"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Wicked Leather Bracers",
+    "count": 1,
+    "ids": [
+     15084
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264148,
+  "name": "Chimeric Vest",
+  "quest": 94348,
+  "tier": "Artisan",
+  "reqs": [
+   "Craftsman's Writ: Chimeric Vest",
+   "Chimeric Vest"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Chimeric Vest",
+    "count": 1,
+    "ids": [
+     15075
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264149,
+  "name": "Heavy Scorpid Helm",
+  "quest": 94349,
+  "tier": "Artisan",
+  "reqs": [
+   "Craftsman's Writ: Heavy Scorpid Helm",
+   "Heavy Scorpid Helm"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Heavy Scorpid Helm",
+    "count": 1,
+    "ids": [
+     15080
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264150,
+  "name": "Runic Leather Bracers",
+  "quest": 94350,
+  "tier": "Artisan",
+  "reqs": [
+   "Craftsman's Writ: Runic Leather Bracers",
+   "Runic Leather Bracers"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Runic Leather Bracers",
+    "count": 1,
+    "ids": [
+     15092
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264151,
+  "name": "Frostsaber Boots",
+  "quest": 94351,
+  "tier": "Artisan",
+  "reqs": [
+   "Craftsman's Writ: Frostsaber Boots",
+   "Frostsaber Boots"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Frostsaber Boots",
+    "count": 1,
+    "ids": [
+     15071
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264152,
+  "name": "Wizardweave Turban",
+  "quest": 94352,
+  "tier": "Artisan",
+  "reqs": [
+   "Craftsman's Writ: Wizardweave Turban",
+   "Wizardweave Turban"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Wizardweave Turban",
+    "count": 1,
+    "ids": [
+     14130
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264153,
+  "name": "Runecloth Bag",
+  "quest": 94353,
+  "tier": "Artisan",
+  "reqs": [
+   "Craftsman's Writ: Runecloth Bag",
+   "Runecloth Bag"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Runecloth Bag",
+    "count": 1,
+    "ids": [
+     14046
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264154,
+  "name": "Runecloth Boots",
+  "quest": 94354,
+  "tier": "Artisan",
+  "reqs": [
+   "Craftsman's Writ: Runecloth Boots",
+   "Runecloth Boots"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Runecloth Boots",
+    "count": 1,
+    "ids": [
+     13864
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264155,
+  "name": "Tuxedo Jacket",
+  "quest": 94355,
+  "tier": "Artisan",
+  "reqs": [
+   "Craftsman's Writ: Tuxedo Jacket",
+   "Tuxedo Jacket"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Tuxedo Jacket",
+    "count": 1,
+    "ids": [
+     10036
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264156,
+  "name": "Felcloth Boots",
+  "quest": 94356,
+  "tier": "Artisan",
+  "reqs": [
+   "Craftsman's Writ: Felcloth Boots",
+   "Felcloth Boots"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Felcloth Boots",
+    "count": 1,
+    "ids": [
+     14108
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264157,
+  "name": "Cenarion Herb Bag",
+  "quest": 94357,
+  "tier": "Artisan",
+  "reqs": [
+   "Craftsman's Writ: Cenarion Herb Bag",
+   "Cenarion Herb Bag"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Cenarion Herb Bag",
+    "count": 1,
+    "ids": [
+     22251
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264158,
+  "name": "Shadoweave Mask",
+  "quest": 94358,
+  "tier": "Artisan",
+  "reqs": [
+   "Craftsman's Writ: Shadoweave Mask",
+   "Shadoweave Mask"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Shadoweave Mask",
+    "count": 1,
+    "ids": [
+     10025
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264159,
+  "name": "Ghostweave Vest",
+  "quest": 94359,
+  "tier": "Artisan",
+  "reqs": [
+   "Craftsman's Writ: Ghostweave Vest",
+   "Ghostweave Vest"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Ghostweave Vest",
+    "count": 1,
+    "ids": [
+     14141
+    ]
+   }
+  ]
+ },
+ {
+  "writ": 264160,
+  "name": "Soul Pouch",
+  "quest": 94360,
+  "tier": "Artisan",
+  "reqs": [
+   "Craftsman's Writ: Soul Pouch",
+   "Soul Pouch"
+  ],
+  "itemids": [],
+  "items": [
+   {
+    "name": "Soul Pouch",
+    "count": 1,
+    "ids": [
+     21340
+    ]
+   }
+  ]
+ }
+]
