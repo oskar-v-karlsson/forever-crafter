@@ -92,8 +92,8 @@ end
 
 -- The Sniper page puts its ticked crafts above a shorter reagent list.
 local CRAFT_ROWS = 5
-local SNIPE_ROWS = ROWS - CRAFT_ROWS - 1
-local LIST_TOP, SNIPE_LIST_TOP = -86, -86 - (CRAFT_ROWS + 1) * ROW_H - 6
+local SNIPE_ROWS = ROWS - CRAFT_ROWS - 2
+local LIST_TOP, SNIPE_LIST_TOP = -86, -86 - (CRAFT_ROWS + 2) * ROW_H - 6
 
 local function visibleRows()
   return snipeMode() and SNIPE_ROWS or ROWS
@@ -1006,7 +1006,7 @@ end
 local function buildCrafts()
   local c = CreateFrame("Frame", nil, frame)
   c:SetPoint("TOPLEFT", 10, LIST_TOP)
-  c:SetSize(LIST_W, (CRAFT_ROWS + 1) * ROW_H + 4)
+  c:SetSize(LIST_W, (CRAFT_ROWS + 2) * ROW_H + 4)
   c:EnableMouseWheel(true)
   c:SetScript("OnMouseWheel", function(_, delta)
     local n = #ns.Sniper.Crafts()
@@ -1058,6 +1058,9 @@ local function buildCrafts()
     row:SetScript("OnLeave", UI.HideHint)
     table.insert(c.rows, row)
   end
+  c.total = text(c, "small", 1, 0.82, 0)
+  c.total:SetPoint("TOPLEFT", 8, -(CRAFT_ROWS + 1) * ROW_H - 4)
+  c.total:SetWidth(LIST_W - 16)
   c.empty = text(c, "small", 0.6, 0.6, 0.6)
   c.empty:SetPoint("TOPLEFT", 8, -ROW_H - 4)
   c.empty:SetText("No ticked crafts: tick S on a craft in the Crafts list to snipe its AH reagents.")
@@ -1070,6 +1073,7 @@ refreshCrafts = function()
   local crafts = ns.Sniper.Crafts()
   UI.craftOffset = math.max(0, math.min(UI.craftOffset, math.max(#crafts - CRAFT_ROWS, 0)))
   c.empty:SetShown(#crafts == 0)
+  c.total:SetText(#crafts > 0 and ns.Sniper.TotalText() or "")
   for i, row in ipairs(c.rows) do
     local lim = crafts[UI.craftOffset + i]
     row.lim = lim

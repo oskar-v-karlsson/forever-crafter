@@ -898,8 +898,34 @@ def check_sniper_target():
     box.SetText(box, "")
     box.__scripts.OnEnterPressed(box)
     expect(S.Target(V) is None and [e for e in UI.view.values() if e.id == R2][0].need == 100, "blank Target")
+    # Time and Profit (at max) scale with Target; the total sums them over the crafts with room.
+    lv, la = S.Limit(V), S.Limit(A)
+    pv = 300 - (50 + 25)                                      # W - (C + room) for the vendor shuffle
+    expect(S.ProfitAtMax(lv) == pv and lv.time == 5, f"profit at max {S.ProfitAtMax(lv)}, time {lv.time}")
+    expect(S.CraftTotals(lv) == (50 * pv, 250), f"batch totals {S.CraftTotals(lv)}")
+    tot1 = S.Totals()
+    pa, ta = S.CraftTotals(la)
+    expect(abs(tot1.profit - (50 * pv + pa)) < 1e-6 and tot1.crafts == 2, f"total {tot1.profit}")
+    box.SetText(box, "150")
+    box.__scripts.OnEnterPressed(box)
+    expect(S.CraftTotals(lv) == (150 * pv, 750), f"3x totals {S.CraftTotals(lv)}")
+    tot = S.Totals()
+    expect(abs(tot.profit - (150 * pv + pa)) < 1e-6 and tot.time == 750 + (ta or 0), f"3x total {tot.profit}")
+    expect(abs(tot.gh - (150 * pv + (pa if ta else 0)) / tot.time * 3600) < 1e-6, f"total g/h {tot.gh}")
+    cells = {h.col.key: rv.cells[k].__text for k, h in crafts.headers.items() if rv.cells[k] is not None}
+    expect(cells["time"] == "12m30s" and cells["profit"] == ns.Util.Money(150 * pv), f"crafts row cells {cells}")
+    expect(ns.Util.Money(round(tot.profit)) in crafts.total.__text and "Total for 2 crafts" in crafts.total.__text,
+           f"total line {crafts.total.__text!r}")
+    # A no-room craft is left out of the sums and shows "-".
+    la.noRoom = True
+    tot2 = S.Totals()
+    expect(tot2.crafts == 1 and tot2.profit == 150 * pv and tot2.time == 750
+           and S.CraftCellText(la, "profit") == "—", f"no-room craft in the totals {tot2.profit}")
+    la.noRoom = None
+    box.SetText(box, "")
+    box.__scripts.OnEnterPressed(box)
     # The reagent list shows SNIPE_ROWS rows on the Sniper page, ROWS on the craft list.
-    expect(frame.list.__h == (UI.SNIPE_ROWS + 1) * 20 + 4 and UI.CRAFT_ROWS + UI.SNIPE_ROWS + 1 == 18,
+    expect(frame.list.__h == (UI.SNIPE_ROWS + 1) * 20 + 4 and UI.CRAFT_ROWS + UI.SNIPE_ROWS + 2 == 18,
            f"reagent list height {frame.list.__h}")
     frame.snipeTab.Click(frame.snipeTab)
     expect(not crafts.__shown and frame.list.__h == 19 * 20 + 4, "crafts list shown on the craft list")
