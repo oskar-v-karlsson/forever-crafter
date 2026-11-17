@@ -24,5 +24,6 @@ Modules\Pricing.lua
 Modules\Sales.lua
 Modules\Planner.lua
 Modules\Reputation.lua
+Modules\Sniper.lua
 Modules\UI.lua
 Modules\Minimap.lua

@@ -9,7 +9,8 @@ A profession profit finder for **World of Warcraft: Forever**. It reads your pro
 - **Learns from the game:** opening a profession window reads your real recipe list and reagents; opening any merchant records its exact prices; AH sale invoices in your mailbox measure the AH cut. All of this overrides the static data.
 - **Does it sell?** How many of each crafted item sell per day in your region, from [TradeSkillMaster](https://tradeskillmaster.com), so crafts that are profitable on paper but hardly ever sell can be hidden.
 - **Reputation planner:** the cheapest way to gain reputation with Durotar Supply and Logistics (Horde) or the Azeroth Commerce Authority (Alliance) from AH and vendor prices: Craftsman's Writs and notarised Waylaid Crates, plus a plan for today.
-- **Advisor only:** it never buys or posts anything.
+- **Sniper:** tick crafts and it watches their AH reagents, searching while the AH is open, and offers the listings under a max price that keeps each craft at 90% of its g/h. You confirm every purchase with a click.
+- **Never posts:** it buys only through the sniper's Buy button, one click per purchase, and never posts auctions.
 
 All game facts come from World of Warcraft: Forever sources only (the Forever client data tables, Wowhead Forever, the Forever UI code, TradeSkillMaster's Forever region data), never Classic or Retail. See [SOURCES.md](SOURCES.md), which also lists what can only be checked in the game or in a browser.
 
@@ -129,6 +130,27 @@ The **Reputation** button at the top right of the window (or `/crafter rep`) swi
 - **Today's plan** (in the details): the cheapest copper per reputation first, step by step, priced after what the plan already bought (the AH price steps rise), up to the next standing or the **Rep goal** box. Notarised crates come first when they are cheaper, using any Merchant's Favor you already have. Below Friendly the plan uses writs until it reaches Friendly. It ends with the shopping list, what you spend and roughly what the Coin Pouches give back.
 - **Unverified amounts:** the writ reputation (75, 125, 150), the Coin Pouch averages, the favor per crate and the receipt price come from guides, not from Forever game data. They show in orange. The addon learns the real numbers when you turn in (the reputation or favor that changes within 3 seconds of a writ quest, a sealed crate or a receipt leaving your bags) and uses them from then on, on every character. `/crafter rep forget` clears what it learned.
 
+### Sniper
+
+The sniper buys the reagents of crafts you pick when someone lists them cheaply, so you can stock a whole batch over time instead of at today's prices.
+
+1. **Tick the crafts:** the **S** checkbox at the left of a result row (both modes; e.g. a few vendor shuffles). The sniper watches every reagent of that craft that its path buys on the AH, with the craft's cheap-batch quantity. Reagents shared by several ticked crafts are merged. The name of a ticked craft that has no room (below) shows `no room` in orange; its details list the max price of each reagent under "Sniping for this craft".
+2. **Open the AH** and press **Sniper** at the top right of the window (or `/crafter snipe`), then **Start**. The sniper searches the watched reagents one at a time (one search every 1.5 s, each item again after 6 s at the earliest; the AH allows 100 searches per minute), only while the AH is open. It stops when the AH closes.
+3. **Buy:** listings at or under the max price show in **Deal qty** and **Deal avg**; the **Buy** button names the best deal (the one furthest under its max). Every purchase takes one click on **Buy** (the game only allows AH purchases from a click). A commodity purchase asks the AH for a price quote first; the addon confirms it only if the quoted total is at or under the deal's budget and cancels it otherwise. If the game blocks the confirm because it did not come from a click, the button turns into **Confirm** for one more click. If the price changes after the confirm, the new quote is checked against the budget again and waits for a **Confirm** click (an unconfirmed quote is cancelled after a minute). If the AH does not answer a confirm within 10 s, the addon tells you to check your mail and still counts the purchase if it goes through later.
+4. **Need** counts down: the batch less what is in your bags and what the sniper bought that is still in the mail (it tracks its purchases until the items reach your bags). **Untick all** (`/crafter snipe clear`) stops watching every craft; **Forget bought** (`/crafter snipe forget`) forgets the purchases still counted as in the mail.
+
+**Max price.** Each ticked craft keeps at least **Keep g/h %** (default 90) of the g/h in its row: **Vend g/h** for a vendor shuffle, **AH g/h** for any other craft, along the path of that column (the faster path, if it has one). For an AH-sold item, the floor is measured after a 10% fall of its sale price; a vendor sale has no such cushion. With W the worth of one craft (vendor price, or AH price after the cut and deposit, times the output count), Wc = W less the cushion, C the batch-average cost of one craft, and f = Keep g/h:
+
+- the room is (1 - f) x (Wc - C) per craft;
+- it is spread as one markup over all the craft's AH reagents: markup = room / (their batch-average cost per craft);
+- each reagent's max price is its batch-average price x (1 + markup).
+
+Buying every reagent at its max costs exactly C + room, so the craft still makes f x (Wc - C): no mix of deals at the max can push it below the floor. A craft with Wc ≤ C has no room. When several ticked crafts share a reagent, each unit of a deal must fit a craft whose max allows its price, so the deal at e.g. 25c only takes as many as the crafts with a max of 25c or more still need.
+
+Example: a vendor shuffle sells for 3s and needs 1 of reagent A (batch price 10c) and 2 of reagent B (20c each), so C = 50c. With Keep g/h 90% the room is 10% of 2s 50c = 25c per craft, a markup of 25 / 50 = 50%: A's max is 15c and B's max 30c. Bought entirely at those prices the craft costs 75c and earns 2s 25c, 90% of the 2s 50c in the row.
+
+The Sniper tab's columns: Reagent, Need, Have (bags plus mail), Max price, Cheapest (the last search, without your own listings), Deal qty, Deal avg, Under max, Searched (seconds ago) and For (the ticked crafts). The ticked crafts, the Keep g/h % box and the purchases still in the mail are saved per character.
+
 ### Commands
 
 | Command | What it does |
@@ -141,6 +163,7 @@ The **Reputation** button at the top right of the window (or `/crafter rep`) swi
 | `/crafter minimap` | Show or hide the minimap button |
 | `/crafter dump` | Save the open profession window's full recipe list (learned and unlearned), reagents, outputs, the game's "how to learn" text (empty in Forever so far) and item info, for the data in this addon (see below); `/crafter dump clear` removes it |
 | `/crafter rep` | The reputation planner (see "Reputation planner" above); `/crafter rep forget` clears the learned reputation and favor amounts |
+| `/crafter snipe [start\|stop\|clear\|forget]` | The sniper (see "Sniper" above): open its tab, start or stop searching, untick all crafts, or forget the purchases still counted as in the mail |
 | `/crafter reset` | Forget prices, merchant data and this character's recipe data (not the learned reputation amounts) |
 | `/crafter debug` | Toggle debug output (also prints any API the client lacks) |
 
@@ -177,6 +200,11 @@ These cannot be tested outside the game. Please go through them once and report 
 25. [ ] **Merchant's Favor:** hand in a sealed crate: is it 5 / 10 (Apprentice white / green), 10 / 20 (Journeyman), 20 / 30 (Expert)? What does an Artisan crate give (the addon shows `?`)? Does handing it in also give reputation (the details then show it)? Are white crates the raw materials and green ones the processed ones?
 26. [ ] **Notarised crate:** does a Forged Delivery Receipt cost 15 Merchant's Favor, does an empty crate with a receipt give 50 reputation, and does a receipt work on the unidentified Waylaid Crate (248549) as well as on an identified one? Are crates really for Friendly and above?
 27. [ ] **Learning:** after a turn-in, chat in `/crafter debug` says "reputation: learned ...", and the number matches what the game showed. Report it if it learned a wrong number (`/crafter rep forget` clears it).
+28. [ ] **Sniper tab:** the **S** checkbox column fits at the left of the list in both modes, the **Sniper** button fits in the title row left of **Reputation**, and in the tab the 10 columns and the controls (**Keep g/h %**, **Start**, **Buy ...**, **Untick all**, **Forget bought**) fit without overlapping or cut-off text. The window size is unchanged.
+29. [ ] **Searches:** with a few crafts ticked and the AH open, **Start**: **Searched** counts up for each reagent, **Cheapest** matches the AH's own list for that item, and the AH does not complain about too many searches. Note whether cloth, herbs and ore (commodities) and gear-like reagents (item auctions, e.g. a crafted part) both get results.
+30. [ ] **Commodity purchase:** press **Buy** on a commodity deal. Does it buy at once, or does the button turn into **Confirm ...** (the game blocked the confirm from the price quote; `/crafter errors` then shows a `blocked` line)? Is the amount and the total what the button said? If the price rose, does the addon cancel and say so in chat?
+31. [ ] **Item auction purchase:** for an item that is not a commodity, does **Buy** buy the whole lot at the listed buyout (is the shown price the lot's total)?
+32. [ ] **Mail:** after a purchase, **Have** includes it at once and **Need** drops; when you take it from the mailbox, it moves from the mail to the bags and is not counted twice.
 
 ## Development
 
@@ -191,7 +219,7 @@ These cannot be tested outside the game. Please go through them once and report 
 - Layout of `ForeverCrafter/`:
   - `Core/`: init, events, slash commands, saved variables (`Init.lua`); money and item helpers (`Util.lua`);
   - `Data/`: generated recipes, items and vendor reagents, each with source and verified date; the TSM sales snapshot (`Sales.lua`);
-  - `Modules/`: professions and skill (`Professions.lua`), the AH snapshot (`Scanner.lua`), buy and sell prices, merchants, invoices and deposits (`Pricing.lua`), sold per day from TSM (`Sales.lua`), the chain solver (`Planner.lua`), the window (`UI.lua`), the minimap button (`Minimap.lua`), `/crafter dump` (`Dump.lua`).
+  - `Modules/`: professions and skill (`Professions.lua`), the AH snapshot (`Scanner.lua`), buy and sell prices, merchants, invoices and deposits (`Pricing.lua`), sold per day from TSM (`Sales.lua`), the chain solver (`Planner.lua`), the window (`UI.lua`), the minimap button (`Minimap.lua`), `/crafter dump` (`Dump.lua`), the reputation planner (`Reputation.lua`), the reagent sniper (`Sniper.lua`).
 - The client is the 12.x API ("Camelot", `## Interface: 16001`). Use `C_*` namespaces and pcall-wrap anything that may not exist.
 
 ## Licence

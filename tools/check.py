@@ -505,7 +505,7 @@ def check_core_flow():
         expect("Shopping list" in detail and "Profit" in detail, "detail pane misses the chain/shopping list")
         expect(ns.UI.selected is not None, "clicking a row does not select it")
         before = ns.settings.sort
-        frame.headers[1].Click(frame.headers[1])
+        frame.headers[2].Click(frame.headers[2])
         expect(ns.settings.sort == "name" and before == "profit", "header click does not sort by name")
         frame.prof.Click(frame.prof)
         expect(ns.settings.profession == TAILORING, "profession button does not cycle to Tailoring")
@@ -579,6 +579,222 @@ def check_solver_shapes():
            "depth: C10 should buy C9 on the AH (a chain from C0 is beyond the depth limit)")
     if 992009 in res:
         expect(ns.Planner.Steps(res[992009].tree) == 9, "depth: C9 chain is not 9 crafts")
+
+
+def check_sniper():
+    """The reagent sniper: max prices per ticked craft, the merged watch list, the search loop and the buy steps."""
+    lua, ns, stub = new_runtime()
+    g = lua.globals()
+    login(lua, stub, skills={TAILORING: 300})
+    expect(ns.settings.snipeFloor == 0.9, "Keep g/h must default to 90%")
+    R1, R2, R3, R4, OV, OA, ON = 990601, 990602, 990603, 990604, 990611, 990612, 990613
+    V, A, N = 991601, 991602, 991603
+    synthetic(lua, ns, stub, {V: (OV, [[R1, 1], [R2, 2]]), A: (OA, [[R1, 1], [R3, 1]]), N: (ON, [[R4, 1]])},
+              [R1, R2, R3, R4, OV, OA, ON])
+    ns.Recipes[V].cast = 5000
+    ns.Items[OV].sell = 300
+    stub["items"][OV] = lua.table_from({"name": f"Test {OV}", "sell": 300})
+    set_auctions(lua, stub, [(OA, 1, 1000), (ON, 1, 100),
+                             (R1, 50, 500), (R1, 100, 100000), (R2, 100, 2000), (R2, 100, 200000),
+                             (R3, 50, 1500), (R3, 100, 150000), (R4, 10, 900)])
+    scan(lua, stub)
+    res, _ = results(ns)
+    S = ns.Sniper
+    v, a, n = res.get(V), res.get(A), res.get(N)
+    if not expect(v and a and n, "sniper test recipes not evaluated"):
+        return
+    # Vendor shuffle: W 300, C 50 (10c + 2 x 20c), room 10% of 250 = 25 spread over 50c of AH reagents: +50%.
+    expect(S.Kind(v) == "vendor" and S.Kind(a) == "ah", "sale kind of a row")
+    lv = S.RowLimit(v, "vendor")
+    expect((lv.W, lv.Wc, lv.C, lv.batch, lv.room, lv.markup) == (300, 300, 50, 50, 25, 0.5)
+           and (lv.reagents[R1].qty, lv.reagents[R1].max, lv.reagents[R2].qty, lv.reagents[R2].max) == (50, 15, 100, 30),
+           f"vendor row limits {(lv.W, lv.Wc, lv.C, lv.batch, lv.room, lv.markup)}")
+    expect(abs(lv.floorGh - 0.9 * 250 / 5 * 3600) < 1e-6, f"vendor row floor g/h {lv.floorGh}")
+    # AH sale: measured after a 10% price drop.
+    la = S.RowLimit(a, "ah")
+    W = int(a.sell.ah * a.n)
+    Wc = int(0.9 * W)
+    room = 0.1 * (Wc - 40)
+    mk = room / 40
+    expect((la.W, la.Wc, la.C, la.batch) == (W, Wc, 40, 50) and abs(la.room - room) < 1e-9
+           and la.reagents[R1].max == int(10 * (1 + mk)) and la.reagents[R3].max == int(30 * (1 + mk))
+           and la.floorGh is None, f"AH row limits {(la.W, la.Wc, la.C, la.batch, la.room)}")
+    # Any mix of buys at the max prices keeps the floor.
+    for lim, worth in ((lv, 300), (la, Wc)):
+        spend = sum(gg.qty * gg.max for gg in lim.reagents.values()) / lim.batch
+        expect(worth - (lim.C - lim.ahCost + spend) >= lim.floor * (worth - lim.C) - 1e-9,
+               f"buying at the max breaks the floor of {lim.name}")
+    print(f"sniper example: vendor row W {lv.W}, C {lv.C}, room {lv.room:g}, markup {lv.markup:.0%}, "
+          f"R1 10->{lv.reagents[R1].max}c, R2 20->{lv.reagents[R2].max}c; AH row W {W}, Wc {Wc}, C 40, "
+          f"room {la.room:g}, markup {mk:.1%}, R1 10->{la.reagents[R1].max}c, R3 30->{la.reagents[R3].max}c")
+    # 4c profit, 84 - 90 after a 10% drop: no room.
+    ln = S.RowLimit(n, "ah")
+    expect(ln.noRoom and not any(True for _ in ln.reagents.values() if _.max), "no-room row")
+
+    # Ticking (the window) and the merged watch list.
+    slash(lua, "")
+    frame = g.ForeverCrafterFrame
+    UI = ns.UI
+    ns.settings.minSoldPerDay = 0
+    ns.settings.minBatch = 1
+    UI.Recompute()
+    UI.Refresh()
+    heads = [h.col.key for h in frame.headers.values() if h.col]
+    expect(heads[0] == "snipe", f"craft columns {heads}")
+    rows = {f.result.spell: f for f in stub.frames.values() if f.cells is not None and f.result is not None}
+    if not expect(V in rows and A in rows and N in rows, f"sniper rows not listed: {list(rows)}"):
+        return
+    for spell in (V, A, N):
+        cb = rows[spell].snipe
+        expect(cb.__shown, "snipe checkbox hidden")
+        cb.Click(cb)
+    expect(S.IsTicked(V) and S.IsTicked(A) and S.IsTicked(N), "checkbox does not tick")
+    UI.Refresh()
+    rows = {f.result.spell: f for f in stub.frames.values() if f.cells is not None and f.result is not None}
+    expect(rows[V].snipe.__checked and "no room" in UI.CellText(n, "name")
+           and "no room" not in UI.CellText(v, "name"), "no room marker / checked state")
+    by = {r.spell: r for r in UI.results.values()}
+    expect("Sniping for this craft|r (vendor sale, keep 90% g/h" in UI.DetailText(by[V])
+           and f"max {ns.Util.Money(15)}" in UI.DetailText(by[V]), "craft detail has no snipe lines")
+    w = {e.id: e for e in S.Watch().values()}
+    expect(set(w) == {R1, R2, R3}, f"watched reagents {set(w)}")
+    r1 = w.get(R1)
+    expect(r1 and [x.spell for x in r1.rows.values()] == [A, V] and r1.max == la.reagents[R1].max
+           and r1.need == 100, "merged reagent: rows highest max first, need of both")
+    stub.bags[R1] = 20
+    r1 = {e.id: e for e in S.Watch().values()}[R1]
+    expect((r1.need, S.NeedAt(r1, 20)) == (80, 50), f"owned fill the lowest max first: {r1.need}, {S.NeedAt(r1, 20)}")
+    stub.bags[R1] = 0
+
+    # The Sniper tab and the search loop.
+    slash(lua, "snipe")
+    expect(ns.settings.tab == "snipe" and [h.col.key for h in frame.headers.values() if h.col][0] == "name"
+           and frame.sn.start.__shown and not frame.minProfit.__shown, "Sniper tab not shown")
+    expect(len(UI.view) == 3 and "3 reagents for 3 crafts" in frame.status.__text
+           and "1 with no room" in frame.status.__text, f"sniper status {frame.status.__text!r}")
+    n0 = len(stub.searches)
+    stub.throttled = True
+    frame.sn.start.Click(frame.sn.start)
+    expect(S.running and len(stub.searches) == n0, "searched while the AH was throttled")
+    stub.throttled = False
+    stub.runTimers(1)
+    expect(len(stub.searches) == n0 + 1, "the loop sent no search")
+    first = stub.searches[len(stub.searches)].key.itemID
+    stub.runTimers(1)
+    expect(len(stub.searches) == n0 + 1, "a second search while the first has no answer")
+    # Commodity results: 12c and 25c fit (the 25c ones only for A), 40c is over every max.
+    stub.commodity[R1] = ltable(lua, [[12, 30], [25, 40], [40, 100], [5, 7, 7]])
+    stub.fire("COMMODITY_SEARCH_RESULTS_UPDATED", R1)
+    stub.runTimers(0.2)
+    r1 = {e.id: e for e in S.Watch().values()}[R1]
+    d = r1.deal
+    expect(d and (d.qty, d.total, d.budget) == (70, 30 * 12 + 40 * 25, 30 * r1.rows[2].max + 40 * r1.rows[1].max),
+           f"commodity deal {d and (d.qty, d.total, d.budget)}")
+    expect(S.seen[R1].listings[1].unit == 12, "own listings must be left out")
+    label, target = S.BuyTarget(None)
+    expect(target is not None and label.startswith("Buy "), f"Buy button {label}")
+    # Buy: the quote is checked; a rise over the budget cancels.
+    stub.purchases = lua.table()
+    S.Buy(r1)
+    expect(stub.purchases[1][1] == "Start" and stub.purchases[1][2] == R1 and stub.purchases[1][3] == 70,
+           "StartCommoditiesPurchase not called")
+    stub.fire("COMMODITY_PRICE_UPDATED", 30, d.budget + 1)
+    expect(stub.purchases[2][1] == "Cancel" and S.pending is None, "a dearer quote was not cancelled")
+    S.Buy(r1)
+    stub.fire("COMMODITY_PRICE_UPDATED", 20, d.total)
+    expect(stub.purchases[4][1] == "Confirm" and stub.purchases[4][3] == 70, "an OK quote was not confirmed")
+    stub.fire("COMMODITY_PURCHASE_SUCCEEDED")
+    r1 = {e.id: e for e in S.Watch().values()}[R1]
+    expect(S.pending is None and (r1.owned, r1.mail, r1.need) == (70, 70, 30), f"bought: {r1.owned} {r1.mail}")
+    stub.bags[R1] = 50                           # 50 of them arrived from the mail
+    r1 = {e.id: e for e in S.Watch().values()}[R1]
+    expect((r1.owned, r1.bags, r1.mail) == (70, 50, 20), f"mail arrival {(r1.owned, r1.bags, r1.mail)}")
+    # A blocked Confirm (from the event): the button becomes Confirm, a click confirms.
+    stub.commodity[R2] = ltable(lua, [[20, 10]])
+    stub.fire("COMMODITY_SEARCH_RESULTS_UPDATED", R2)
+    r2 = {e.id: e for e in S.Watch().values()}[R2]
+    S.Buy(r2)
+    stub.fire("COMMODITY_PRICE_UPDATED", 20, 200)
+    stub.fire("ADDON_ACTION_BLOCKED", "ForeverCrafter", "C_AuctionHouse.ConfirmCommoditiesPurchase()")
+    expect(S.pending and S.pending.stage == "click" and S.BuyTarget(None).startswith("Confirm 10"), "blocked confirm")
+    k = len(stub.purchases)
+    frame.sn.buy.Click(frame.sn.buy)
+    expect(stub.purchases[k + 1][1] == "Confirm", "the Confirm click does not confirm")
+    stub.fire("COMMODITY_PURCHASE_SUCCEEDED")
+    expect(S.pending is None and ns.char.snipe.bought[R2].n == 10, "purchase after the click")
+    # A new quote after the confirm (the price changed) is not confirmed by itself; unconfirmed, it is cancelled.
+    r2 = {e.id: e for e in S.Watch().values()}[R2]
+    S.Buy(r2)
+    stub.fire("COMMODITY_PRICE_UPDATED", 20, 200)
+    k = len(stub.purchases)
+    stub.fire("COMMODITY_PRICE_UPDATED", 21, 210)
+    expect(S.pending and S.pending.stage == "click" and len(stub.purchases) == k, "a new quote must wait for a click")
+    stub.runTimers(S.CLICK_WAIT + 1)
+    expect(S.pending is None and stub.purchases[len(stub.purchases)][1] == "Cancel", "an unconfirmed quote stays open")
+    # A confirm the AH does not answer in time is not cancelled, and a late success still counts.
+    S.Buy({e.id: e for e in S.Watch().values()}[R2])
+    stub.fire("COMMODITY_PRICE_UPDATED", 20, 200)
+    k = len(stub.purchases)
+    stub.runTimers(S.TIMEOUT + 1)
+    expect(S.pending is None and S.late and len(stub.purchases) == k, "a slow confirm was cancelled")
+    stub.fire("COMMODITY_PURCHASE_SUCCEEDED")
+    expect(S.late is None and ns.char.snipe.bought[R2].n == 20, "a late purchase is not counted")
+    # The budget: each unit at the max of the row it fills (owned items fill the lowest max first).
+    d = lua.execute("""
+      local S = ...
+      S.seen[990699] = { commodity = true, listings = { { unit = 40, qty = 20 } } }
+      local w = { id = 990699, max = 100, owned = 10,
+        rows = { { spell = 1, max = 100, qty = 10 }, { spell = 2, max = 50, qty = 10 } } }
+      w.need = S.NeedAt(w, 0)
+      local d = S.Deal(w)
+      S.seen[990699] = nil
+      return d
+    """, S)
+    expect(d and (d.qty, d.total, d.budget) == (10, 400, 1000), f"budget per row {d and (d.qty, d.budget)}")
+    # Item auctions: bought whole with PlaceBid.
+    key = ltable(lua, {"itemID": R3, "itemLevel": 0, "itemSuffix": 0, "battlePetSpeciesID": 0})
+    stub.itemResults[R3] = ltable(lua, [[501, 100 * 60, 100], [502, 40 * 20, 20], [503, 1, 1, True]])
+    stub.fire("ITEM_SEARCH_RESULTS_UPDATED", key)
+    r3 = {e.id: e for e in S.Watch().values()}[R3]
+    expect(r3.deal and (r3.deal.qty, r3.deal.total, r3.deal.auctionID) == (20, 800, 502), "item auction deal")
+    S.Buy(r3)
+    expect(stub.purchases[len(stub.purchases)][1] == "PlaceBid" and stub.purchases[len(stub.purchases)][2] == 502,
+           "PlaceBid not called")
+    stub.fire("AUCTION_HOUSE_PURCHASE_COMPLETED", 502)
+    expect(S.pending is None and ns.char.snipe.bought[R3].n == 20, "item auction purchase")
+    # Keep g/h box: 80% doubles the room.
+    frame.sn.floor.SetText(frame.sn.floor, "80")
+    frame.sn.floor.__scripts.OnEnterPressed(frame.sn.floor)
+    expect(ns.settings.snipeFloor == 0.8 and abs(S.Limit(V).room - 50) < 1e-9
+           and S.Limit(V).reagents[R1].max == 20, f"Keep g/h 80: room {S.Limit(V).room}")
+    # Closing the AH stops the loop and cancels a quote.
+    stub.fire("AUCTION_HOUSE_CLOSED")
+    expect(not S.running and "closed" in (S.stopReason or ""), "AH close does not stop the sniper")
+    UI.Refresh()
+    expect(UI.SortValue(UI.view[1], ns.settings.snipeSort) is not None and first in (R1, R2, R3),
+           "sniper tab sort")
+
+    # Saved: the floor, the ticked rows and what was bought.
+    saved = stub.savedVariables("ForeverCrafterDB")
+    lua2, ns2, stub2 = new_runtime(saved=saved)
+    login(lua2, stub2, skills={TAILORING: 300})
+    expect(ns2.settings.snipeFloor == 0.8 and ns2.Sniper.IsTicked(V) and ns2.char.snipe.bought[R3].n == 20,
+           "sniper state not restored")
+    slash(lua2, "snipe clear")
+    slash(lua2, "snipe forget")
+    expect(not ns2.Sniper.IsTicked(V) and not any(True for _ in ns2.char.snipe.bought), "snipe clear/forget")
+    errs = list(ns.errors.values())
+    expect(not [e for e in errs if "blocked" not in e], f"errors in the sniper checks: {errs[:3]}")
+
+    # A client without the AH search API: Start says so.
+    lua3, ns3, stub3 = new_runtime(remove=("C_AuctionHouse.SendSearchQuery",))
+    login(lua3, stub3, skills={TAILORING: 300})
+    stub3.fire("AUCTION_HOUSE_SHOW")
+    ns3.char.snipe.rows[V] = ltable(lua3, {"name": "x", "kind": "ah", "reagents": {R1: {"qty": 1, "max": 5}}})
+    n0 = len(stub3.prints)
+    slash(lua3, "snipe start")
+    expect(not ns3.Sniper.running and any("no AH search API" in p for p in prints(stub3, n0))
+           and any("SendSearchQuery missing" in e for e in ns3.errors.values()), "missing search API")
 
 
 def check_merchant():
@@ -1588,7 +1804,7 @@ def check_what_if():
     expect(all(r.whatIf for r in ns.UI.view.values()) and len(ns.UI.view) > 0, "what-if view is empty or mixed")
     expect(frame.wi.cap.__shown and not frame.known.__shown, "what-if controls not swapped in")
     labels = [h.col.label for h in frame.headers.values() if h.col]
-    expect(labels == ["Recipe", "Profit", "Vend. profit", "%", "Profs", "Conf", "Sell", "Sold/d", "Batch",
+    expect(labels == ["S", "Recipe", "Profit", "Vend. profit", "%", "Profs", "Conf", "Sell", "Sold/d", "Batch",
                      "Batch profit", "Time", "AH g/h", "Vend g/h"],
            f"what-if columns {labels}")
     rows = [f for f in stub.frames.values() if f.result is not None and f.result.whatIf]
@@ -1907,11 +2123,11 @@ def check_sales():
     view0 = [x.spell for x in ns.UI.view.values()]
     expect(ns.UI.salesHidden == 0 and view0, "filter 0 hides results")
     labels = [h.col.label for h in frame.headers.values() if h.col]
-    expect(labels == ["Recipe", "Profit", "Vend. profit", "%", "Sell", "Listed", "Sold/d", "Batch", "Batch profit",
+    expect(labels == ["S", "Recipe", "Profit", "Vend. profit", "%", "Sell", "Listed", "Sold/d", "Batch", "Batch profit",
                      "Time", "AH g/h", "Vend g/h"],
            f"My character columns {labels}")
     ns.UI.Refresh()
-    cells = [f.cells[7].__text for f in stub.frames.values() if f.cells is not None and f.result is not None]
+    cells = [f.cells[8].__text for f in stub.frames.values() if f.cells is not None and f.result is not None]
     expect(cells and all(c == S.Format(x.sales and x.sales.perDay) for c, x in
                          zip(cells, ns.UI.view.values())), f"Sold/d cells {cells}")
     frame.minSold.SetText(frame.minSold, "2.5")
@@ -2291,6 +2507,7 @@ def main():
         check_fast_path()
         check_cheap_batch()
         check_merchant()
+        check_sniper()
         check_missing_apis()
         check_dump()
         n, evaluated, took, hidden, shuffles, times, batches, fasts = check_full_run()

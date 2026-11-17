@@ -31,9 +31,12 @@ local BATCH_HINT = "Cheap batch: how many crafts you can make before the reagent
   .. "shuffles on: the vendor batch."
 local BATCH_PROFIT_HINT = "Profit of the whole cheap batch: every craft of the Batch column, sold at the price shown. "
   .. "With Vendor shuffles on: the vendor batch sold to a vendor. — = not profitable; ~ = estimated vendor price."
+local SNIPE_COL = { key = "snipe", label = "S", title = "Snipe", width = 20, hint = "Tick to watch this craft's AH "
+  .. "reagents in the Sniper tab (batch quantities, at prices that keep most of the g/h shown)." }
 local COLUMNS = {
   char = {
-    { key = "name", label = "Recipe", width = 162 },
+    SNIPE_COL,
+    { key = "name", label = "Recipe", width = 142 },
     { key = "profit", label = "Profit", width = 88 },
     { key = "vprofit", label = "Vend. profit", width = 84 },
     { key = "pct", label = "%", width = 44 },
@@ -47,7 +50,8 @@ local COLUMNS = {
     { key = "vgh", label = "Vend g/h", width = 56, hint = VENDOR_HOUR_HINT },
   },
   whatIf = {
-    { key = "name", label = "Recipe", width = 130 },
+    SNIPE_COL,
+    { key = "name", label = "Recipe", width = 120 },
     { key = "profit", label = "Profit", width = 76 },
     { key = "vprofit", label = "Vend. profit", width = 76 },
     { key = "pct", label = "%", width = 38 },
@@ -63,7 +67,8 @@ local COLUMNS = {
   },
 }
 COLUMNS.rep = ns.Reputation.COLUMNS
-local MAX_COLUMNS = 13
+COLUMNS.snipe = ns.Sniper.COLUMNS
+local MAX_COLUMNS = 14
 local LIST_W = 804
 local FRAME_W = LIST_W + 400
 local PL = ns.Planner
@@ -72,14 +77,24 @@ local function repMode()
   return ns.settings.tab == "rep"
 end
 
+local function snipeMode()
+  return ns.settings.tab == "snipe"
+end
+
+-- A tab other than the craft list (Reputation, Sniper).
+local function panelMode()
+  return repMode() or snipeMode()
+end
+
 local function whatIf()
-  return not repMode() and ns.settings.mode == "whatIf"
+  return not panelMode() and ns.settings.mode == "whatIf"
 end
 
 UI.COLUMNS, UI.ROW_W = COLUMNS, LIST_W - 8
 
 local function columns()
   if repMode() then return COLUMNS.rep end
+  if snipeMode() then return COLUMNS.snipe end
   return COLUMNS[whatIf() and "whatIf" or "char"]
 end
 
@@ -87,12 +102,15 @@ end
 local function sortSetting()
   local s = ns.settings
   if repMode() then return s.repSort or "rper", s.repSortDesc == true end
+  if snipeMode() then return s.snipeSort or "under", s.snipeSortDesc ~= false end
   return s.sort or "profit", s.sortDesc ~= false
 end
 
 local function setSort(key, desc)
   if repMode() then
     ns.settings.repSort, ns.settings.repSortDesc = key, desc
+  elseif snipeMode() then
+    ns.settings.snipeSort, ns.settings.snipeSortDesc = key, desc
   else
     ns.settings.sort, ns.settings.sortDesc = key, desc
   end
@@ -309,16 +327,17 @@ local function sortValue(r, key)
   if key == "sold" then return r.sales and r.sales.perDay or -1 end
   if key == "batch" then return UI.Batch(r) or -1 end
   if key == "bprofit" then return UI.BatchProfit(r) or -math.huge end
+  if key == "snipe" then return ns.Sniper.IsTicked(r.spell) and 1 or 0 end
   return r.profit
 end
 
-local function applyRep()
+-- The Reputation and Sniper tabs: no filters, their own sort.
+local function applyPanel(mod)
   local view = {}
   for _, o in ipairs(UI.results) do table.insert(view, o) end
   local key, desc = sortSetting()
-  local R = ns.Reputation
   table.sort(view, function(a, b)
-    local x, y = R.SortValue(a, key), R.SortValue(b, key)
+    local x, y = mod.SortValue(a, key), mod.SortValue(b, key)
     if x ~= y then
       if desc then return x > y end
       return x < y
@@ -331,7 +350,8 @@ local function applyRep()
 end
 
 function UI.ApplyFilter()
-  if repMode() then return applyRep() end
+  if repMode() then return applyPanel(ns.Reputation) end
+  if snipeMode() then return applyPanel(ns.Sniper) end
   local s = ns.settings
   local view = {}
   local wi = whatIf()
@@ -382,6 +402,7 @@ end
 
 local function apply(results, stats)
   UI.results, UI.stats = results, stats
+  if not panelMode() then ns.Sniper.Update(results, ns.settings.mode == "whatIf" and "whatIf" or "char") end
   if UI.selected then
     local still
     for _, r in ipairs(results) do
@@ -394,6 +415,12 @@ end
 
 -- What-if runs are spread over frames (Planner.RunAsync); the list keeps the last results until the new ones are in.
 function UI.Recompute()
+  if snipeMode() then
+    PL.CancelAsync()
+    UI.calculating = nil
+    apply(ns.Sniper.List(), {})
+    return
+  end
   if repMode() then
     PL.CancelAsync()
     UI.calculating = nil
@@ -578,6 +605,7 @@ local function whatIfSteps(r, out)
 end
 
 function UI.DetailText(r)
+  if snipeMode() then return ns.Sniper.DetailText(r) end
   if repMode() then
     return ns.Reputation.DetailText(r, UI.repPlan or { steps = {}, shopping = {}, inPlan = {}, gained = 0, cash = 0 },
       UI.repStanding)
@@ -699,6 +727,13 @@ function UI.DetailText(r)
       .. ns.Scanner.LADDER_STEPS .. " cheapest price steps (rescan). The crafted item's sell-to-vendor price: from game "
       .. "data until the client has loaded the item; that happens by itself, a vendor visit does not change it.")
   end
+  local lim = ns.Sniper.IsTicked(r.spell) and ns.Sniper.Limit(r.spell)
+  if lim then
+    table.insert(out, "")
+    table.insert(out, string.format("|cffffd100Sniping for this craft|r (%s sale, keep %d%% g/h; Sniper tab):",
+      lim.kind == "vendor" and "vendor" or "AH", math.floor(lim.floor * 100 + 0.5)))
+    ns.Sniper.LimitLines(lim, out)
+  end
   return table.concat(out, "\n")
 end
 
@@ -734,6 +769,7 @@ local function maxPrimariesText(n)
 end
 
 function UI.StatusText()
+  if snipeMode() then return ns.Sniper.StatusText(#UI.view) end
   if repMode() then
     return ns.Reputation.StatusText(UI.repPlan or { inPlan = {} }, UI.repStanding, #UI.view)
   end
@@ -832,17 +868,18 @@ local function hint(owner, lines)
   owner:SetScript("OnLeave", UI.HideHint)
 end
 
--- mode: "char" | "whatIf" | "rep" (the Reputation tab; the crafting mode is kept for when you go back)
+-- mode: "char" | "whatIf" | "rep" (the Reputation tab) | "snipe" (the Sniper tab); the crafting mode is kept for
+-- when you go back
 function UI.SetMode(mode)
-  if mode == "rep" then
-    ns.settings.tab = "rep"
+  if mode == "rep" or mode == "snipe" then
+    ns.settings.tab = mode
   else
     ns.settings.tab = "craft"
     ns.settings.mode = mode == "whatIf" and "whatIf" or "char"
   end
   UI.selected, UI.offset = nil, 0
   if UI.overrides and not whatIf() then UI.overrides:Hide() end
-  if repMode() then
+  if panelMode() then
     UI.results, UI.stats = {}, {}
     UI.Recompute()
     UI.Refresh()
@@ -917,11 +954,12 @@ local function buildOverrides()
 end
 
 local function layoutColumns()
-  local mode = repMode() and "rep" or ns.settings.mode
+  local mode = panelMode() and ns.settings.tab or ns.settings.mode
   if frame.layoutMode == mode then return end
   frame.layoutMode = mode
   local cols = columns()
   local x = 0
+  for _, row in ipairs(rows) do row.snipe:Hide() end
   for i, h in ipairs(frame.headers) do
     local col = cols[i]
     h.col = col
@@ -936,6 +974,10 @@ local function layoutColumns()
         fs:SetPoint("LEFT", x + 2, 0)
         fs:SetWidth(col.width - 4)
         fs:Show()
+        if col.key == "snipe" then
+          row.snipe:ClearAllPoints()
+          row.snipe:SetPoint("LEFT", x, 0)
+        end
       end
       x = x + col.width
     else
@@ -947,6 +989,8 @@ end
 
 local function cellText(r, key)
   if repMode() then return ns.Reputation.CellText(r, key, UI.repPlan) end
+  if snipeMode() then return ns.Sniper.CellText(r, key) end
+  if key == "snipe" then return "" end
   if key == "name" then
     local col = COLORS[r.color] or COLORS.unknown
     local name = "|c" .. col .. r.name .. "|r"
@@ -958,6 +1002,8 @@ local function cellText(r, key)
     end
     if UI.IsShuffle(r) then name = "|cff40ff40[V]|r " .. name end
     if ns.Planner.Steps(r.tree) > 1 then name = name .. " |cffaaaaaa+chain|r" end
+    local lim = ns.Sniper.IsTicked(r.spell) and ns.Sniper.Limit(r.spell)
+    if lim and lim.noRoom then name = "|cffff8040no room|r " .. name end
     return name
   elseif key == "profit" then
     return Util.Money(r.profit)
@@ -1000,6 +1046,7 @@ end
 UI.CellText = cellText
 UI.SortValue = function(r, key)
   if repMode() then return ns.Reputation.SortValue(r, key) end
+  if snipeMode() then return ns.Sniper.SortValue(r, key) end
   return sortValue(r, key)
 end
 
@@ -1087,6 +1134,55 @@ local function build()
   frame.repTab = button(frame, 110, "Reputation", function()
     UI.SetMode(repMode() and ns.settings.mode or "rep")
   end)
+  frame.snipeTab = button(frame, 80, "Sniper", function()
+    UI.SetMode(snipeMode() and ns.settings.mode or "snipe")
+  end)
+  frame.snipeTab:SetPoint("TOPRIGHT", -154, -8)
+  hint(frame.snipeTab, { "Sniper", "Watch the AH for the reagents of the crafts you ticked (S column) and buy the "
+    .. "listings at or under a max price that keeps most of the craft's g/h. One click per purchase. Also: /crafter snipe" })
+  -- Sniper controls (filter row, Sniper tab only).
+  local sn = {}
+  sn.floor = editBox(frame, 32, "Keep g/h %", 14, function()
+    return tostring(math.floor(ns.Sniper.Floor() * 100 + 0.5))
+  end, function(v)
+    local n = tonumber(v)
+    if n and n >= 0 and n <= 99 then
+      ns.Sniper.SetFloor(n / 100)
+      UI.Recompute()
+    end
+  end)
+  hint(sn.floor, { "Keep g/h %", "A deal must keep a ticked craft at this share of its g/h (Vend g/h for a vendor "
+    .. "sale, AH g/h otherwise). For an AH sale, of the g/h it would earn if the sale price fell 10%.",
+    "The room left is spread as one markup over the craft's AH reagents. Lower = higher max prices." })
+  sn.start = button(frame, 70, "Start", function()
+    if ns.Sniper.running then ns.Sniper.Stop() else ns.Sniper.Start() end
+  end)
+  sn.start:SetPoint("TOPLEFT", 132, -38)
+  hint(sn.start, { "Start / Stop", "Search the watched reagents one at a time (the AH must be open). Stops when the AH "
+    .. "closes or every need is met." })
+  sn.buy = button(frame, 250, "Buy", function()
+    local _, w = ns.Sniper.BuyTarget(UI.selected)
+    ns.Sniper.Buy(w)
+  end)
+  sn.buy:SetPoint("TOPLEFT", 208, -38)
+  hint(sn.buy, { "Buy", "Buys the selected reagent's deal, or the deal furthest under its max. One purchase per click "
+    .. "(the game requires it). A commodity's price is checked again before it is confirmed; above the max it is "
+    .. "cancelled." })
+  sn.clear = button(frame, 80, "Untick all", function()
+    ns.Sniper.Clear()
+    UI.Recompute()
+    UI.Refresh()
+  end)
+  sn.clear:SetPoint("TOPLEFT", 464, -38)
+  sn.forget = button(frame, 110, "Forget bought", function()
+    ns.Sniper.ForgetBought()
+    UI.Recompute()
+    UI.Refresh()
+  end)
+  sn.forget:SetPoint("TOPLEFT", 550, -38)
+  hint(sn.forget, { "Forget bought", "What you bought counts as owned until it arrives in your bags from the mail. "
+    .. "Forget it, e.g. if you sold or used it." })
+  frame.sn = sn
   frame.repTab:SetPoint("TOPRIGHT", -40, -8)
   hint(frame.repTab, { "Reputation", "The cheapest ways to gain reputation with " .. select(2, ns.Reputation.Faction())
     .. " from AH and vendor prices: Craftsman's Writs and, from Friendly, notarised Waylaid Crates. Also: /crafter rep" })
@@ -1175,6 +1271,8 @@ local function build()
         setSort(key, not desc)
       elseif repMode() then
         setSort(key, key == "rtier" or key == "rrep")
+      elseif snipeMode() then
+        setSort(key, key ~= "name" and key ~= "cheap" and key ~= "davg" and key ~= "max" and key ~= "seen")
       else
         setSort(key, key ~= "name" and key ~= "profs" and key ~= "conf" and key ~= "time")
       end
@@ -1182,7 +1280,7 @@ local function build()
       UI.Refresh()
     end)
     h:SetScript("OnEnter", function(self)
-      if self.col and self.col.hint then UI.ShowHint(self, { self.col.label, self.col.hint }) end
+      if self.col and self.col.hint then UI.ShowHint(self, { self.col.title or self.col.label, self.col.hint }) end
     end)
     h:SetScript("OnLeave", UI.HideHint)
     table.insert(frame.headers, h)
@@ -1196,6 +1294,18 @@ local function build()
     row.sel = row:CreateTexture(nil, "BACKGROUND")
     row.sel:SetAllPoints()
     row.sel:SetColorTexture(0.3, 0.5, 0.9, 0.25)
+    row.snipe = CreateFrame("CheckButton", nil, row, "UICheckButtonTemplate")
+    row.snipe:SetSize(20, 20)
+    row.snipe:SetPoint("LEFT", 0, 0)
+    row.snipe:SetScript("OnClick", function(self)
+      local r = row.result
+      if r then ns.Sniper.Toggle(r) end
+      self:SetChecked(r ~= nil and ns.Sniper.IsTicked(r.spell))
+      UI.Refresh()
+    end)
+    row.snipe:SetScript("OnEnter", function(self) UI.ShowHint(self, { SNIPE_COL.title, SNIPE_COL.hint }) end)
+    row.snipe:SetScript("OnLeave", UI.HideHint)
+    row.snipe:Hide()
     row.cells = {}
     for _ = 1, MAX_COLUMNS do
       local fs = text(row, "small")
@@ -1210,9 +1320,9 @@ local function build()
     row:SetScript("OnEnter", function(self)
       local r = self.result
       if not r then return end
-      if repMode() then
+      if panelMode() then
         local lines = {}
-        ns.Reputation.OptionLines(r, lines)
+        if repMode() then ns.Reputation.OptionLines(r, lines) else ns.Sniper.OptionLines(r, lines) end
         UI.ShowHint(self, lines)
         return
       end
@@ -1265,17 +1375,29 @@ end
 
 function UI.Refresh()
   if not frame or not frame:IsShown() then return end
-  local wi, rm = whatIf(), repMode()
+  local wi, rm, sm = whatIf(), repMode(), snipeMode()
+  local pm = rm or sm
   layoutColumns()
   frame.mode:SetText(wi and "Mode: What-if" or "Mode: My character")
   frame.repTab:SetText(rm and "Back to crafts" or "Reputation")
+  frame.snipeTab:SetText(sm and "Crafts" or "Sniper")
   for _, c in ipairs({ frame.mode, frame.shuffles, frame.prof, frame.minProfit, frame.minListings, frame.minSold,
     frame.minBatch }) do
-    c:SetShown(not rm)
-    if c.label then c.label:SetShown(not rm) end
+    c:SetShown(not pm)
+    if c.label then c.label:SetShown(not pm) end
   end
   frame.repGoal:SetShown(rm)
   frame.repGoal.label:SetShown(rm)
+  for _, c in pairs(frame.sn) do c:SetShown(sm) end
+  frame.sn.floor.label:SetShown(sm)
+  if sm then
+    frame.sn.start:SetText(ns.Sniper.running and "Stop" or "Start")
+    frame.sn.start:SetEnabled(ns.Sniper.running or ns.Scanner.ahOpen)
+    local label, target = ns.Sniper.BuyTarget(UI.selected)
+    frame.sn.buy:SetText(label)
+    frame.sn.buy:SetEnabled(ns.Scanner.ahOpen and (target ~= nil or (ns.Sniper.pending ~= nil
+      and ns.Sniper.pending.stage == "click")))
+  end
   for _, c in pairs(frame.wi) do c:SetShown(wi) end
   frame.wi.cap.label:SetShown(wi)
   if wi then
@@ -1285,8 +1407,8 @@ function UI.Refresh()
   elseif UI.overrides then
     UI.overrides:Hide()
   end
-  frame.known:SetShown(not wi and not rm)
-  frame.learn:SetShown(not wi and not rm)
+  frame.known:SetShown(not wi and not pm)
+  frame.learn:SetShown(not wi and not pm)
   frame.prof:SetText(professionLabel())
   frame.known:SetChecked(ns.settings.showKnown)
   frame.learn:SetChecked(ns.settings.showLearnable)
@@ -1307,24 +1429,29 @@ function UI.Refresh()
     if r then
       for c, h in ipairs(frame.headers) do
         if h.col then row.cells[c]:SetText(cellText(r, h.col.key)) end
+        if h.col and h.col.key == "snipe" then
+          row.snipe:SetChecked(ns.Sniper.IsTicked(r.spell))
+          row.snipe:Show()
+        end
       end
       row.sel:SetShown(UI.selected ~= nil and UI.selected.spell == r.spell)
       row:Show()
     else
+      row.snipe:Hide()
       row:Hide()
     end
   end
   local n = #UI.view
-  if rm then
+  if pm then
     frame.footer:SetText(string.format("%d-%d of %d   (%s)", math.min(UI.offset + 1, n), math.min(UI.offset + ROWS, n),
-      n, ns.Reputation.FOOTER))
+      n, rm and ns.Reputation.FOOTER or ns.Sniper.FOOTER))
     detail:SetText(UI.DetailText(UI.selected))
     frame.detailChild:SetHeight(math.max(detail:GetStringHeight() + 10, 10))
     return
   end
   frame.footer:SetText(n > 0 and string.format("%d-%d of %d   (scroll with the mouse wheel; [L] = not learned yet; "
     .. "[1-5] = random count; [V] = vendor shuffle; 50+ = batch may be bigger; Batch profit = the whole batch; "
-    .. "* = g/h of a faster path)",
+    .. "* = g/h of a faster path; S = snipe)",
     UI.offset + 1, math.min(UI.offset + ROWS, n), n)
     or (ns.settings.vendorShuffles and "no vendor shuffles with these filters" or "nothing profitable with these filters"))
   detail:SetText(UI.DetailText(UI.selected))
@@ -1355,6 +1482,19 @@ ns.Listen("DATA_CHANGED", function()
   C_Timer.After(0.2, function()
     pending = false
     UI.Recompute()
+    UI.Refresh()
+  end)
+end)
+local snipePending = false
+ns.Listen("SNIPE_CHANGED", function()
+  if not UI.IsShown() or snipePending then return end
+  snipePending = true
+  C_Timer.After(0.1, function()
+    snipePending = false
+    if snipeMode() then
+      UI.results = ns.Sniper.List()
+      UI.ApplyFilter()
+    end
     UI.Refresh()
   end)
 end)

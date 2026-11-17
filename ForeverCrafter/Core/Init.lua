@@ -119,6 +119,10 @@ local DEFAULTS = {
     repGoal = 0,
     repSort = "rper",
     repSortDesc = false,
+    -- Sniper: a deal must keep a ticked craft at this share of its g/h (AH sales: the g/h after a 10% price drop)
+    snipeFloor = 0.9,
+    snipeSort = "under",
+    snipeSortDesc = true,
   },
   realms = {},      -- realm key → { time, items = { [itemID] = { min, qty, n, steps = {unit1, qty1, ...} } } }
   vendorSeen = {},  -- itemID → { unit, stack, limited, time, npc } from MERCHANT_SHOW (authoritative)
@@ -138,6 +142,9 @@ local CHAR_DEFAULTS = {
   difficulty = {},  -- spell ID → TradeskillRelativeDifficulty (0 optimal .. 3 trivial)
   casts = {},       -- spell ID → cast time in ms (C_Spell.GetSpellInfo castTime, read at the profession window)
   sourceText = {},  -- spell ID → C_TradeSkillUI.GetRecipeSourceText of an unlearned recipe (the game's "how to learn")
+  -- Sniper: rows = { [spell] = limits of a ticked craft (Modules/Sniper.lua RowLimit) }; bought = { [itemID] =
+  -- { n = bought and not yet in the bags (AH purchases go to the mail), bagsAt = bag count when last checked } }
+  snipe = { rows = {}, bought = {} },
 }
 
 local function fill(dst, src)
@@ -207,6 +214,7 @@ local function help()
   ns.Print("/crafter minimap      - show or hide the minimap button")
   ns.Print("/crafter rep          - reputation planner (Durotar Supply and Logistics / Azeroth Commerce Authority)")
   ns.Print("/crafter rep forget   - clear the reputation and favor amounts learned in game")
+  ns.Print("/crafter snipe [start|stop|clear|forget] - reagent sniper: tab, search loop, untick all, forget purchases")
   ns.Print("/crafter status       - professions, snapshot age, AH cut")
   ns.Print("/crafter reset        - forget prices, merchant data and this character's recipe data")
   ns.Print("/crafter dump         - save the open profession's recipes and item data for the addon's data files")
