@@ -90,7 +90,17 @@ local function whatIf()
   return not panelMode() and ns.settings.mode == "whatIf"
 end
 
-UI.COLUMNS, UI.ROW_W = COLUMNS, LIST_W - 8
+-- The Sniper page puts its ticked crafts above a shorter reagent list.
+local CRAFT_ROWS = 5
+local SNIPE_ROWS = ROWS - CRAFT_ROWS - 1
+local LIST_TOP, SNIPE_LIST_TOP = -86, -86 - (CRAFT_ROWS + 1) * ROW_H - 6
+
+local function visibleRows()
+  return snipeMode() and SNIPE_ROWS or ROWS
+end
+
+UI.COLUMNS, UI.ROW_W, UI.CRAFT_ROWS, UI.SNIPE_ROWS = COLUMNS, LIST_W - 8, CRAFT_ROWS, SNIPE_ROWS
+UI.craftOffset = 0
 
 local function columns()
   if repMode() then return COLUMNS.rep end
@@ -117,6 +127,7 @@ local function setSort(key, desc)
 end
 
 local frame, rows, detail
+local refreshCrafts
 UI.results, UI.view, UI.stats = {}, {}, {}
 UI.offset = 0
 UI.selected = nil
@@ -345,7 +356,7 @@ local function applyPanel(mod)
     return a.spell < b.spell
   end)
   UI.view, UI.salesHidden, UI.batchHidden = view, 0, 0
-  local maxOffset = math.max(#view - ROWS, 0)
+  local maxOffset = math.max(#view - visibleRows(), 0)
   if UI.offset > maxOffset then UI.offset = maxOffset end
 end
 
@@ -396,7 +407,7 @@ function UI.ApplyFilter()
     return a.spell < b.spell
   end)
   UI.view, UI.salesHidden, UI.batchHidden = view, salesHidden, batchHidden
-  local maxOffset = math.max(#view - ROWS, 0)
+  local maxOffset = math.max(#view - visibleRows(), 0)
   if UI.offset > maxOffset then UI.offset = maxOffset end
 end
 
@@ -730,8 +741,8 @@ function UI.DetailText(r)
   local lim = ns.Sniper.IsTicked(r.spell) and ns.Sniper.Limit(r.spell)
   if lim then
     table.insert(out, "")
-    table.insert(out, string.format("|cffffd100Sniping for this craft|r (%s sale, keep %d%% g/h; Sniper tab):",
-      lim.kind == "vendor" and "vendor" or "AH", math.floor(lim.floor * 100 + 0.5)))
+    table.insert(out, string.format("|cffffd100Sniping for this craft|r (%s sale, keep %d%% g/h, %s; Sniper tab):",
+      lim.kind == "vendor" and "vendor" or "AH", math.floor(lim.floor * 100 + 0.5), ns.Sniper.TargetText(lim)))
     ns.Sniper.LimitLines(lim, out)
   end
   return table.concat(out, "\n")
@@ -953,10 +964,136 @@ local function buildOverrides()
   return f
 end
 
+-- Sniper page: the ticked crafts, each with a Target box -------------------------------------------------------
+
+-- Re-list the reagents after a sniper change (a Target, a tick).
+function UI.RelistSnipe()
+  if not frame or not snipeMode() then return end
+  UI.results = ns.Sniper.List()
+  UI.ApplyFilter()
+end
+
+local function targetBox(row)
+  local e = CreateFrame("EditBox", nil, row, "InputBoxTemplate")
+  e:SetSize(48, 18)
+  e:SetAutoFocus(false)
+  e:SetMaxLetters(4)
+  local function current(self)
+    self:SetText(row.lim and ns.Sniper.CraftCellText(row.lim, "target") or "")
+  end
+  e:SetScript("OnEnterPressed", function(self)
+    local lim = row.lim
+    if lim then
+      local t = (self:GetText() or ""):gsub("%s", "")
+      if not ns.Sniper.SetTarget(lim.spell, t) then
+        ns.Print("Target must be a whole number from 1 to " .. ns.Sniper.MAX_TARGET .. ", or blank for the batch")
+      end
+    end
+    self:ClearFocus()
+    current(self)
+    UI.RelistSnipe()
+    UI.Refresh()
+  end)
+  e:SetScript("OnEscapePressed", function(self) self:ClearFocus() end)
+  e:SetScript("OnEditFocusLost", current)
+  e:SetScript("OnEnter", function(self)
+    UI.ShowHint(self, { "Target", ns.Sniper.CRAFT_COLUMNS[4].hint })
+  end)
+  e:SetScript("OnLeave", UI.HideHint)
+  return e
+end
+
+local function buildCrafts()
+  local c = CreateFrame("Frame", nil, frame)
+  c:SetPoint("TOPLEFT", 10, LIST_TOP)
+  c:SetSize(LIST_W, (CRAFT_ROWS + 1) * ROW_H + 4)
+  c:EnableMouseWheel(true)
+  c:SetScript("OnMouseWheel", function(_, delta)
+    local n = #ns.Sniper.Crafts()
+    UI.craftOffset = math.max(0, math.min(UI.craftOffset - delta, math.max(n - CRAFT_ROWS, 0)))
+    UI.Refresh()
+  end)
+  c.headers, c.rows = {}, {}
+  local x = 0
+  for _, col in ipairs(ns.Sniper.CRAFT_COLUMNS) do
+    local h = CreateFrame("Button", nil, c)
+    h:SetSize(col.width, ROW_H)
+    h:SetPoint("TOPLEFT", x + 4, 0)
+    h.text = text(h, "small", 1, 0.82, 0)
+    h.text:SetPoint("LEFT", 2, 0)
+    h.text:SetText(col.label)
+    h.col, h.x = col, x
+    if col.hint then
+      h:SetScript("OnEnter", function(self) UI.ShowHint(self, { col.label, col.hint }) end)
+      h:SetScript("OnLeave", UI.HideHint)
+    end
+    table.insert(c.headers, h)
+    x = x + col.width
+  end
+  for i = 1, CRAFT_ROWS do
+    local row = CreateFrame("Button", nil, c)
+    row:SetSize(LIST_W - 8, ROW_H)
+    row:SetPoint("TOPLEFT", 4, -i * ROW_H)
+    row:SetHighlightTexture("Interface\\QuestFrame\\UI-QuestTitleHighlight")
+    row.cells = {}
+    for k, h in ipairs(c.headers) do
+      if h.col.key == "target" then
+        row.target = targetBox(row)
+        row.target:SetPoint("LEFT", h.x + 6, 0)
+      else
+        local fs = text(row, "small")
+        fs:SetPoint("LEFT", h.x + 2, 0)
+        fs:SetWidth(h.col.width - 4)
+        fs:SetJustifyV("MIDDLE")
+        if fs.SetWordWrap then fs:SetWordWrap(false) end
+        row.cells[k] = fs
+      end
+    end
+    row:SetScript("OnEnter", function(self)
+      if not self.lim then return end
+      local lines = { self.lim.name or "?" }
+      ns.Sniper.LimitLines(self.lim, lines)
+      UI.ShowHint(self, lines)
+    end)
+    row:SetScript("OnLeave", UI.HideHint)
+    table.insert(c.rows, row)
+  end
+  c.empty = text(c, "small", 0.6, 0.6, 0.6)
+  c.empty:SetPoint("TOPLEFT", 8, -ROW_H - 4)
+  c.empty:SetText("No ticked crafts: tick S on a craft in the Crafts list to snipe its AH reagents.")
+  c:Hide()
+  frame.crafts = c
+end
+
+refreshCrafts = function()
+  local c = frame.crafts
+  local crafts = ns.Sniper.Crafts()
+  UI.craftOffset = math.max(0, math.min(UI.craftOffset, math.max(#crafts - CRAFT_ROWS, 0)))
+  c.empty:SetShown(#crafts == 0)
+  for i, row in ipairs(c.rows) do
+    local lim = crafts[UI.craftOffset + i]
+    row.lim = lim
+    if lim then
+      for k, h in ipairs(c.headers) do
+        if row.cells[k] then row.cells[k]:SetText(ns.Sniper.CraftCellText(lim, h.col.key)) end
+      end
+      if not row.target:HasFocus() then row.target:SetText(ns.Sniper.CraftCellText(lim, "target")) end
+      row:Show()
+    else
+      row:Hide()
+    end
+  end
+end
+
 local function layoutColumns()
   local mode = panelMode() and ns.settings.tab or ns.settings.mode
   if frame.layoutMode == mode then return end
   frame.layoutMode = mode
+  local sm = snipeMode()
+  frame.list:ClearAllPoints()
+  frame.list:SetPoint("TOPLEFT", 10, sm and SNIPE_LIST_TOP or LIST_TOP)
+  frame.list:SetHeight((visibleRows() + 1) * ROW_H + 4)
+  frame.crafts:SetShown(sm)
   local cols = columns()
   local x = 0
   for _, row in ipairs(rows) do row.snipe:Hide() end
@@ -1250,14 +1387,15 @@ local function build()
 
   -- List.
   local list = CreateFrame("Frame", nil, frame)
-  list:SetPoint("TOPLEFT", 10, -86)
+  list:SetPoint("TOPLEFT", 10, LIST_TOP)
   list:SetSize(LIST_W, (ROWS + 1) * ROW_H + 4)
   list:EnableMouseWheel(true)
   list:SetScript("OnMouseWheel", function(_, delta)
-    UI.offset = math.max(0, math.min(UI.offset - delta * 3, math.max(#UI.view - ROWS, 0)))
+    UI.offset = math.max(0, math.min(UI.offset - delta * 3, math.max(#UI.view - visibleRows(), 0)))
     UI.Refresh()
   end)
   frame.list = list
+  buildCrafts()
   frame.headers = {}
   for _ = 1, MAX_COLUMNS do
     local h = CreateFrame("Button", nil, list)
@@ -1397,6 +1535,7 @@ function UI.Refresh()
     frame.sn.buy:SetText(label)
     frame.sn.buy:SetEnabled(ns.Scanner.ahOpen and (target ~= nil or (ns.Sniper.pending ~= nil
       and ns.Sniper.pending.stage == "click")))
+    refreshCrafts()
   end
   for _, c in pairs(frame.wi) do c:SetShown(wi) end
   frame.wi.cap.label:SetShown(wi)
@@ -1423,8 +1562,9 @@ function UI.Refresh()
       h.text:SetText(h.col.label .. mark)
     end
   end
+  local shown = visibleRows()
   for i, row in ipairs(rows) do
-    local r = UI.view[UI.offset + i]
+    local r = i <= shown and UI.view[UI.offset + i] or nil
     row.result = r
     if r then
       for c, h in ipairs(frame.headers) do
@@ -1443,7 +1583,8 @@ function UI.Refresh()
   end
   local n = #UI.view
   if pm then
-    frame.footer:SetText(string.format("%d-%d of %d   (%s)", math.min(UI.offset + 1, n), math.min(UI.offset + ROWS, n),
+    frame.footer:SetText(string.format("%d-%d of %d   (%s)", math.min(UI.offset + 1, n),
+      math.min(UI.offset + visibleRows(), n),
       n, rm and ns.Reputation.FOOTER or ns.Sniper.FOOTER))
     detail:SetText(UI.DetailText(UI.selected))
     frame.detailChild:SetHeight(math.max(detail:GetStringHeight() + 10, 10))
@@ -1491,10 +1632,7 @@ ns.Listen("SNIPE_CHANGED", function()
   snipePending = true
   C_Timer.After(0.1, function()
     snipePending = false
-    if snipeMode() then
-      UI.results = ns.Sniper.List()
-      UI.ApplyFilter()
-    end
+    UI.RelistSnipe()
     UI.Refresh()
   end)
 end)

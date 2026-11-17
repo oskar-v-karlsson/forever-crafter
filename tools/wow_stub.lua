@@ -103,6 +103,13 @@ function methods:SetScrollChild(c) self.__child = c end
 function methods:IsEnabled() return self.__enabled end
 function methods:SetEnabled(v) self.__enabled = not not v end
 function methods:GetChecked() return self.__checked end
+function methods:SetFocus() self.__focus = true end
+function methods:HasFocus() return self.__focus == true end
+function methods:ClearFocus()
+  if not self.__focus then return end
+  self.__focus = false
+  if self.__scripts.OnEditFocusLost then self.__scripts.OnEditFocusLost(self) end
+end
 function methods:SetChecked(v) self.__checked = not not v end
 function methods:SetTexture(t) self.__texture = t end
 function methods:Click(button)
