@@ -18,6 +18,7 @@ S.GAP = 1.5            -- seconds between two searches (the AH allows 100 per mi
 S.REPEAT = 6           -- seconds before the same item is searched again
 S.TIMEOUT = 10         -- seconds to wait for a search's results or a purchase quote
 S.TICK = 0.5
+S.MET = "every reagent need is met; raise a craft's Target to keep buying"
 S.DEFAULT_FLOOR = 0.9
 
 local function now()
@@ -26,7 +27,9 @@ local function now()
 end
 
 local function store()
-  return ns.char.snipe
+  local st = ns.char.snipe
+  st.targets = st.targets or {}
+  return st
 end
 
 function S.Floor()
@@ -73,7 +76,7 @@ end
 function S.RowLimit(r, kind, floor)
   floor = floor or S.Floor()
   local lim = { spell = r.spell, name = r.name, kind = kind, mode = r.whatIf and "whatIf" or "char", out = r.out,
-    floor = floor, reagents = {}, ahCost = 0 }
+    floor = floor, reagents = {}, ahCost = 0, est = kind == "vendor" and r.vendorEst or nil }
   local p = S.Path(r, kind)
   if not p then
     lim.noRoom = true
@@ -132,10 +135,46 @@ function S.Limit(spell)
   return store().rows[spell]
 end
 
+S.MAX_TARGET = 9999
+
+-- A ticked craft's target: how many crafts to buy reagents for. nil = its cheap batch.
+function S.Target(spell)
+  return ns.char and store().targets[spell] or nil
+end
+
+-- n = an integer 1 .. MAX_TARGET, or nil / blank for the batch. → true if accepted
+function S.SetTarget(spell, n)
+  if n == nil or n == "" then
+    store().targets[spell] = nil
+  else
+    n = tonumber(n)
+    if not n or n ~= math.floor(n) or n < 1 or n > S.MAX_TARGET then return false end
+    store().targets[spell] = n
+  end
+  ns.Fire("SNIPE_CHANGED")
+  return true
+end
+
+-- "target 150 crafts (batch 50)"; just "target 50 crafts (batch)" without a Target.
+function S.TargetText(lim)
+  local t = S.Target(lim.spell)
+  if not lim.batch then return t and string.format("target %d crafts", t) or "no batch" end
+  if not t then return string.format("target %d crafts (batch)", lim.batch) end
+  return string.format("target %d crafts (batch %d)", t, lim.batch)
+end
+
+-- How many of a reagent the craft needs at its target: the batch quantity scaled, rounded up.
+function S.TargetQty(spell, lim, g)
+  local t = S.Target(spell)
+  if not t or not lim.batch or lim.batch <= 0 then return g.qty end
+  return math.ceil(g.qty / lim.batch * t - 1e-9)
+end
+
 function S.Toggle(r)
   local rows = store().rows
   if rows[r.spell] then
     rows[r.spell] = nil
+    store().targets[r.spell] = nil
     ns.Print("no longer sniping for " .. r.name)
   else
     local lim = S.RowLimit(r, S.Kind(r))
@@ -160,6 +199,7 @@ end
 
 function S.Clear()
   store().rows = {}
+  store().targets = {}
   ns.Fire("SNIPE_CHANGED")
 end
 
@@ -239,8 +279,8 @@ function S.Watch()
           byID[id] = w
           table.insert(list, w)
         end
-        table.insert(w.rows, { spell = spell, name = lim.name, kind = lim.kind, max = g.max, qty = g.qty,
-          unit = g.unit })
+        table.insert(w.rows, { spell = spell, name = lim.name, kind = lim.kind, max = g.max,
+          qty = S.TargetQty(spell, lim, g), unit = g.unit })
       end
     end
   end
@@ -430,7 +470,7 @@ function S.Step()
   local okReady, ready = ns.Call("C_AuctionHouse.IsThrottledMessageSystemReady")
   if okReady and ready == false then return end
   local id, anyNeed = nextItem(t)
-  if not anyNeed then return S.Stop("every reagent need is met") end
+  if not anyNeed then return S.Stop(S.MET) end
   if not id then return end
   local sorts = { { sortOrder = Enum and Enum.AuctionHouseSortOrder and Enum.AuctionHouseSortOrder.Price or 0,
     reverseSort = false } }
@@ -466,7 +506,7 @@ function S.Start()
   end
   local _, anyNeed = nextItem(now())
   if not anyNeed then
-    ns.Print(next(store().rows) and "nothing to snipe: every reagent need is met"
+    ns.Print(next(store().rows) and ("nothing to snipe: " .. S.MET)
       or "nothing to snipe: tick the Snipe box of a craft first")
     return
   end
@@ -694,7 +734,112 @@ S.COLUMNS = {
   { key = "rows", label = "For", width = 100 },
 }
 
-S.FOOTER = "Buy = one purchase per click; Need 0 = done; searches run only while the AH is open"
+S.FOOTER = "Buy = one purchase per click; Need 0 = done (raise a craft's Target to buy more); searches run only "
+  .. "while the AH is open"
+
+-- The ticked crafts above the reagent list.
+S.CRAFT_COLUMNS = {
+  { key = "craft", label = "Ticked craft", width = 290 },
+  { key = "sale", label = "Sale", width = 60, hint = "The sale the max prices are worked out for: Vendor (a vendor "
+    .. "shuffle, Vend g/h) or AH (AH g/h, measured after a 10% price drop)." },
+  { key = "batch", label = "Batch", width = 60, hint = "The craft's cheap batch from the last scan: how many crafts the "
+    .. "cheap listings were enough for." },
+  { key = "target", label = "Target", width = 70, hint = "How many crafts to buy reagents for. Blank = the batch. Raise "
+    .. "it to keep sniping when new cheap listings keep appearing; the max prices stay the same, so every craft still "
+    .. "keeps Keep g/h. 1 to " .. S.MAX_TARGET .. "; Enter to set." },
+  { key = "time", label = "Time", width = 70, hint = "Crafting time for the Target: Target x the time of one craft "
+    .. "(the path of the g/h column)." },
+  { key = "profit", label = "Profit (at max)", width = 110, hint = "Profit for the Target if every AH reagent is bought "
+    .. "at its max price: Target x (sale - batch-average cost - room) at today's sale price. Buying cheaper earns more. "
+    .. "~ = the vendor price is an estimate; - = no room or no AH reagents." },
+  { key = "floorgh", label = "Floor g/h", width = 100, hint = "The g/h a craft keeps at worst, when every reagent is "
+    .. "bought at its max price (AH sales: after a 10% price drop)." },
+}
+
+-- How many crafts a ticked craft is sniped for: its Target, else its batch.
+function S.TargetCount(lim)
+  return S.Target(lim.spell) or lim.batch
+end
+
+-- The profit of one craft with every AH reagent bought at its max: W - (C + room). nil = no room / no AH reagents.
+function S.ProfitAtMax(lim)
+  if not lim.W or lim.noRoom or lim.noAH then return nil end
+  return lim.W - (lim.C + lim.room)
+end
+
+-- One craft's totals for its Target. → profit (nil = no room), seconds (nil = unknown)
+function S.CraftTotals(lim)
+  local n = S.TargetCount(lim)
+  if not n then return nil, nil end
+  local p = S.ProfitAtMax(lim)
+  local t = lim.time and lim.time > 0 and n * lim.time or nil
+  return p and n * p, t
+end
+
+-- Over all ticked crafts with room: { profit, time, gh, crafts, est }. g/h counts only crafts with a known time.
+function S.Totals()
+  local tot = { profit = 0, time = 0, crafts = 0 }
+  local timedProfit = 0
+  for _, lim in ipairs(S.Crafts()) do
+    local p, t = S.CraftTotals(lim)
+    if p then
+      tot.profit, tot.crafts = tot.profit + p, tot.crafts + 1
+      if lim.est then tot.est = true end
+      if t then tot.time, timedProfit = tot.time + t, timedProfit + p end
+    end
+  end
+  if tot.time > 0 then tot.gh = timedProfit / tot.time * 3600 end
+  return tot
+end
+
+function S.TotalText()
+  local tot = S.Totals()
+  if tot.crafts == 0 then return "Total: no ticked craft with room" end
+  local UI = ns.UI
+  return string.format("Total for %d craft%s at Target: time %s, profit at max %s%s, %s", tot.crafts,
+    tot.crafts == 1 and "" or "s", tot.time > 0 and UI.TimeText(tot.time) or "—",
+    Util.Money(math.floor(tot.profit + 0.5)), tot.est and " ~" or "",
+    tot.gh and (Util.Money(math.floor(tot.gh + 0.5)) .. "/h") or "g/h unknown")
+end
+
+-- Ticked crafts, by name. → { lim, ... }
+function S.Crafts()
+  local list = {}
+  if not ns.char then return list end
+  for _, lim in pairs(store().rows) do table.insert(list, lim) end
+  table.sort(list, function(a, b)
+    if (a.name or "") ~= (b.name or "") then return (a.name or "") < (b.name or "") end
+    return a.spell < b.spell
+  end)
+  return list
+end
+
+function S.CraftCellText(lim, key)
+  if key == "craft" then
+    local mark = ""
+    if lim.noRoom then mark = " |cffff8040no room|r" elseif lim.noAH then mark = " |cff808080no AH reagents|r" end
+    return (lim.name or "?") .. mark
+  end
+  if key == "sale" then return lim.kind == "vendor" and "Vendor" or "AH" end
+  if key == "batch" then return lim.batch and tostring(lim.batch) or "—" end
+  if key == "target" then
+    local t = S.Target(lim.spell)
+    return t and tostring(t) or ""
+  end
+  if key == "time" then
+    local _, t = S.CraftTotals(lim)
+    return t and ns.UI.TimeText(t, true) or "—"
+  end
+  if key == "profit" then
+    local p = S.CraftTotals(lim)
+    return p and (Util.Money(math.floor(p + 0.5)) .. (lim.est and " ~" or "")) or "—"
+  end
+  if key == "floorgh" then
+    if lim.noRoom or lim.noAH then return "—" end
+    return lim.floorGh and (Util.Money(math.floor(lim.floorGh + 0.5)) .. "/h") or "—"
+  end
+  return ""
+end
 
 local function ago(t)
   if not t or t == -math.huge then return "—" end
@@ -786,7 +931,7 @@ function S.LimitLines(lim, out)
   table.sort(ids)
   for _, id in ipairs(ids) do
     local g = lim.reagents[id]
-    table.insert(out, string.format("    %s x%d: batch avg %s -> max %s", Util.ItemText(id), g.qty,
+    table.insert(out, string.format("    %s x%d: batch avg %s -> max %s", Util.ItemText(id), S.TargetQty(lim.spell, lim, g),
       Util.Money(math.floor(g.unit + 0.5)), Util.Money(g.max)))
   end
   if lim.floorGh then
@@ -803,7 +948,7 @@ function S.DetailText(w)
     table.insert(out, "Select a reagent on the left.")
     table.insert(out, "")
     table.insert(out, "Tick the Snipe box of a craft in the craft list: its AH reagents are watched here with its cheap "
-      .. "batch quantities. Open the AH and press Start: the sniper searches the watched reagents one at a time and "
+      .. "batch quantities (raise a craft's Target above to buy for more crafts). Open the AH and press Start: the sniper searches the watched reagents one at a time and "
       .. "lists listings at or under the max price. Press Buy for each purchase (the game needs a click per buy).")
     table.insert(out, "")
     table.insert(out, "Max price: a deal must keep the craft at Keep g/h of the g/h it would earn if its AH sale price "
@@ -822,9 +967,9 @@ function S.DetailText(w)
   table.insert(out, "")
   table.insert(out, "|cffffd100For:|r")
   for _, row in ipairs(w.rows) do
-    table.insert(out, string.format("%s (%s sale): %d, max %s", row.name or "?", row.kind == "vendor" and "vendor" or "AH",
-      row.qty, Util.Money(row.max)))
     local lim = store().rows[row.spell]
+    table.insert(out, string.format("%s (%s sale, %s): %d, max %s", row.name or "?",
+      row.kind == "vendor" and "vendor" or "AH", lim and S.TargetText(lim) or "?", row.qty, Util.Money(row.max)))
     if lim then S.LimitLines(lim, out) end
   end
   local s = S.seen[w.id]

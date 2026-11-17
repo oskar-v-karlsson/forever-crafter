@@ -797,6 +797,144 @@ def check_sniper():
            and any("SendSearchQuery missing" in e for e in ns3.errors.values()), "missing search API")
 
 
+def check_sniper_target():
+    """A per-craft sniper Target: needs scale with it, it survives a recompute, and deals go past the batch."""
+    lua, ns, stub = new_runtime()
+    g = lua.globals()
+    login(lua, stub, skills={TAILORING: 300})
+    R1, R2, R3, OV, OA = 990601, 990602, 990603, 990611, 990612
+    V, A = 991601, 991602
+    synthetic(lua, ns, stub, {V: (OV, [[R1, 1], [R2, 2]]), A: (OA, [[R1, 1], [R3, 1]])}, [R1, R2, R3, OV, OA])
+    ns.Recipes[V].cast = 5000
+    ns.Items[OV].sell = 300
+    stub["items"][OV] = lua.table_from({"name": f"Test {OV}", "sell": 300})
+    set_auctions(lua, stub, [(OA, 1, 1000), (R1, 50, 500), (R1, 100, 100000), (R2, 100, 2000), (R2, 100, 200000),
+                             (R3, 50, 1500), (R3, 100, 150000)])
+    scan(lua, stub)
+    res, _ = results(ns)
+    S, UI = ns.Sniper, ns.UI
+    v, a = res.get(V), res.get(A)
+    if not expect(v and a, "target test recipes not evaluated"):
+        return
+    S.Toggle(v)
+    S.Toggle(a)
+
+    def watch():
+        return {e.id: e for e in S.Watch().values()}
+
+    # No Target: the need is the batch, exactly as before (V: batch 50, 1 R1 + 2 R2; A: batch 50, 1 R1 + 1 R3).
+    w = watch()
+    expect(S.Target(V) is None and (w[R1].need, w[R2].need, w[R3].need) == (100, 100, 50)
+           and all(row.qty == S.Limit(row.spell).reagents[i].qty for i, e in w.items() for row in e.rows.values()),
+           f"default target need {(w[R1].need, w[R2].need, w[R3].need)}")
+    # 3 x the batch triples V's needs; the shared R1 sums V at its target and A at its batch.
+    expect(S.SetTarget(V, 150), "SetTarget refused 150")
+    w = watch()
+    expect((w[R1].need, w[R2].need, w[R3].need) == (200, 300, 50), f"3x target need {(w[R1].need, w[R2].need)}")
+    expect(S.SetTarget(A, 75) and watch()[R1].need == 225 and watch()[R3].need == 75, "shared reagent at two targets")
+    # Fractional per-craft amounts round up: 5 for a batch of 2 = 2.5 a craft, x 3 crafts = 8.
+    S.SetTarget(A, 3)
+    expect(S.TargetQty(A, lua.table_from({"batch": 2}), lua.table_from({"qty": 5})) == 8, "ceil of 7.5")
+    S.SetTarget(A, None)
+    # Bad input is refused and changes nothing.
+    for bad in (0, 10000, 2.5, "abc", -3):
+        expect(not S.SetTarget(V, bad) and S.Target(V) == 150, f"SetTarget accepted {bad!r}")
+    expect(S.SetTarget(V, "9999") and S.Target(V) == 9999 and S.SetTarget(V, 150), "string target")
+    # A recompute replaces the ticked rows; the target stays.
+    old = S.Limit(V)
+    UI.Recompute()
+    expect(S.Limit(V) is not None and S.Limit(V) != old and S.Target(V) == 150 and watch()[R2].need == 300,
+           "target lost on recompute")
+    # A deal past the batch: 250 R2 at 20c (max 30c) are all wanted at target 150, only 100 without.
+    stub.fire("AUCTION_HOUSE_SHOW")
+    stub.commodity[R2] = ltable(lua, [[20, 250]])
+    stub.fire("COMMODITY_SEARCH_RESULTS_UPDATED", R2)
+    d = watch()[R2].deal
+    expect(d and d.qty == 250 and d.qty > S.Limit(V).reagents[R2].qty, f"deal past the batch {d and d.qty}")
+    S.SetTarget(V, None)
+    d = watch()[R2].deal
+    expect(d and d.qty == 100, f"deal without a target {d and d.qty}")
+    S.SetTarget(V, 150)
+    # Saved and restored; untick and Clear drop it.
+    saved = stub.savedVariables("ForeverCrafterDB")
+    lua2, ns2, stub2 = new_runtime(saved=saved)
+    login(lua2, stub2, skills={TAILORING: 300})
+    expect(ns2.Sniper.Target(V) == 150, "target not restored")
+    S.Toggle(v)
+    expect(not S.IsTicked(V) and S.Target(V) is None, "untick keeps the target")
+    S.Toggle(v)
+    expect(watch()[R2].need == 100, "re-ticked craft keeps an old target")
+    S.SetTarget(V, 120)
+    S.Clear()
+    expect(S.Target(V) is None and not any(True for _ in ns.char.snipe.targets), "Clear keeps targets")
+    expect("raise a craft's Target" in S.MET, "stop message does not mention Target")
+
+    # The Sniper page: ticked crafts above a shorter reagent list, Target typed into a box.
+    S.Toggle(v)
+    S.Toggle(a)
+    slash(lua, "snipe")
+    frame = g.ForeverCrafterFrame
+    crafts = frame.crafts
+    expect(crafts.__shown and not crafts.empty.__shown, "crafts list hidden on the Sniper page")
+    crows = {f.lim.spell: f for f in crafts.rows.values() if f.lim is not None and f.__shown}
+    if not expect(set(crows) == {V, A}, f"crafts rows {set(crows)}"):
+        return
+    rv = crows[V]
+    cells = [c.__text for c in rv.cells.values()]
+    expect(any("Vendor" == c for c in cells) and "50" in cells and rv.target.__text == "", f"crafts row {cells}")
+    box = rv.target
+    box.SetFocus(box)
+    box.SetText(box, "150")
+    UI.Refresh()
+    expect(box.__text == "150" and box.HasFocus(box), "a refresh overwrote a Target being typed")
+    box.__scripts.OnEnterPressed(box)
+    expect(S.Target(V) == 150 and not box.HasFocus(box) and box.__text == "150", "Target box did not set")
+    r2 = [e for e in UI.view.values() if e.id == R2]
+    expect(r2 and r2[0].need == 300, "the reagent list was not refreshed right away")
+    expect("target 150 crafts (batch 50)" in UI.DetailText(r2[0]), "sniper detail has no target")
+    box.SetText(box, "abc")
+    box.__scripts.OnEnterPressed(box)
+    expect(S.Target(V) == 150 and box.__text == "150", "a bad Target was not refused")
+    box.SetText(box, "")
+    box.__scripts.OnEnterPressed(box)
+    expect(S.Target(V) is None and [e for e in UI.view.values() if e.id == R2][0].need == 100, "blank Target")
+    # Time and Profit (at max) scale with Target; the total sums them over the crafts with room.
+    lv, la = S.Limit(V), S.Limit(A)
+    pv = 300 - (50 + 25)                                      # W - (C + room) for the vendor shuffle
+    expect(S.ProfitAtMax(lv) == pv and lv.time == 5, f"profit at max {S.ProfitAtMax(lv)}, time {lv.time}")
+    expect(S.CraftTotals(lv) == (50 * pv, 250), f"batch totals {S.CraftTotals(lv)}")
+    tot1 = S.Totals()
+    pa, ta = S.CraftTotals(la)
+    expect(abs(tot1.profit - (50 * pv + pa)) < 1e-6 and tot1.crafts == 2, f"total {tot1.profit}")
+    box.SetText(box, "150")
+    box.__scripts.OnEnterPressed(box)
+    expect(S.CraftTotals(lv) == (150 * pv, 750), f"3x totals {S.CraftTotals(lv)}")
+    tot = S.Totals()
+    expect(abs(tot.profit - (150 * pv + pa)) < 1e-6 and tot.time == 750 + (ta or 0), f"3x total {tot.profit}")
+    expect(abs(tot.gh - (150 * pv + (pa if ta else 0)) / tot.time * 3600) < 1e-6, f"total g/h {tot.gh}")
+    cells = {h.col.key: rv.cells[k].__text for k, h in crafts.headers.items() if rv.cells[k] is not None}
+    expect(cells["time"] == "12m30s" and cells["profit"] == ns.Util.Money(150 * pv), f"crafts row cells {cells}")
+    expect(ns.Util.Money(round(tot.profit)) in crafts.total.__text and "Total for 2 crafts" in crafts.total.__text,
+           f"total line {crafts.total.__text!r}")
+    # A no-room craft is left out of the sums and shows "-".
+    la.noRoom = True
+    tot2 = S.Totals()
+    expect(tot2.crafts == 1 and tot2.profit == 150 * pv and tot2.time == 750
+           and S.CraftCellText(la, "profit") == "—", f"no-room craft in the totals {tot2.profit}")
+    la.noRoom = None
+    box.SetText(box, "")
+    box.__scripts.OnEnterPressed(box)
+    # The reagent list shows SNIPE_ROWS rows on the Sniper page, ROWS on the craft list.
+    expect(frame.list.__h == (UI.SNIPE_ROWS + 1) * 20 + 4 and UI.CRAFT_ROWS + UI.SNIPE_ROWS + 2 == 18,
+           f"reagent list height {frame.list.__h}")
+    frame.snipeTab.Click(frame.snipeTab)
+    expect(not crafts.__shown and frame.list.__h == 19 * 20 + 4, "crafts list shown on the craft list")
+    S.SetTarget(V, 150)
+    expect("keep 90% g/h, target 150 crafts (batch 50)" in UI.DetailText(v), "craft detail has no target")
+    errs = list(ns.errors.values())
+    expect(not errs, f"errors in the sniper target checks: {errs[:3]}")
+
+
 def check_merchant():
     """Merchant capture. Forever loads the Mainline MerchantFrame (C_MerchantFrame.GetItemInfo → a table); the
     global GetMerchantItemInfo is a fallback. Failures go to /crafter errors and say so in chat."""
@@ -1421,6 +1559,8 @@ def check_crafting_time():
     for mode, cols in ns.UI.COLUMNS.items():
         w = sum(c.width for c in cols.values())
         expect(w <= ns.UI.ROW_W, f"{mode} columns are {w} px wide, a row only {ns.UI.ROW_W}")
+    w = sum(c.width for c in ns.Sniper.CRAFT_COLUMNS.values())
+    expect(w <= ns.UI.ROW_W, f"sniper crafts columns are {w} px wide, a row only {ns.UI.ROW_W}")
 
     # 3. Sorting: AH g/h and Vend g/h high first (no value last); Time short first.
     ns.settings.minSoldPerDay = 0
@@ -2508,6 +2648,7 @@ def main():
         check_cheap_batch()
         check_merchant()
         check_sniper()
+        check_sniper_target()
         check_missing_apis()
         check_dump()
         n, evaluated, took, hidden, shuffles, times, batches, fasts = check_full_run()

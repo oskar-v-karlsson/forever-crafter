@@ -144,7 +144,7 @@ local CHAR_DEFAULTS = {
   sourceText = {},  -- spell ID → C_TradeSkillUI.GetRecipeSourceText of an unlearned recipe (the game's "how to learn")
   -- Sniper: rows = { [spell] = limits of a ticked craft (Modules/Sniper.lua RowLimit) }; bought = { [itemID] =
   -- { n = bought and not yet in the bags (AH purchases go to the mail), bagsAt = bag count when last checked } }
-  snipe = { rows = {}, bought = {} },
+  snipe = { rows = {}, bought = {}, targets = {} },
 }
 
 local function fill(dst, src)
