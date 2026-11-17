@@ -30,6 +30,15 @@ STUB = {
   currency = {},    -- currency ID → quantity (C_CurrencyInfo.GetCurrencyInfo)
   questsDone = {},  -- quest ID → true (C_QuestLog.IsQuestFlaggedCompleted)
   bags = {},        -- item ID → count (C_Item.GetItemCount)
+  -- AH searches (the sniper): commodity[itemID] = { {unitPrice, quantity, numOwnerItems}, ... };
+  -- itemResults[itemID] = { {auctionID, buyoutAmount, quantity, containsOwnerItem}, ... }; the harness fires
+  -- COMMODITY_/ITEM_SEARCH_RESULTS_UPDATED itself after a SendSearchQuery
+  commodity = {},
+  itemResults = {},
+  searches = {},    -- itemKeys passed to SendSearchQuery
+  purchases = {},   -- { {call, ...args}, ... } Start/Confirm/CancelCommoditiesPurchase, PlaceBid
+  throttled = false, -- C_AuctionHouse.IsThrottledMessageSystemReady() == false
+  money = 1000000000,
 }
 
 -- Frames ------------------------------------------------------------------------------------------
@@ -125,7 +134,7 @@ end
 date = os.date
 STUB.clock = 0   -- seconds the fake client has run; C_Timer delays advance it
 time = function() return STUB.now + math.floor(STUB.clock) end
-GetTime = os.clock
+GetTime = function() return STUB.clock end
 tinsert, tremove = table.insert, table.remove
 
 -- Timers run when the harness calls STUB.runTimers(horizon): every timer due within `horizon` seconds (default
@@ -247,6 +256,36 @@ function C_AuctionHouse.GetReplicateItemLink(index)
   return a and ("|Hitem:" .. a[1] .. "::::|h[x]|h") or nil
 end
 function C_AuctionHouse.CalculateCommodityDeposit(id) return STUB.deposits[id] end
+function C_AuctionHouse.MakeItemKey(id) return { itemID = id, itemLevel = 0, itemSuffix = 0, battlePetSpeciesID = 0 } end
+function C_AuctionHouse.IsThrottledMessageSystemReady() return not STUB.throttled end
+function C_AuctionHouse.SendSearchQuery(key, sorts, separateOwnerItems)
+  table.insert(STUB.searches, { key = key, sorts = sorts, separate = separateOwnerItems })
+end
+function C_AuctionHouse.GetNumCommoditySearchResults(id) return #(STUB.commodity[id] or {}) end
+function C_AuctionHouse.GetCommoditySearchResultInfo(id, i)
+  local c = (STUB.commodity[id] or {})[i]
+  if not c then return nil end
+  return { itemID = id, quantity = c[2], unitPrice = c[1], auctionID = 0, numOwnerItems = c[3] or 0,
+           containsOwnerItem = (c[3] or 0) > 0, containsAccountItem = false, totalNumberOfOwners = 1 }
+end
+function C_AuctionHouse.GetNumItemSearchResults(key) return #(STUB.itemResults[key.itemID] or {}) end
+function C_AuctionHouse.GetItemSearchResultInfo(key, i)
+  local r = (STUB.itemResults[key.itemID] or {})[i]
+  if not r then return nil end
+  return { itemKey = key, auctionID = r[1], buyoutAmount = r[2], quantity = r[3], containsOwnerItem = r[4] or false,
+           itemLink = "|Hitem:" .. key.itemID .. "|h", timeLeft = 2 }
+end
+local function purchase(name)
+  return function(...) table.insert(STUB.purchases, { name, ... }) end
+end
+C_AuctionHouse.StartCommoditiesPurchase = purchase("Start")
+C_AuctionHouse.ConfirmCommoditiesPurchase = purchase("Confirm")
+C_AuctionHouse.CancelCommoditiesPurchase = purchase("Cancel")
+C_AuctionHouse.PlaceBid = purchase("PlaceBid")
+function C_AuctionHouse.GetQuoteDurationRemaining() return STUB.quoteLeft or 30 end
+Enum = Enum or {}
+Enum.AuctionHouseSortOrder = { Price = 0, Name = 1, Level = 2, Bid = 3, Buyout = 4, TimeRemaining = 5 }
+function GetMoney() return STUB.money end
 
 -- Merchant and mail -------------------------------------------------------------------------------
 -- STUB.merchant.items = { {id, price, stack, available (-1 unlimited), extendedCost, currencyID}, ... }
