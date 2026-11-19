@@ -1661,7 +1661,8 @@ def fast_stats(ns, res):
                 continue
             ok = (gold is not None and gold > 0 and f.perHour > gold and f.time > 0 and f.batch >= 1
                   and f.profit1 >= f.profit > 0 and f.profit >= 0.75 * f.profit1 and f.cost1 + f.profit1 == f.cost + f.profit
-                  and abs(f.perHour - f.profit / f.time * 3600) < 1e-6 and PL.PathSig(f.tree) != PL.PathSig(r.tree))
+                  and abs(f.perHour - f.profit / f.time * 3600) < 1e-6 and PL.PathSig(f.tree) != PL.PathSig(r.tree)
+                  and PL.PathSig(f.batchTree) == PL.PathSig(f.tree) and f.batchTree.crafts == f.batch)
             if not ok:
                 break
         bah, _ = PL.AHPerHour(r)
@@ -1761,6 +1762,11 @@ def check_fast_path():
            and f"Buy Test {BAR} x2 from AH" in t and "Its shopping list (first craft):" in t
            and "Its batch shopping list (200 crafts):" in t, "details: the fastest path section")
     expect("Fastest path" not in ns.UI.DetailText(eq), "details: no fastest path when the paths are equal")
+    # The Time cell follows the g/h: the AH best-g/h path's time with * (not a shuffle), else the most-gold time.
+    expect(not ns.UI.IsShuffle(top) and cell(top, "time") == ns.UI.TimeText(f.time, True) + FAST_MARK
+           and ns.UI.SortValue(top, "time") == f.time and top.time == 65, f"TOP time cell {cell(top, 'time')!r}")
+    expect(cell(eq, "time") == ns.UI.TimeText(eq.time, True) and ns.UI.SortValue(eq, "time") == eq.time,
+           f"EQ time cell {cell(eq, 'time')!r}")
     ns.settings.minSoldPerDay = 0
     ns.settings.minBatch = 0
     slash(lua, "")
@@ -1777,6 +1783,59 @@ def check_fast_path():
     check_gold_unchanged(ns, lambda: results(ns)[0], "best-g/h synthetic")
     errs = list(ns.errors.values())
     expect(not errs, f"errors in the best-g/h checks: {errs[:3]}")
+
+
+def tree_ids(node, out=None):
+    out = set() if out is None else out
+    out.add(node.id)
+    if node.src == "craft":
+        for c in node.children.values():
+            tree_ids(c, out)
+    return out
+
+
+def check_fast_batch_path():
+    """Heavy Dynamite: the best-g/h path buys the powder, but its few cheap listings run out and crafting the powder
+    wins again at a bigger batch. The fast batch must end there (buy powder, no stone), its g/h is that batch's
+    profit over the fast time, the Time cell shows the fast time, and the sniper watches the powder."""
+    lua, ns, stub = new_runtime()
+    PL, UI, S = ns.Planner, ns.UI, ns.Sniper
+    login(lua, stub, skills={TAILORING: 300})
+    STONE, POWDER, BOOM = 990701, 990702, 990703
+    R_POWDER, R_BOOM = 991701, 991702
+    synthetic(lua, ns, stub, {R_POWDER: (POWDER, [[STONE, 1]]), R_BOOM: (BOOM, [[POWDER, 1]])}, [STONE, POWDER, BOOM])
+    ns.Recipes[R_POWDER].cast = 30000
+    ns.Recipes[R_BOOM].cast = 5000
+    stub["items"][BOOM] = lua.table_from({"name": "Test boom", "sell": 1000})
+    # Stone is cheap and deep; three cheap powders (20, 25, 30c), then only dear ones.
+    set_auctions(lua, stub, [(STONE, 10000, 10 * 10000), (POWDER, 1, 20), (POWDER, 1, 25), (POWDER, 1, 30),
+                             (POWDER, 50, 50000 * 50)])
+    scan(lua, stub)
+    res, _ = results(ns)
+    r = res.get(R_BOOM)
+    if not expect(r is not None and r.where == "vendor" and UI.IsShuffle(r), "boom: a vendor shuffle"):
+        return
+    f = r.fastVendor
+    # Most-gold: craft the powder from stone (10c, 35 s); best-g/h: buy the powder (5 s).
+    expect(r.time == 35 and r.tree.children[1].src == "craft", f"boom most-gold path: time {r.time}")
+    if not expect(f is not None and f.time == 5 and f.tree.children[1].src == "ah", "boom: no best-g/h vendor path"):
+        return
+    ids = tree_ids(f.batchTree)
+    expect(f.batch == 3 and not f.batchCapped and f.batchTree.crafts == 3 and f.batchTree.children[1].src == "ah"
+           and POWDER in ids and STONE not in ids, f"boom fast batch {f.batch}: {sorted(ids)}")
+    expect(PL.PathSig(f.batchTree) == PL.PathSig(f.tree), "boom fast batch left its path")
+    # Batch average 25c: g/h = (1000 - 25) / 5 s.
+    expect(f.cost == 25 and f.batchProfit == 3 * 1000 - 75 and f.perHour == (1000 - 25) / 5 * 3600
+           and abs(f.perHour - f.batchProfit / f.batch / f.time * 3600) < 1e-6, f"boom fast g/h {f.perHour}")
+    cell = UI.CellText
+    expect(cell(r, "vgh").endswith(FAST_MARK) and cell(r, "time") == UI.TimeText(5, True) + FAST_MARK
+           and UI.SortValue(r, "time") == 5, f"boom time cell {cell(r, 'time')!r}")
+    # The sniper watches the powder for the fast batch, not the stone.
+    lim = S.RowLimit(r, S.Kind(r))
+    watched = {k: v.qty for k, v in lim.reagents.items()}
+    expect(S.Kind(r) == "vendor" and watched == {POWDER: 3}, f"boom sniper watches {watched}")
+    errs = list(ns.errors.values())
+    expect(not errs, f"errors in the fast batch checks: {errs[:3]}")
 
 
 def wi_run(lua, ns, **kw):
@@ -2645,6 +2704,7 @@ def main():
         check_vendor_shuffles()
         check_crafting_time()
         check_fast_path()
+        check_fast_batch_path()
         check_cheap_batch()
         check_merchant()
         check_sniper()
