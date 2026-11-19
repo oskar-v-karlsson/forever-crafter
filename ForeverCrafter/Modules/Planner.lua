@@ -276,9 +276,10 @@ end
 
 -- Cheap batch: the most crafts k (up to BATCH_CAP) for which every craft's own profit, worth - (cost(k) - cost(k-1)),
 -- is at least BATCH_KEEP of the first craft's. The extra cost of each craft is taken to never fall, so k is found by
--- doubling and a binary search. at(k) is the cached solveCrafts. → k, capped (k is a lower bound: the search cap,
--- or the next craft needs more than the snapshot's price steps)
-local function cheapBatch(worth, at)
+-- doubling and a binary search. at(k) is the cached solveCrafts; nil = k is not available. prefix: every k up to the
+-- batch must be available (the search only checks some k), so the batch ends before the first k that is not.
+-- → k, capped (k is a lower bound: the search cap, or the next craft needs more than the snapshot's price steps)
+local function cheapBatch(worth, at, prefix)
   local first = worth - at(1).cost
   if first <= 0 then return nil end
   local need = PL.BATCH_KEEP * first
@@ -297,18 +298,27 @@ local function cheapBatch(worth, at)
     return status[k]
   end
   if at(1).deep then return 1, true end
-  local lo, hi = 1, 2
+  local lo, hi, top = 1, 2, false
   while hi <= PL.BATCH_CAP and check(hi) == "ok" do
     lo, hi = hi, hi * 2
   end
   if hi > PL.BATCH_CAP then
-    if check(PL.BATCH_CAP) == "ok" then return PL.BATCH_CAP, true end
-    hi = PL.BATCH_CAP
+    if check(PL.BATCH_CAP) == "ok" then
+      lo, top = PL.BATCH_CAP, true
+    else
+      hi = PL.BATCH_CAP
+    end
   end
-  while hi - lo > 1 do
+  while not top and hi - lo > 1 do
     local mid = math.floor((lo + hi) / 2)
     if check(mid) == "ok" then lo = mid else hi = mid end
   end
+  if prefix then
+    for k = 2, lo do
+      if not at(k) then lo, top = k - 1, false break end
+    end
+  end
+  if top then return lo, true end
   -- The binary search checks single crafts; make sure the batch as a whole keeps the share too.
   while lo > 1 and lo * worth - at(lo).cost < need * lo do lo = lo - 1 end
   return lo, check(lo + 1) == "deep"
@@ -388,17 +398,23 @@ local function fastPath(res, r, kit, worth, goldPerHour)
     children = one.kids, h = one.h + 1, var = res.tree.var, outMin = res.tree.outMin, outMax = res.tree.outMax }
   local time, casts, unknown = PL.ChainTime(tree)
   if unknown or time <= 0 then return nil end
-  local solved = { [1] = one }
+  -- The batch stays on the chosen path: a k whose solve takes another path (e.g. the cheap listings of a bought
+  -- intermediate run out and crafting it wins again) counts as unavailable, and so does every k above the smallest
+  -- such k seen, so the batch is the largest prefix of k on the path.
+  local solved, offPath = { [1] = one }, math.huge
   local function at(k)
-    if k < 1 then return nil end
+    if k < 1 or k >= offPath then return nil end
     local s = solved[k]
     if s == nil then
       s = solveCrafts(r, k, solver) or false
+      if s and kidsSig(s.kids) ~= sig then
+        offPath, s = k, false
+      end
       solved[k] = s
     end
     return s or nil
   end
-  local batch, capped = cheapBatch(worth, at)
+  local batch, capped = cheapBatch(worth, at, true)
   if not batch then return nil end
   local cost = batchCost(at, batch)
   local perHour = (worth - cost) / time * 3600

@@ -25,6 +25,8 @@ local AH_HOUR_HINT = "AH profit per hour of crafting (the whole chain), on the p
 local VENDOR_HOUR_HINT = "Vendor profit per hour of crafting (the whole chain), on the path with the most gold per hour. "
   .. "— = a vendor will not buy it or no crafting time; ~ = estimated vendor price." .. FAST_HINT
 local FAST_MARK = "|cff66e0ff*|r"
+local TIME_COL_HINT = "Crafting time of the chain. * = the faster path's time (its vendor sale with Vendor shuffles on or "
+  .. "on a vendor shuffle row, else its AH sale), the path its g/h uses. " .. TIME_HINT
 local BATCH_HINT = "Cheap batch: how many crafts you can make before the reagents' AH price steps cut a craft's own "
   .. "profit below 75% of the first craft's. Profit and g/h are the batch average. Buy the batch, craft it, let the AH "
   .. "restock, repeat. 50+ = the batch may be bigger (the snapshot's price steps or the search end there). With Vendor "
@@ -45,7 +47,7 @@ local COLUMNS = {
     { key = "sold", label = "Sold/d", width = 46 },
     { key = "batch", label = "Batch", width = 40, hint = BATCH_HINT },
     { key = "bprofit", label = "Batch profit", width = 84, hint = BATCH_PROFIT_HINT },
-    { key = "time", label = "Time", width = 48, hint = "Crafting time of the chain. " .. TIME_HINT },
+    { key = "time", label = "Time", width = 48, hint = TIME_COL_HINT },
     { key = "ahgh", label = "AH g/h", width = 52, hint = AH_HOUR_HINT },
     { key = "vgh", label = "Vend g/h", width = 56, hint = VENDOR_HOUR_HINT },
   },
@@ -61,7 +63,7 @@ local COLUMNS = {
     { key = "sold", label = "Sold/d", width = 44 },
     { key = "batch", label = "Batch", width = 40, hint = BATCH_HINT },
     { key = "bprofit", label = "Batch profit", width = 76, hint = BATCH_PROFIT_HINT },
-    { key = "time", label = "Time", width = 46, hint = "Crafting time of the chain. " .. TIME_HINT },
+    { key = "time", label = "Time", width = 46, hint = TIME_COL_HINT },
     { key = "ahgh", label = "AH g/h", width = 50, hint = AH_HOUR_HINT },
     { key = "vgh", label = "Vend g/h", width = 56, hint = VENDOR_HOUR_HINT },
   },
@@ -189,6 +191,15 @@ function UI.ShuffleHint(r)
   if not UI.IsShuffle(r) then return nil end
   return string.format("Sells to a vendor for %s profit%s; no AH needed.", Util.Money(r.vendorProfit),
     r.vendorEst and " (vendor price ~ estimate)" or "")
+end
+
+-- The chain time the Time column shows: the best-g/h path's when it differs (its vendor sale with Vendor shuffles on
+-- or on a vendor shuffle row, else its AH sale), else the most-gold path's. → seconds or nil, unknown, fast
+function UI.Time(r)
+  local fast
+  if ns.settings.vendorShuffles or UI.IsShuffle(r) then fast = r.fastVendor else fast = r.fastAH end
+  if fast then return fast.time, false, fast end
+  return r.time, r.timeUnknown, nil
 end
 
 -- The cheap batch the view uses: the vendor batch with Vendor shuffles on, else the batch for the best sale.
@@ -330,7 +341,10 @@ local function sortValue(r, key)
   if key == "conf" then return r.conf or 0 end
   if key == "pct" then return r.pct or -math.huge end
   if key == "vprofit" then return r.vendorProfit or -math.huge end
-  if key == "time" then return (r.timeUnknown or not r.time) and math.huge or r.time end
+  if key == "time" then
+    local t, unknown = UI.Time(r)
+    return (unknown or not t) and math.huge or t
+  end
   if key == "ahgh" then return PL.AHPerHour(r) or -math.huge end
   if key == "vgh" then return PL.VendorPerHour(r) or -math.huge end
   if key == "where" then return r.where end
@@ -1167,9 +1181,10 @@ local function cellText(r, key)
     if not v then return "—" end
     return Util.Money(v) .. (est and " ~" or "")
   elseif key == "time" then
-    if not r.time then return "—" end
-    if r.timeUnknown then return "|cffff8040>" .. UI.TimeText(r.time, true) .. "|r" end
-    return UI.TimeText(r.time, true)
+    local t, unknown, fast = UI.Time(r)
+    if not t then return "—" end
+    if unknown then return "|cffff8040>" .. UI.TimeText(t, true) .. "|r" end
+    return UI.TimeText(t, true) .. (fast and FAST_MARK or "")
   elseif key == "ahgh" then
     local v, fast = PL.AHPerHour(r)
     return UI.PerHourText(v) .. (fast and FAST_MARK or "")
@@ -1596,7 +1611,7 @@ function UI.Refresh()
   end
   frame.footer:SetText(n > 0 and string.format("%d-%d of %d   (scroll with the mouse wheel; [L] = not learned yet; "
     .. "[1-5] = random count; [V] = vendor shuffle; 50+ = batch may be bigger; Batch profit = the whole batch; "
-    .. "* = g/h of a faster path; S = snipe)",
+    .. "* = g/h and time of a faster path; S = snipe)",
     UI.offset + 1, math.min(UI.offset + ROWS, n), n)
     or (ns.settings.vendorShuffles and "no vendor shuffles with these filters" or "nothing profitable with these filters"))
   detail:SetText(UI.DetailText(UI.selected))
