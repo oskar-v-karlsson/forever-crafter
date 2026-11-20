@@ -231,6 +231,7 @@ def check_data(ns):
     counts.update(check_sales_data(ns, keys, date))
     counts.update(check_shelves_data(ns, keys, date))
     counts.update(check_rep_data(ns, keys, date))
+    counts.update(check_farms_data(ns, keys, date))
     return counts
 
 
@@ -1216,6 +1217,271 @@ def check_farm():
            f"errors in the farm checks: {list(ns.errors.values())[:3]}")
 
 
+def check_farms_data(ns, keys, date):
+    """Data/Farms.lua (gen_data.py from research/wowhead/farms_*.json): src + verified on every farm, page and item;
+    the assumed rates say verified=false; every page is a Wowhead Forever NPC or object page."""
+    info = ns.FarmInfo
+    expect(info and all(p in keys for p in info.src.split("+")) and date.match(info.verified or ""),
+           "ns.FarmInfo needs src + verified")
+    pages = ns.FarmPages
+    used = set()
+    nfarms = 0
+    for _, d in ns.FarmDefs.items():
+        nfarms += 1
+        expect(d.src and all(p in keys for p in d.src.split("+")) and date.match(d.verified or ""),
+               f"FarmDefs {d.key} needs src + verified")
+        expect(d.kind in ("kill", "node") and isinstance(d.zone, int) and d.zoneName, f"FarmDefs {d.key} kind/zone")
+        expect(d.rate.n > 0 and d.rate.src in keys and (d.rate.src != "assumed" or d.rate.verified is False),
+               f"FarmDefs {d.key} rate {d.rate.n} {d.rate.src}: assumed rates must say verified=false")
+        for _, pk in d.pages.items():
+            pg = pages[pk]
+            used.add(pk)
+            expect(pg is not None and pg.kind == ("npc" if d.kind == "kill" else "object"),
+                   f"FarmDefs {d.key} page {pk} is missing or the wrong kind")
+    npages, nrows = 0, 0
+    for pk, pg in pages.items():
+        npages += 1
+        expect(pk == f"{pg.kind}{pg.id}" and pg.src == "wh_" + pg.kind and date.match(pg.verified or ""),
+               f"FarmPages {pk} src {pg.src!r}")
+        expect(re.match(r"^https://www\.wowhead\.com/forever/(npc|object)=" + str(pg.id) + r"/[a-z0-9-]+$", pg.url),
+               f"FarmPages {pk} url {pg.url}")
+        for lname in ("drops", "skinning", "pickpocketing", "herbalism", "mining"):
+            for _, r in (pg[lname] or {}).items():
+                nrows += 1
+                item, count, outof, lo, hi = r[1], r[2], r[3], r[4], r[5]
+                if not expect(0 < count <= outof and 1 <= lo <= hi, f"FarmPages {pk} {lname} row {list(r.values())}"):
+                    break
+                d = ns.Items[item] or ns.RepItems[item] or ns.FarmItems[item]
+                expect(d is not None and d.name, f"FarmPages {pk} item {item} has no name")
+    expect(used == set(pages.keys()), "FarmPages has pages no farm uses")
+    for i, e in ns.FarmItems.items():
+        expect(e.src in keys and date.match(e.verified or "") and e.name, f"FarmItems[{i}] needs src + verified")
+        expect(ns.Items[i] is None and ns.RepItems[i] is None, f"FarmItems[{i}] duplicates Items or RepItems")
+    expect(nfarms == 21 and npages == 43, f"{nfarms} farms, {npages} pages (21, 43)")
+    # Wowhead Forever npc=5982 Black Slayer (2026-11-20): Vulture Gizzard 8396.
+    expect(any(r[1] == 8396 for r in pages.npc5982.drops.values()), "Black Slayer must drop Vulture Gizzard")
+    return {"farms": nfarms, "farm pages": npages, "farm loot rows": nrows}
+
+
+FARM_FIXTURE = """
+  local ns = ...
+  ns.FarmDefs = {
+    {key="kfarm",name="Testlands: mobs",zone=9001,zoneName="Testlands (wh)",kind="kill",pages={"npc7001","npc7002"},
+     rate={n=120,src="assumed",verified=false},src="wh_npc+wh_item",verified="2026-11-20"},
+    {key="nfarm",name="Testlands: herbs",zone=9001,zoneName="Testlands (wh)",kind="node",pages={"object8001"},
+     rate={n=60,src="assumed",verified=false},src="wh_object+wh_item",verified="2026-11-20"},
+  }
+  ns.FarmPages = {
+    npc7001={kind="npc",id=7001,name="Mob A",url="https://www.wowhead.com/forever/npc=7001/mob-a",
+      drops={{996001,1,2,1,3},{996002,1,4,2,2},{996006,1,1,1,1}},skinning={{996003,1,1,1,1}},
+      pickpocketing={{996004,1,2,1,1}},src="wh_npc",verified="2026-11-20"},
+    npc7002={kind="npc",id=7002,name="Mob B",url="https://www.wowhead.com/forever/npc=7002/mob-b",
+      drops={{996001,1,1,1,1}},src="wh_npc",verified="2026-11-20"},
+    object8001={kind="object",id=8001,name="Herb",url="https://www.wowhead.com/forever/object=8001/herb",
+      herbalism={{996005,1,1,2,2}},src="wh_object",verified="2026-11-20"},
+  }
+  ns.FarmGuide.Reset()
+"""
+
+
+def check_farm_guide():
+    """Built-in farms: EV, skinning / pickpocket gating, rates (assumed, learned, yours), kill and node counting
+    without double counting, learned coin and mix, the demand flag and the Farms view."""
+    lua, ns, stub = new_runtime()
+    g = lua.globals()
+    login(lua, stub)
+    G, F, UI = ns.FarmGuide, ns.Farm, ns.UI
+    A, B, S, P, H, Q = range(996001, 996007)
+    for i, d in {A: {"sell": 10}, B: {"quality": 0, "sell": 500}, S: {"sell": 5}, P: {"sell": 300},
+                 H: {"sell": 1}, Q: {"quality": 2, "sell": 50, "bind": 1}}.items():
+        stub["items"][i] = lua.table_from(dict({"name": f"Farm {i}", "quality": 1}, **d))
+    set_auctions(lua, stub, [(A, 10, 10000), (B, 1, 99999), (S, 5, 10000), (H, 20, 8000), (Q, 1, 99999)])
+    tsm_money(lua, ns, {A: {"DBRegionSoldPerDay": 150, "DBRegionSaleRate": 0.5},
+                        H: {"DBRegionSoldPerDay": 1000000, "DBRegionSaleRate": 0.5}})
+    scan(lua, stub)
+    lua.eval("function(src, ns) assert(loadstring(src))(ns) end")(FARM_FIXTURE, ns)
+    cut = ns.Pricing.Cut()[0]
+    vA, vS, vH = int(1000 * (1 - cut)), int(2000 * (1 - cut)), int(400 * (1 - cut))
+
+    def rows():
+        return {o.spell: o for o in G.List().values()}
+    near = lambda a, b: abs(a - b) < 1e-6
+    # EV: equal mix of the two mobs; greys and bound items at the vendor price; no Skinning, not a Rogue.
+    k = rows()["kfarm"]
+    ev = 0.5 * (1 * vA + 0.5 * 500 + 1 * 50) + 0.5 * vA
+    expect(near(k.ev, ev) and near(k.parts.loot, ev) and near(k.skipped.skinning, 0.5 * vS)
+           and near(k.skipped.pickpocket, 0.5 * 0.5 * 300) and k.rateSrc == "assumed" and k.rate == 120
+           and near(k.gph, ev * 120) and k.coin == 0, f"kill farm EV {k.ev} (want {ev}), g/h {k.gph}")
+    its = {(it.id, it.part): it for it in k["items"].values()}
+    expect(its[(B, "loot")].how == "vendor" and its[(Q, "loot")].how == "vendor" and its[(A, "loot")].how == "AH"
+           and k.top.id == A, "grey and bound items are valued at the vendor price")
+    # Skinning with Skinning, pickpocketing as a Rogue.
+    ns.char.gather = ltable(lua, {393: 300})
+    stub["class"] = "ROGUE"
+    k = rows()["kfarm"]
+    expect(near(k.ev, ev + 0.5 * vS + 0.5 * 0.5 * 300) and k.skipped.skinning is None and k.skipped.pickpocket is None,
+           f"with Skinning and as a Rogue: EV {k.ev}")
+    stub["class"] = "WARRIOR"
+    n = rows()["nfarm"]
+    expect(near(n.ev, 2 * vH) and n.need == "Herbalism" and near(n.gph, 2 * vH * 60), f"node farm {n.ev} {n.need}")
+    ns.char.gather = None
+    expect(rows()["nfarm"].need is None, "unknown gathering skills: no warning")
+    # Demand: A drops 1 a kill x 120/h, the realm buys 150 / 15 = 10 a day.
+    k = rows()["kfarm"]
+    d = {x.id: x for x in k.demand.values()}
+    expect(k.over and d[A].over and near(d[A].perHour, 120) and near(d[A].realmDay, 10) and not rows()["nfarm"].over,
+           f"demand flag {k.over} {d.get(A) and (d[A].perHour, d[A].realmDay)}")
+    # Your own nodes per hour beats a learned rate.
+    n = rows()["nfarm"]
+    expect(not G.SetRate(n, "abc") and not G.SetRate(n, "0") and not G.SetRate(k, "90") and G.SetRate(n, "90")
+           and rows()["nfarm"].rate == 90 and rows()["nfarm"].rateSrc == "you", "Nodes/h 90")
+    expect(G.RateBoxText(n) == "90" and G.RateBoxText(k) == "", "the Nodes/h box text")
+    G.SetRate(n, "")
+    expect(rows()["nfarm"].rateSrc == "assumed" and rows()["nfarm"].rate == 60, "a blank Nodes/h clears it")
+
+    # Counting kills and nodes in a session.
+    stub.areas[9001] = "Testlands"
+    G.Reset()
+    stub.zone = "Testlands"
+    stub.fire("ZONE_CHANGED_NEW_AREA")
+    F.Start()
+    guid = lambda npc, n: f"Creature-0-1-2-3-{npc}-0000AA{n:04d}"
+    node = lambda n: f"GameObject-0-1-2-3-8001-0000BB{n:04d}"
+
+    def link(i):
+        return f"|cffffffff|Hitem:{i}::::::::60:::::|h[Farm {i}]|h|r"
+
+    def target(gd, dead=False, **kw):
+        stub.target = ltable(lua, dict(guid=gd, dead=dead, **kw)) if gd else None
+
+    def loot(*slots, source_info=True):
+        stub.noSourceInfo = not source_info
+        stub.loot = ltable(lua, [{"link": link(i), "sources": src} if src else {"link": link(i)} for i, src in slots])
+        stub.fire("LOOT_OPENED")
+        stub.loot = ltable(lua, [])
+
+    def counted():
+        cur = F.Current()
+        return {key: t.n for key, t in (cur.guide or {}).items()}
+    target(guid(7001, 1), dead=True)
+    stub.fire("UNIT_DIED", guid(7001, 1))
+    loot((A, [guid(7001, 1), 1]))                       # its corpse: the same kill
+    stub.fire("CHAT_MSG_MONEY", "You loot 50 Copper")
+    stub.money = stub.money + 50
+    stub.fire("PLAYER_MONEY")
+    stub.fire("UNIT_DIED", guid(7002, 2))                # not your target
+    target(guid(7002, 3), dead=True, tapDenied=True)
+    stub.fire("UNIT_DIED", guid(7002, 3))                # someone else's tap
+    target(None)
+    loot((A, [guid(7002, 2), 1, guid(7001, 4), 1]), (B, [guid(7002, 2), 1]))   # area loot: 2 corpses
+    target(guid(7001, 5))
+    loot((P, [guid(7001, 5), 1]))                       # pickpocketing the living target
+    target(guid(7001, 5), dead=True)
+    stub.fire("UNIT_DIED", guid(7001, 5))                # then the kill
+    target(guid(7002, 6), dead=True)
+    loot((A, None), source_info=False)                  # no GetLootSourceInfo: the dead target
+    target(None)
+    loot((H, [node(1), 2]))
+    loot((H, [node(1), 2]))                             # the same node again
+    loot((H, None), source_info=False)                  # no source info: the node's herb
+    stub.target = ltable(lua, {"secret": True, "dead": True})
+    stub.fire("UNIT_DIED", guid(7001, 7))                # a secret target GUID: never counted
+    c = counted()
+    expect(c == {"kfarm": 5, "nfarm": 2}, f"counted {c} (want kfarm 5, nfarm 2)")
+    cur = F.Current()
+    expect(cur.guide.kfarm.money == 50 and dict(cur.guide.kfarm.mix) == {"npc7001": 3, "npc7002": 2},
+           f"coin {cur.guide.kfarm.money}, mix {dict(cur.guide.kfarm.mix)}")
+    stub.zone = "Elsewhere"
+    stub.fire("ZONE_CHANGED_NEW_AREA")
+    target(guid(7001, 8), dead=True)
+    stub.fire("UNIT_DIED", guid(7001, 8))
+    expect(counted() == c, "kills outside the farm's zone must not count")
+    stub.zone = "Testlands"
+    stub.fire("ZONE_CHANGED_NEW_AREA")
+    for i in range(10, 20):                             # 10 more kills, all Mob A
+        target(guid(7001, i), dead=True)
+        stub.fire("UNIT_DIED", guid(7001, i))
+    stub.now = stub.now + 1400
+    strip = lambda t: re.sub(r"\|c\w{8}|\|r", "", t)
+    k = rows()["kfarm"]
+    expect(k.session == 15 and strip(G.CellText(k, "grate")) == "120/h assumed (15)",
+           f"this session's count: {strip(G.CellText(k, 'grate'))!r}")
+    F.Stop()
+    L = ns.char.farmGuide.farms.kfarm
+    secs = L.secs
+    k = rows()["kfarm"]
+    expect(L.n == 15 and L.money == 50 and near(secs, 1400 * 15 / 17)
+           and near(k.rate, 15 * 3600 / secs) and k.rateSrc == "learned" and near(k.coin, 50 / 15)
+           and k.learnedMix and near(k.weights.npc7001, 13 / 15), f"learned {L.n} kills in {secs} s, rate {k.rate}")
+    nL = ns.char.farmGuide.farms.nfarm
+    expect(nL.n == 2 and near(nL.secs, 1400 * 2 / 17), f"the zone's time split by count: nodes {nL.secs}")
+    ev = 13 / 15 * (vA + 250 + 50) + 2 / 15 * vA
+    expect(near(k.ev, ev) and near(k.gph, (ev + 50 / 15) * k.rate), f"learned mix EV {k.ev} (want {ev})")
+    expect(rows()["nfarm"].rateSrc == "assumed", "2 nodes are not enough to learn a rate")
+    ns.char.farmGuide.farms.nfarm = ltable(lua, {"n": 20, "secs": 3600, "money": 0, "mix": {}})
+    n = rows()["nfarm"]
+    expect(n.rate == 20 and n.rateSrc == "learned", "a learned node rate")
+    G.SetRate(n, "90")
+    expect(rows()["nfarm"].rate == 90 and rows()["nfarm"].rateSrc == "you", "your Nodes/h beats the learned rate")
+    # A new session forgets the counted GUIDs only when it starts.
+    F.Start()
+    target(guid(7001, 1), dead=True)
+    stub.fire("UNIT_DIED", guid(7001, 1))
+    expect(counted() == {"kfarm": 1}, f"a new session counts again: {counted()}")
+    F.Stop()
+
+    # The Farms view.
+    slash(lua, "farm")
+    frame = g.ForeverCrafterFrame
+    frame.fm.guide.Click(frame.fm.guide)
+    view = {o.spell: o for o in UI.view.values()}
+    expect(ns.settings.farmView == "farms" and len(UI.view) == 2 and UI.view[1].gph >= UI.view[2].gph
+           and frame.fm.guide.GetText(frame.fm.guide) == "This session" and frame.fmRate.IsShown(frame.fmRate),
+           f"Farms view: {ns.settings.farmView} {len(UI.view)} rows")
+    UI.selected = view["nfarm"]
+    UI.Refresh()
+    expect(frame.fmRate.GetText(frame.fmRate) == "90", "the Nodes/h box shows the selected farm's rate")
+    frame.fmRate.SetText(frame.fmRate, "45")
+    frame.fmRate.__scripts.OnEnterPressed(frame.fmRate)
+    expect(ns.settings.farmRates.nfarm == 45 and UI.selected.rate == 45, "Nodes/h edit")
+    text = UI.DetailText(UI.selected)
+    expect("Loot per node" in text and "object=8001" in text and "Rate 45 nodes/h: set by you" in text, "Farms details")
+    UI.selected = [o for o in UI.view.values() if o.spell == "kfarm"][0]
+    text = UI.DetailText(UI.selected)
+    expect("Coin per kill" in text and "learned from 16 kills" in text and "Realm demand" in text
+           and "npc=7001" in text and "Not counted: skinning" in text, f"kill farm details:\n{text}")
+    for o in UI.view.values():
+        for c in G.COLUMNS.values():
+            UI.CellText(o, c.key)
+    w = sum(c.width for c in G.COLUMNS.values())
+    expect(w <= 796, f"Farms columns are {w} px wide (796 max)")
+    frame.fm.view.Click(frame.fm.view)
+    expect(ns.settings.farmView == "best" and not frame.fmRate.IsShown(frame.fmRate), "Best farms from the Farms view")
+    expect(not list(ns.errors.values()), f"errors in the farm guide checks: {list(ns.errors.values())[:3]}")
+
+
+def farm_summary():
+    """The built-in farms on the test snapshot (every item listed at a pseudo-random price): top g/h."""
+    lua, ns, stub = new_runtime()
+    login(lua, stub)
+    ids = set(ns.Items.keys()) | set(ns.FarmItems.keys())
+    listings = []
+    for i in sorted(ids):
+        p = 100 + (i * 7919) % 50000
+        listings += [(i, 5, p * 5), (i, 1, p + 10)]
+    set_auctions(lua, stub, listings)
+    scan(lua, stub)
+    G, U = ns.FarmGuide, ns.Util
+    strip = lambda t: re.sub(r"\|c\w{8}|\|r", "", t)
+    rows = sorted(G.List().values(), key=lambda o: -o.gph)
+    out = [f"built-in farms (test snapshot, {len(rows)} farms, no gathering skill, not a Rogue): top g/h"]
+    for o in rows[:8]:
+        out.append(f"  {o['def'].name}: {strip(G.CellText(o, 'gev'))} x {strip(G.CellText(o, 'grate'))} = "
+                   f"{strip(G.CellText(o, 'ggph'))}, top {strip(G.CellText(o, 'gtop'))}")
+    expect(not list(ns.errors.values()), f"errors in the farm summary: {list(ns.errors.values())[:3]}")
+    return out
+
+
 def check_filter_row():
     """The filter row: the Shelves and Farm tabs and Scan AH sit right of every crafting filter and panel control."""
     lua, ns, stub = new_runtime()
@@ -1233,7 +1499,8 @@ def check_filter_row():
     def right(e, chars):   # an edit box: its label (about 6 px a character), 8 px, the box
         return e.label.__points[2] + 6 * chars + 8 + e.__w
     ends = [right(frame.minBatch, len("Min batch")), right(frame.sh.realms, len("Realm share 1 /")),
-            frame.fm.view.__points[2] + frame.fm.view.__w]
+            frame.fm.view.__points[2] + frame.fm.view.__w, frame.fm.guide.__points[2] + frame.fm.guide.__w,
+            right(frame.fmRate, len("Nodes/h"))]
     expect(max(ends) < spans[0][0], f"filter controls end at {max(ends)}, the tabs start at {spans[0][0]}")
 
 
@@ -3225,6 +3492,7 @@ def main():
         check_cooldowns()
         check_shelves()
         check_farm()
+        check_farm_guide()
         check_filter_row()
         check_missing_apis()
         check_dump()
@@ -3247,6 +3515,7 @@ def main():
         check_sales()
         check_reputation()
         summary += rep_summary()
+        summary += farm_summary()
         check_zip()
     for p in problems:
         print("FAIL", p)

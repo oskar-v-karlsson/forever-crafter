@@ -1,0 +1,381 @@
+ID,Display_lang,OverallQualityID,SellPrice,Bonding
+810,Hammer of the Northern Wind,4,45267,2
+864,Knightly Longsword,2,9716,2
+1464,Buzzard Talon,0,71,0
+1529,Jade,2,700,0
+1685,Troll-hide Bag,1,6250,0
+1725,Large Knapsack,1,5000,0
+2295,Large Boar Tusk,0,70,0
+3395,Recipe: Limited Invulnerability Potion,2,250,0
+3403,Ivory Boar Tusk,0,321,0
+3404,Buzzard Wing,1,181,0
+3730,Big Bear Meat,1,45,0
+3830,Recipe: Elixir of Lesser Fortitude,1,500,0
+3831,Recipe: Troll's Blood Elixir,1,550,0
+3832,Recipe: Elixir of Detect Lesser Invisibility,2,550,0
+3857,Coal,1,125,0
+3864,Citrine,2,800,0
+3867,Plans: Golden Iron Destroyer,2,950,0
+3868,Plans: Frost Tiger Blade,2,1250,0
+3869,Plans: Shadow Crescent Axe,2,1250,0
+3870,Plans: Green Iron Shoulders,2,750,0
+3872,Plans: Golden Scale Leggings,2,800,0
+3873,Plans: Golden Scale Cuirass,2,1100,0
+3874,Plans: Polished Steel Boots,2,1100,0
+3914,Journeyman's Backpack,1,6250,0
+3928,Superior Healing Potion,1,250,0
+3944,Twill Belt,0,2277,0
+3945,Twill Boots,0,3852,0
+3946,Twill Bracers,0,2431,0
+3947,Twill Cloak,0,3258,0
+3948,Twill Gloves,0,3092,0
+3949,Twill Pants,0,6517,0
+3950,Twill Shoulderpads,0,4157,0
+3951,Twill Vest,0,5897,0
+3969,Smooth Leather Belt,0,3256,0
+3970,Smooth Leather Boots,0,4296,0
+3971,Smooth Leather Bracers,0,3811,0
+3972,Smooth Cloak,0,3891,0
+3973,Smooth Leather Gloves,0,3657,0
+3974,Smooth Leather Pants,0,5486,0
+3975,Smooth Leather Shoulderpads,0,3896,0
+3976,Smooth Leather Armor,0,6978,0
+3987,Deflecting Tower,0,6837,0
+3990,Crested Buckler,0,8237,0
+3992,Laminated Scale Belt,0,3082,0
+3993,Laminated Scale Boots,0,4940,0
+3994,Laminated Scale Bracers,0,4404,0
+3995,Laminated Scale Cloak,0,6284,0
+3996,Laminated Scale Gloves,0,4659,0
+3997,Laminated Scale Pants,0,7929,0
+3998,Laminated Scale Shoulderpads,0,5656,0
+3999,Laminated Scale Armor,0,7109,0
+4092,Prismatic Basilisk Scale,0,1296,0
+4093,Large Basilisk Tail,0,713,0
+4234,Heavy Leather,1,150,0
+4235,Heavy Hide,1,200,0
+4299,Pattern: Guardian Armor,2,500,0
+4300,Pattern: Guardian Leather Bracers,2,700,0
+4304,Thick Leather,1,300,0
+4352,Pattern: Boots of the Enchanter,2,275,0
+4353,Pattern: Spider Belt,2,300,0
+4354,Pattern: Rich Purple Silk Shirt,3,350,0
+4414,Schematic: Portable Bronze Mortar,2,462,0
+4416,Schematic: Goblin Land Mine,2,600,0
+4417,Schematic: Large Seaforium Charge,2,675,0
+4425,Scroll of Agility III,1,125,0
+4426,Scroll of Strength III,1,125,0
+4479,Burning Charm,1,178,0
+4480,Thundering Charm,1,185,0
+4481,Cresting Charm,1,176,0
+4500,Traveler's Backpack,2,8750,0
+4552,Smooth Stone Chip,0,530,0
+4553,Jagged Piece of Stone,0,411,0
+4583,Thick Furry Mane,0,812,0
+4584,Large Trophy Paw,0,937,0
+4587,Tribal Raptor Feathers,0,807,0
+4588,Pristine Raptor Skull,0,900,0
+4589,Long Elegant Feather,1,530,0
+4590,Curved Yellow Bill,0,655,0
+4591,Eagle Eye,0,413,0
+4636,Strong Iron Lockbox,2,110,0
+4637,Steel Lockbox,2,150,0
+4638,Reinforced Steel Lockbox,2,200,0
+4784,Lifeless Stone,0,360,0
+4787,Burning Pitch,0,577,0
+4791,Enchanted Water,1,133,0
+5117,Vibrant Plume,1,825,0
+5430,Intricate Bauble,0,277,0
+5758,Mithril Lockbox,2,250,0
+5759,Thorium Lockbox,2,375,0
+5774,Pattern: Green Silk Pack,2,275,0
+5829,Razor-sharp Beak,0,804,0
+5974,Pattern: Guardian Cloak,2,350,0
+6045,Plans: Iron Counterweight,2,650,0
+6991,Smoldering Coal,1,0,4
+7067,Elemental Earth,1,400,0
+7068,Elemental Fire,1,400,0
+7069,Elemental Air,1,400,0
+7070,Elemental Water,1,400,0
+7077,Heart of Fire,1,400,0
+7078,Essence of Fire,2,400,0
+7079,Globe of Water,1,400,0
+7080,Essence of Water,2,400,0
+7084,Pattern: Crimson Silk Shoulders,2,350,0
+7085,Pattern: Azure Shoulders,2,350,0
+7086,Pattern: Earthen Silk Belt,2,375,0
+7449,Pattern: Dusky Leather Leggings,2,625,0
+7450,Pattern: Green Whelp Armor,2,500,0
+7453,Pattern: Swift Boots,2,875,0
+7555,Regal Star,2,7123,2
+7556,Twilight Orb,2,5387,2
+7610,Aurora Sphere,2,5811,2
+7909,Aquamarine,2,1000,0
+7910,Star Ruby,2,5000,0
+7911,Truesilver Ore,2,500,0
+7912,Solid Stone,1,100,0
+7975,Plans: Heavy Mithril Pants,2,1500,0
+7989,Plans: Mithril Spurs,2,2500,0
+7990,Plans: Heavy Mithril Helm,2,2500,0
+7992,Plans: Blue Glittering Axe,2,2000,0
+7993,Plans: Dazzling Mithril Rapier,2,2500,0
+8029,Plans: Wicked Mithril Blade,2,2000,1
+8080,Light Plate Chestpiece,0,5987,0
+8081,Light Plate Belt,0,2834,0
+8082,Light Plate Boots,0,3189,0
+8083,Light Plate Bracers,0,2261,0
+8084,Light Plate Gloves,0,2703,0
+8085,Light Plate Pants,0,5253,0
+8086,Light Plate Shoulderpads,0,3730,0
+8146,Wicked Claw,1,500,0
+8150,Deeprock Salt,1,250,0
+8154,Scorpid Scale,1,250,0
+8168,Jet Black Feather,1,100,0
+8169,Thick Hide,1,500,0
+8170,Rugged Leather,1,500,0
+8171,Rugged Hide,1,500,0
+8368,Thick Wolfhide,1,1000,0
+8385,Pattern: Turtle Scale Gloves,1,875,1
+8386,Pattern: Big Voodoo Robe,2,1000,0
+8387,Pattern: Big Voodoo Mask,2,1000,0
+8389,Pattern: Big Voodoo Pants,2,1250,0
+8390,Pattern: Big Voodoo Cloak,2,1250,0
+8391,Snickerfang Jowl,1,0,0
+8392,Blasted Boar Lung,1,0,0
+8393,Scorpok Pincer,1,0,0
+8394,Basilisk Brain,1,0,0
+8396,Vulture Gizzard,1,0,0
+8704,OOX-09/HL Distress Beacon,2,0,1
+8752,Laminated Scale Circlet,0,5217,0
+8753,Smooth Leather Helmet,0,5198,0
+8754,Twill Cover,0,3937,0
+8755,Light Plate Helmet,0,3728,0
+8766,Morning Glory Dew,1,200,0
+8836,Arthas' Tears,1,95,0
+8838,Sungrass,1,60,0
+8846,Gromsblood,1,250,0
+8952,Roasted Quail,1,200,0
+8953,Deep Fried Plantains,1,200,0
+9262,Black Vitriol,1,1000,0
+9293,Recipe: Magic Resistance Potion,2,1250,0
+9295,Recipe: Invisibility Potion,2,2000,0
+9298,Recipe: Elixir of Giants,2,2250,0
+9882,Sorcerer Sphere,2,6209,2
+9914,Royal Scepter,2,7557,2
+10300,Pattern: Red Mageweave Vest,2,1250,0
+10301,Pattern: White Bandit Mask,2,1250,0
+10302,Pattern: Red Mageweave Pants,2,1250,0
+10305,Scroll of Protection IV,1,100,0
+10306,Scroll of Spirit IV,1,100,0
+10307,Scroll of Stamina IV,1,112,0
+10308,Scroll of Intellect IV,1,112,0
+10309,Scroll of Agility IV,1,125,0
+10310,Scroll of Strength IV,1,125,0
+10312,Pattern: Red Mageweave Gloves,2,1500,0
+10315,Pattern: Red Mageweave Shoulders,2,1750,0
+10320,Pattern: Red Mageweave Headband,2,1750,0
+10593,Imperfect Draenethyst Fragment,2,0,0
+10604,Schematic: Mithril Heavy-bore Rifle,2,825,0
+10606,Schematic: Parachute Cloak,2,875,0
+10620,Thorium Ore,1,250,0
+11018,Un'Goro Soil,1,146,0
+11116,A Mangled Journal,2,0,1
+11164,Formula: Enchant Weapon - Lesser Beastslayer,2,750,0
+11165,Formula: Enchant Weapon - Lesser Elemental Slayer,2,750,0
+11167,Formula: Enchant Boots - Lesser Spirit,2,1000,0
+11202,Formula: Enchant Shield - Stamina,2,1100,0
+11204,Formula: Enchant Bracer - Greater Spirit,2,1100,0
+11208,Formula: Enchant Weapon - Demonslaying,2,1350,0
+11225,Formula: Enchant Bracer - Greater Stamina,2,1550,0
+11370,Dark Iron Ore,1,500,0
+11382,Blood of the Mountain,2,750,0
+11386,Squishy Basilisk Eye,0,676,0
+11387,Basilisk Heart,0,1013,0
+11388,Basilisk Venom,0,1563,0
+11389,Shimmering Basilisk Skin,0,2163,0
+11408,Bear Jaw,0,898,0
+11409,Bear Flank,0,503,0
+11410,Savage Bear Claw,0,578,0
+11411,Large Bear Bone,0,1484,0
+11417,Feathery Wing,0,1204,0
+11418,Hollow Wing Bone,0,604,0
+11419,Mysterious Unhatched Egg,0,1900,0
+11420,Elegant Writing Tool,0,1712,0
+11513,Tainted Vitriol,1,1,1
+11514,Fel Creep,1,1,1
+11515,Corrupted Soul Shard,1,1,1
+11733,Libram of Constitution,2,0,0
+11734,Libram of Tenacity,2,0,0
+11736,Libram of Resilience,2,0,0
+11737,Libram of Voracity,2,0,0
+11754,Black Diamond,2,0,0
+12037,Mystery Meat,1,87,0
+12203,Red Wolf Meat,1,87,0
+12207,Giant Egg,1,150,0
+12208,Tender Wolf Meat,1,150,0
+12361,Blue Sapphire,2,7000,0
+12363,Arcane Crystal,2,2000,0
+12364,Huge Emerald,2,10000,0
+12365,Dense Stone,1,250,0
+12431,Winterfall E'ko,1,0,0
+12432,Shardtooth E'ko,1,0,0
+12622,Shardtooth Meat,1,0,4
+12682,Plans: Thorium Armor,2,3000,0
+12683,Plans: Thorium Belt,2,3000,0
+12684,Plans: Thorium Bracers,2,3000,0
+12689,Plans: Radiant Breastplate,2,3500,0
+12691,Pattern: Wildthorn Mail,2,4000,0
+12693,Plans: Thorium Boots,2,5000,0
+12694,Plans: Thorium Helm,2,5000,0
+12695,Plans: Radiant Gloves,2,5000,0
+12697,Plans: Radiant Boots,2,5500,0
+12704,Plans: Thorium Leggings,2,7500,0
+12713,Plans: Radiant Leggings,2,10000,0
+12771,Empty Firewater Flask,1,0,1
+12799,Large Opal,2,7000,0
+12800,Azerothian Diamond,2,10000,0
+12820,Winterfall Firewater,1,0,0
+12822,Toxic Horror Droplet,1,0,4
+13463,Dreamfoil,1,100,0
+13464,Golden Sansam,1,100,0
+13465,Mountain Silversage,1,150,0
+13466,Plaguebloom,1,250,0
+13467,Icecap,1,250,0
+13468,Black Lotus,2,1000,0
+13486,Recipe: Transmute Undeath to Water,2,3750,0
+13492,Recipe: Purification Potion,2,5000,0
+13816,Fine Longsword,0,10561,0
+13817,Tapered Greatsword,0,18796,0
+13818,Jagged Axe,0,13431,0
+13819,Balanced War Axe,0,19880,0
+13820,Clout Mace,0,12042,0
+13821,Bulky Maul,0,17993,0
+13822,Spiked Dagger,0,11442,0
+13823,Stout War Staff,0,11924,0
+13824,Recurve Long Bow,0,9015,0
+13825,Primed Musket,0,10168,0
+14047,Runecloth,1,400,0
+14467,Pattern: Frostweave Robe,2,3000,0
+14470,Pattern: Runecloth Tunic,2,3000,0
+14474,Pattern: Frostweave Gloves,2,3000,0
+14478,Pattern: Brightcloth Robe,2,3500,0
+14479,Pattern: Brightcloth Gloves,2,3500,0
+14484,Pattern: Brightcloth Cloak,2,4000,0
+14489,Pattern: Frostweave Pants,2,5000,0
+14491,Pattern: Runecloth Pants,2,5000,0
+14492,Pattern: Felcloth Boots,2,5000,0
+14494,Pattern: Brightcloth Pants,2,5500,0
+14496,Pattern: Felcloth Hood,2,5500,0
+14498,Pattern: Runecloth Headband,2,6250,0
+14499,Pattern: Mooncloth Bag,2,7500,0
+14504,Pattern: Runecloth Shoulders,2,10000,0
+14506,Pattern: Felcloth Robe,2,10000,0
+14508,Pattern: Felcloth Shoulders,2,15000,0
+14661,Keeper's Cord,2,5461,2
+14674,Pridelord Girdle,2,8270,2
+14864,Warleader's Belt,2,7602,2
+15180,Praetorian Girdle,2,6686,2
+15324,Burnside Rifle,2,25565,2
+15388,Jadefire Belt,2,6357,2
+15417,Devilsaur Leather,1,500,0
+15419,Warbear Leather,1,600,0
+15420,Ironfeather,1,100,0
+15731,Pattern: Runic Leather Gauntlets,2,3500,0
+15737,Pattern: Chimeric Boots,2,4000,0
+15743,Pattern: Heavy Scorpid Belt,2,5000,0
+15745,Pattern: Runic Leather Belt,2,5000,0
+15746,Pattern: Chimeric Leggings,2,5000,0
+15747,Pattern: Frostsaber Leggings,2,5000,0
+15755,Pattern: Chimeric Vest,2,5500,0
+15757,Pattern: Wicked Leather Pants,2,5500,0
+15758,Pattern: Devilsaur Gauntlets,1,5500,0
+15765,Pattern: Runic Leather Pants,2,7500,0
+15779,Pattern: Frostsaber Tunic,2,15000,0
+15918,Conjurer's Sphere,2,4848,2
+15929,Nightsky Orb,2,4396,2
+15937,Hibernal Sphere,2,7922,2
+15966,Venomshroud Orb,2,9137,2
+15967,Highborne Star,2,10304,2
+15983,Gaea's Scepter,2,8387,2
+15984,Opulent Scepter,2,9614,2
+15985,Arachnidian Branch,2,9887,2
+15986,Bonecaster's Star,2,10813,2
+15988,Resplendent Orb,2,12471,2
+16043,Schematic: Thorium Rifle,2,3000,0
+16051,Schematic: Thorium Shells,2,5000,0
+16215,Formula: Enchant Boots - Greater Stamina,2,3000,0
+16218,Formula: Enchant Bracer - Superior Spirit,2,3500,0
+16220,Formula: Enchant Boots - Spirit,2,4000,0
+16245,Formula: Enchant Boots - Greater Agility,2,6000,0
+16251,Formula: Enchant Bracer - Superior Stamina,2,7500,0
+16885,Heavy Junkbox,1,0,0
+19230,Two of Beasts,3,12500,0
+19231,Three of Beasts,3,12500,0
+19232,Four of Beasts,3,12500,0
+19259,Two of Warlords,3,12500,0
+19260,Three of Warlords,3,12500,0
+19261,Four of Warlords,3,12500,0
+19269,Two of Elementals,3,12500,0
+19270,Three of Elementals,3,12500,0
+19271,Four of Elementals,3,12500,0
+19278,Two of Portals,3,12500,0
+19279,Three of Portals,3,12500,0
+19280,Four of Portals,3,12500,0
+19441,Huge Venom Sac,1,1500,0
+19933,Glowing Scorpid Blood,1,1180,0
+19934,Large Scorpid Claw,0,1400,0
+19935,Empty Venom Sac,0,830,0
+19936,Dried Scorpid Carapace,0,830,0
+20015,Elder Raptor Feathers,0,1658,0
+20016,Trophy Raptor Skull,0,3635,0
+20400,Pumpkin Bag,2,20000,1
+20742,Winterfall Ritual Totem,1,0,1
+21383,Winterfall Spirit Beads,1,200,1
+21928,Winterspring Blood Sample,1,0,4
+22389,Plans: Sageblade,4,20000,0
+22527,Core of Elements,1,0,0
+213543,Scroll: UPDOG,1,15,0
+213544,Scroll: TOPAZ YORAK,1,15,0
+213545,Scroll: PEATCHY ATTAX,1,15,0
+213546,Scroll: SHOOBEEDOOP,1,15,0
+213547,Scroll: THAW WORDS,1,15,0
+229416,Warm Fur,1,0,4
+238798,Toxic Essence,1,0,4
+248690,Waylaid Crate: Earthly Expert Herbs,1,0,0
+248691,Waylaid Crate: Flowering Expert Herbs,1,0,0
+248692,Waylaid Crate: Expert Ore,1,0,0
+248693,Waylaid Crate: Expert Textiles,1,0,0
+248694,Waylaid Crate: Expert Curiosities,1,0,0
+248695,Waylaid Crate: Earthly Artisan Herbs,1,0,0
+248696,Waylaid Crate: Flowering Artisan Herbs,1,0,0
+248697,Waylaid Crate: Artisan Ore,1,0,0
+248698,Waylaid Crate: Artisan Textiles,1,0,0
+248699,Waylaid Crate: Artisan Curiosities,1,0,0
+248708,Waylaid Crate: Expert Fabrics,2,0,0
+248709,Waylaid Crate: Expert Ingots,2,0,0
+248710,Waylaid Crate: Expert Parts,2,0,0
+248711,Waylaid Crate: Artisan Fabrics,2,0,0
+248712,Waylaid Crate: Artisan Ingots,2,0,0
+248713,Waylaid Crate: Artisan Parts,2,0,0
+248815,Heavy Thorium Ore,1,375,0
+248819,Fel Crystal,2,3000,0
+248820,Torbernite,2,15000,0
+248821,Demonsage,1,225,0
+248822,Death Lotus,2,1500,0
+249274,Stranglevine,2,250,0
+249424,Rosecap,2,95,0
+249426,Pitchblende,2,375,0
+249428,Pristine Hide,2,250,0
+249429,Pristine Scale,2,375,0
+250178,Recipe: Bear Bruscitti,1,0,1
+252879,Pattern: Wicked Leather Boots,2,5000,0
+252890,Pattern: Blue Suede Hat,2,7500,0
+255645,Swollen Venom Sac,1,370,0
+262889,Sealed Expert's Writ,3,0,0
+262890,Sealed Artisan's Writ,3,0,0
+268418,Scarce Herb Seeds,2,115,0
+280181,Redstone Basilisk Scale,1,0,4
+281015,Scroll: DOST OREM,1,15,0
+281016,Scroll: FORGOT HOOF THUD,1,15,0
+281017,Scroll: KEEP CLEF FOCI,1,15,0
+281018,Scroll: RARE SERVICHI RADAR,1,15,0

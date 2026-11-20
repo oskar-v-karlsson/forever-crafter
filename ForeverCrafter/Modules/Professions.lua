@@ -29,14 +29,21 @@ local function store(skills, line, rank, maxRank)
 end
 
 -- Re-reads skill ranks. Keeps the old table when no API answers (e.g. during loading).
+-- Gathering skills (DB2 SkillLine: Herbalism 182, Mining 186, Skinning 393), for the built-in farms.
+P.GATHER = { [182] = "Herbalism", [186] = "Mining", [393] = "Skinning" }
+
 function P.ReadSkills()
   if not ns.char then return end
-  local skills, answered = {}, false
+  local skills, answered, gather = {}, false, {}
   if ns.API("C_SkillInfo.GetSkillLineInfoByID") then
     for line in pairs(ns.SkillLines) do
       local ok, info = ns.Call("C_SkillInfo.GetSkillLineInfoByID", line)
       if ok then answered = true end
       if ok and type(info) == "table" and not info.isHeader then store(skills, line, info.rank, info.maxRank) end
+    end
+    for line in pairs(P.GATHER) do
+      local ok, info = ns.Call("C_SkillInfo.GetSkillLineInfoByID", line)
+      if ok and type(info) == "table" and not info.isHeader and (info.rank or 0) > 0 then gather[line] = info.rank end
     end
   end
   if ns.API("GetProfessions") and ns.API("GetProfessionInfo") then
@@ -46,6 +53,7 @@ function P.ReadSkills()
       for _, index in pairs({ a, b, c, d, e, f }) do
         local ok2, _, _, rank, maxRank, _, _, skillLine = ns.Call("GetProfessionInfo", index)
         if ok2 and skillLine then store(skills, skillLine, rank, maxRank) end
+        if ok2 and P.GATHER[skillLine] and (rank or 0) > 0 then gather[skillLine] = rank end
       end
     end
   end
@@ -55,6 +63,7 @@ function P.ReadSkills()
       if not skills[line] and s.fromWindow then skills[line] = s end
     end
     ns.char.skills = skills
+    ns.char.gather = gather
   end
 end
 

@@ -190,6 +190,18 @@ The **Farm** button (or `/crafter farm`) measures what a farm really earns. **St
 - **Saved sessions:** Stop saves the session with the values of that moment, and the last 20 are kept per character.
 - **Best farms:** this view compares your zones over every character's saved sessions. It shows the time, what was earned, g/h and the best single session.
 
+### Built-in farms
+
+The **Farms** button on the Farm tab lists 21 known farms (Blasted Lands, Felwood, Winterspring, Un'Goro, devilsaurs, herb and ore routes, and more), each with an estimated gold per hour at today's prices.
+
+- **EV per kill or node:** for each item on the mob's or node's Wowhead Forever loot table, the drop chance × the average stack × what the item is worth, summed. Items are valued the same way as in farm sessions (shelf value or AH min less the cut, or the vendor price). Grey and soulbound items use the vendor price, and items with no price count as 0. A farm with several mobs or nodes averages them, equally at first and then in the mix you actually kill.
+- **Skinning and pickpocketing** count only if this character has Skinning, or is a Rogue. The details show what was left out. Herb and ore routes are greyed out without Herbalism or Mining.
+- **Rate:** kills or nodes per hour. Until you have farmed there, this is an **assumed** rate that no source backs: 120 kills/h, 30/h for devilsaurs, 60 nodes/h, and 3/h for Black Lotus. Run a Farm session in the farm's zone and the addon counts your kills and nodes. After 10 it uses your own rate (**learned**), your coin per kill and your mob mix. For a herb or ore route, type your own **Nodes/h**; it beats both the learned and the assumed rate.
+- **g/h** = (EV + coin per kill) × rate. Wowhead has no coin data, so coin is 0 until your sessions learn it.
+- **Realm demand:** an orange `!` means one hour's drops of a top item exceed what your realm buys in a day (TSM region sold/day × the realm share). The g/h will not hold for long there.
+- **Details:** the EV split (loot, skinning, pickpocketing, gathering), how the rate was found, the top 18 drops with chance, average stack, value and price source, and a Wowhead Forever link for each mob or node.
+- **How kills are counted:** on Forever, addons cannot read the combat log. A kill is your target dying (not tapped by someone else), or a corpse you loot. A node is a herb or ore you loot from that node. Each mob or node counts once.
+
 ### Commands
 
 | Command | What it does |
@@ -258,6 +270,11 @@ These cannot be tested outside the game. Please go through them once and report 
 40. [ ] **Loot lines on the Forever client:** start a farm session and loot a mob or a node. Are single items and stacks (`x5`) counted, and is the looted money right (alone, in a party "Your share of the loot is ...", and with a guild share)? Are purchases, crafts and quest rewards left out? If your client is not in English, does money still count?
 41. [ ] **AFK and logout:** go AFK during a session. Does the status line say "paused (AFK)" and does the clock stop, then run again when you are back? Log out with a session running: does the next login print "farm session resumed"?
 42. [ ] **SavedVariables size:** a scan now keeps the min price and count of every item on the AH (Empty shelves and the farm values use them). Is `ForeverCrafter.lua` in SavedVariables still a reasonable size, and does login stay quick?
+43. [ ] **Built-in farms, the tab:** on the Farm tab, press **Farms**. Do the **Farms** button and the **Nodes/h** box fit left of the tabs? Do the six columns fit without cut-off text, and does a herb or ore farm's **Nodes/h** box take your number (Enter) and change its g/h?
+44. [ ] **Kill counting without the combat log:** start a session in Blasted Lands (or another farm's zone) and kill a few of its mobs. Does each kill count once, as `assumed (N)` in the **Rate** column, whether you loot the corpse or not? Does a mob someone else tapped not count, and does area looting several corpses count each of them? (`UNIT_DIED` with your target's GUID, and `GetLootSourceInfo` for looted corpses.)
+45. [ ] **Node detection:** gather a few herbs or ore in a farm's zone. Does each node count once, also when you loot it in two goes? Does pickpocketing (Rogue) not count as a kill?
+46. [ ] **Zone names:** do the built-in farms' zones (`C_Map.GetAreaInfo` of the Wowhead / AreaTable zone IDs 4, 361, 45, 618, 490, 47, 46, 616) match `GetRealZoneText()` there, so kills are counted in that zone? The **Zone** column shows the client's name.
+47. [ ] **Assumed rates:** after 10 kills or nodes, does the **Rate** turn into your learned rate, and does the details pane show the coin per kill?
 
 ## Development
 

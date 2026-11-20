@@ -73,6 +73,7 @@ COLUMNS.snipe = ns.Sniper.COLUMNS
 COLUMNS.cd = ns.Cooldowns.COLUMNS
 COLUMNS.shelves = ns.Shelves.COLUMNS
 COLUMNS.farm, COLUMNS.farmBest = ns.Farm.SESSION_COLUMNS, ns.Farm.BEST_COLUMNS
+COLUMNS.farmGuide = ns.FarmGuide.COLUMNS
 local MAX_COLUMNS = 14
 local LIST_W = 804
 local FRAME_W = LIST_W + 400
@@ -98,10 +99,11 @@ local function farmMode()
   return ns.settings.tab == "farm"
 end
 
--- The Empty shelves or Farm tab: a module with List, CellText, SortValue, OptionLines, DetailText, StatusText, FOOTER.
+-- The Empty shelves or Farm tab (its Farms view: the built-in farms): a module with List, CellText, SortValue,
+-- OptionLines, DetailText, StatusText, FOOTER.
 local function listPanel()
   if shelfMode() then return ns.Shelves end
-  if farmMode() then return ns.Farm end
+  if farmMode() then return ns.Farm.GuideView() and ns.FarmGuide or ns.Farm end
 end
 
 -- A tab other than the craft list (Reputation, Sniper, Cooldowns, Empty shelves, Farm).
@@ -130,7 +132,7 @@ local function columns()
   if snipeMode() then return COLUMNS.snipe end
   if cdMode() then return COLUMNS.cd end
   if shelfMode() then return COLUMNS.shelves end
-  if farmMode() then return ns.Farm.Columns() end
+  if farmMode() then return ns.Farm.GuideView() and ns.FarmGuide.COLUMNS or ns.Farm.Columns() end
   return COLUMNS[whatIf() and "whatIf" or "char"]
 end
 
@@ -143,6 +145,7 @@ local function sortSetting()
   if shelfMode() then return s.shelfSort or "sscore", s.shelfSortDesc ~= false end
   if farmMode() then
     if ns.Farm.BestView() then return s.farmBestSort or "fgph", s.farmBestSortDesc ~= false end
+    if ns.Farm.GuideView() then return s.farmGuideSort or "ggph", s.farmGuideSortDesc ~= false end
     return s.farmSort or "fvalue", s.farmSortDesc ~= false
   end
   return s.sort or "profit", s.sortDesc ~= false
@@ -159,6 +162,8 @@ local function setSort(key, desc)
     ns.settings.shelfSort, ns.settings.shelfSortDesc = key, desc
   elseif farmMode() and ns.Farm.BestView() then
     ns.settings.farmBestSort, ns.settings.farmBestSortDesc = key, desc
+  elseif farmMode() and ns.Farm.GuideView() then
+    ns.settings.farmGuideSort, ns.settings.farmGuideSortDesc = key, desc
   elseif farmMode() then
     ns.settings.farmSort, ns.settings.farmSortDesc = key, desc
   else
@@ -1577,7 +1582,24 @@ local function build()
   fm.view:SetPoint("TOPLEFT", 166, -38)
   hint(fm.view, { "This session / Best farms", "This session: the items of the running (or last) session.",
     "Best farms: your saved sessions by zone, best gold per hour first." })
+  fm.guide = button(frame, 90, "Farms", function()
+    ns.settings.farmView = ns.Farm.GuideView() and "session" or "farms"
+    UI.selected, UI.offset = nil, 0
+    UI.Recompute()
+    UI.Refresh()
+  end)
+  fm.guide:SetPoint("TOPLEFT", 280, -38)
+  hint(fm.guide, { "Farms", "Built-in farms: Wowhead Forever loot tables x today's prices = gold per kill or node, "
+    .. "x kills or nodes per hour (learned from your Farm sessions in the zone, else assumed)." })
   frame.fm = fm
+  -- Nodes/h (Farms view): your own rate for the selected node farm.
+  frame.fmRate = editBox(frame, 40, "Nodes/h", 384, function()
+    return ns.FarmGuide.RateBoxText(UI.selected)
+  end, function(v)
+    if ns.FarmGuide.SetRate(UI.selected, v) then UI.Recompute() end
+  end)
+  hint(frame.fmRate, { "Nodes/h", "Your own nodes per hour for the selected herb or ore farm (it beats the learned "
+    .. "and the assumed rate). Blank = not set. 1 to 9999." })
 
   frame.status = text(frame, "small", 0.8, 0.8, 0.8)
   frame.status:SetPoint("TOPLEFT", 14, -66)
@@ -1614,7 +1636,8 @@ local function build()
       elseif shelfMode() then
         setSort(key, key ~= "sname" and key ~= "slisted" and key ~= "smin" and key ~= "ssupply")
       elseif farmMode() then
-        setSort(key, key ~= "fitem" and key ~= "fhow" and key ~= "fzone" and key ~= "fchars")
+        setSort(key, key ~= "fitem" and key ~= "fhow" and key ~= "fzone" and key ~= "fchars" and key ~= "gname"
+          and key ~= "gzone" and key ~= "gtop")
       else
         setSort(key, key ~= "name" and key ~= "profs" and key ~= "conf" and key ~= "time")
       end
@@ -1743,12 +1766,17 @@ function UI.Refresh()
   end
   frame.sh.gear:SetChecked(ns.settings.shelfGear)
   for _, c in pairs(frame.fm) do c:SetShown(farmMode()) end
+  local guide = farmMode() and ns.Farm.GuideView()
+  frame.fmRate:SetShown(guide)
+  frame.fmRate.label:SetShown(guide)
+  if guide and not frame.fmRate:HasFocus() then frame.fmRate:SetText(ns.FarmGuide.RateBoxText(UI.selected)) end
   if farmMode() then
     local cur = ns.Farm.Current()
     frame.fm.start:SetText(cur and "Stop" or "Start")
     frame.fm.pause:SetText(cur and not cur.since and "Resume" or "Pause")
     frame.fm.pause:SetEnabled(cur ~= nil)
     frame.fm.view:SetText(ns.Farm.BestView() and "This session" or "Best farms")
+    frame.fm.guide:SetText(ns.Farm.GuideView() and "This session" or "Farms")
     if ns.Farm.Running() then ns.Farm.Tick() end
   end
   for _, c in ipairs({ frame.mode, frame.shuffles, frame.prof, frame.minProfit, frame.minListings, frame.minSold,

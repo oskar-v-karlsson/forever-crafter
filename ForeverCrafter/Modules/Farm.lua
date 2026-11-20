@@ -123,6 +123,12 @@ end
 
 local changed = function() ns.Fire("DATA_CHANGED") end
 
+-- Looted money: the session's, and the built-in farm of the last kill or loot window (Modules/FarmGuide.lua).
+local function addMoney(cur, copper)
+  cur.money = cur.money + copper
+  if ns.FarmGuide then ns.FarmGuide.OnMoney(copper) end
+end
+
 function F.Start()
   if not ns.char then return false end
   local cur = F.Current()
@@ -227,6 +233,7 @@ function F.Stop()
     cur.acc = cur.acc + math.max(0, now - cur.since)
     cur.since = nil
   end
+  if ns.FarmGuide then ns.FarmGuide.OnStop(cur) end
   cur.values = {}
   for id in pairs(cur.items) do
     local each, how = F.Value(id)
@@ -262,14 +269,14 @@ function F.OnMoneyLine(text)
   if not cur or not cur.since then return end
   local c = F.ParseMoney(text)
   if c then
-    cur.money = cur.money + c
+    addMoney(cur, c)
     if rise and GetTime() - riseAt <= MONEY_WINDOW then
       rise = nil
     else
       rise, parsedAt = nil, GetTime()
     end
   elseif rise and GetTime() - riseAt <= MONEY_WINDOW then
-    cur.money = cur.money + rise
+    addMoney(cur, rise)
     rise = nil
   else
     unreadAt = GetTime()
@@ -287,7 +294,7 @@ function F.OnPlayerMoney()
   if parsedAt and GetTime() - parsedAt <= MONEY_WINDOW then
     parsedAt = nil
   elseif unreadAt and GetTime() - unreadAt <= MONEY_WINDOW then
-    cur.money = cur.money + delta
+    addMoney(cur, delta)
     unreadAt = nil
     changed()
   else
@@ -367,6 +374,11 @@ end
 
 function F.BestView()
   return ns.settings.farmView == "best"
+end
+
+-- The built-in farms (Modules/FarmGuide.lua) instead of a session view.
+function F.GuideView()
+  return ns.settings.farmView == "farms"
 end
 
 function F.List()
@@ -515,7 +527,7 @@ function F.Tick()
   ticking = true
   C_Timer.After(1, function()
     ticking = false
-    if ns.settings.tab == "farm" and ns.UI.IsShown() and F.Running() and not F.BestView() then
+    if ns.settings.tab == "farm" and ns.UI.IsShown() and F.Running() and not F.BestView() and not F.GuideView() then
       ns.UI.RefreshStatus()
       F.Tick()
     end

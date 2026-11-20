@@ -135,12 +135,16 @@ local DEFAULTS = {
     shelfRealms = 15,
     shelfSort = "sscore",
     shelfSortDesc = true,
-    -- Farm tab: farmView = "session" (this session's loot) or "best" (Best farms); the sorts of both
+    -- Farm tab: farmView = "session" (this session's loot), "best" (Best farms) or "farms" (the built-in farms,
+    -- Modules/FarmGuide.lua); the sorts of each; farmRates = { [farm key] = nodes per hour you set }
     farmView = "session",
     farmSort = "fvalue",
     farmSortDesc = true,
     farmBestSort = "fgph",
     farmBestSortDesc = true,
+    farmGuideSort = "ggph",
+    farmGuideSortDesc = true,
+    farmRates = {},
   },
   -- realm key → { time, items = { [itemID] = { min, qty, n, steps = {unit1, qty1, ...} } } (recipe items),
   --   others = { [itemID] = { min, qty } } (every other item listed), listings, total }
@@ -169,6 +173,10 @@ local CHAR_DEFAULTS = {
   cooldowns = {},
   -- Farm sessions (Modules/Farm.lua): current = the running or paused one; sessions = the last 20 finished
   farm = { sessions = {} },
+  -- Built-in farms learned from your sessions (Modules/FarmGuide.lua): farms = { [farm key] = { n = kills or
+  -- nodes, secs, money, mix = { [page] = n } } }
+  farmGuide = { farms = {} },
+  -- gather = gathering skills (Herbalism 182, Mining 186, Skinning 393) → rank, set by Professions.ReadSkills
 }
 
 local function fill(dst, src)
