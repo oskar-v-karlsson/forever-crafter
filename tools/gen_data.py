@@ -60,6 +60,8 @@ PRODUCT = "wowf"
 BUILD = "1.60.1.70888"
 DB2_URL = "https://wago.tools/db2/{table}/csv?build={build}"
 DB2_VERIFIED = "2026-11-12"
+CD_VERIFIED = "2026-11-20"   # SpellCooldowns / SpellCategories / SpellCategory fetched later
+CD_TABLES = ("SpellCooldowns", "SpellCategories", "SpellCategory")
 WH_VERIFIED = "2026-11-12"
 PAGES_VERIFIED = "2026-11-12"
 
@@ -81,6 +83,9 @@ TABLES = {
                     "EffectBasePointsF", "Variance"],
     "SpellMisc": ["ID", "SpellID", "DifficultyID", "CastingTimeIndex"],
     "SpellCastTimes": ["ID", "Base", "Minimum"],
+    "SpellCooldowns": ["ID", "SpellID", "DifficultyID", "RecoveryTime", "CategoryRecoveryTime"],
+    "SpellCategories": ["ID", "SpellID", "DifficultyID", "Category"],
+    "SpellCategory": ["ID", "Name_lang", "Flags", "MaxCharges", "ChargeRecoveryTime"],
     "SpellReagents": ["ID", "SpellID"] + ["Reagent_%d" % i for i in range(8)]
                      + ["ReagentCount_%d" % i for i in range(8)],
     "Item": ["ID", "ClassID", "SubclassID"],
@@ -153,6 +158,11 @@ def cmd_fetch(args):
     misc = [r for r in rows["SpellMisc"] if r["SpellID"] in spells]
     cast_ids = {r["CastingTimeIndex"] for r in misc}
     cast_times = [r for r in rows["SpellCastTimes"] if r["ID"] in cast_ids]
+    cooldowns = [r for r in rows["SpellCooldowns"] if r["SpellID"] in spells
+                 and (r["RecoveryTime"] != "0" or r["CategoryRecoveryTime"] != "0")]
+    spell_cats = [r for r in rows["SpellCategories"] if r["SpellID"] in spells and r["Category"] != "0"]
+    cat_ids = {r["Category"] for r in spell_cats}
+    categories = [r for r in rows["SpellCategory"] if r["ID"] in cat_ids]
 
     recipe_items = {r["ID"] for r in rows["Item"] if r["ClassID"] == str(RECIPE_CLASS)}
     item_effects = {r["ID"]: r for r in rows["ItemEffect"]}
@@ -173,7 +183,8 @@ def cmd_fetch(args):
 
     filtered = {
         "SkillLine": skill_lines, "SkillLineAbility": sla, "SpellName": names,
-        "SpellEffect": effects, "SpellMisc": misc, "SpellCastTimes": cast_times, "SpellReagents": reagents, "Item": item_rows,
+        "SpellEffect": effects, "SpellMisc": misc, "SpellCastTimes": cast_times,
+        "SpellCooldowns": cooldowns, "SpellCategories": spell_cats, "SpellCategory": categories, "SpellReagents": reagents, "Item": item_rows,
         "ItemXItemEffect": ixe, "ItemEffect": ie, "ItemSparse": sparse,
     }
     os.makedirs(DB2_DIR, exist_ok=True)
@@ -185,7 +196,7 @@ def cmd_fetch(args):
             "url": DB2_URL.format(table=t, build=BUILD),
             "full_sha256": sha256(raw[t]), "full_rows": len(rows[t]),
             "snapshot_sha256": sha256(data), "snapshot_rows": len(out),
-            "columns": cols,
+            "columns": cols, "fetched": CD_VERIFIED if t in CD_TABLES else DB2_VERIFIED,
         }
         print("%-18s %6d of %6d rows" % (t, len(out), len(rows[t])))
     with open(os.path.join(DB2_DIR, "manifest.json"), "w") as f:
@@ -632,6 +643,15 @@ def build(manifest, db, wh, client=None):
     for r in sorted(db["SpellMisc"], key=lambda r: int(r["ID"])):
         if r["DifficultyID"] == "0" and r["SpellID"] not in casts and cast_base.get(r["CastingTimeIndex"], -1) >= 0:
             casts[r["SpellID"]] = cast_base[r["CastingTimeIndex"]]
+    # Cooldown: SpellCooldowns (DifficultyID 0) RecoveryTime = the spell's own cooldown, CategoryRecoveryTime = the
+    # cooldown it puts on every spell of its SpellCategories.Category (the transmutes share one); both in ms.
+    spell_cat = {r["SpellID"]: int(r["Category"]) for r in db["SpellCategories"] if r["DifficultyID"] == "0"}
+    cooldowns = {}
+    for r in db["SpellCooldowns"]:
+        if r["DifficultyID"] == "0":
+            rec, cat_rec = int(r["RecoveryTime"]), int(r["CategoryRecoveryTime"])
+            cooldowns[r["SpellID"]] = (max(rec, cat_rec) // 1000, spell_cat.get(r["SpellID"]) if cat_rec else None)
+    cat_name = {int(r["ID"]): r["Name_lang"] for r in db["SpellCategory"]}
     reagents = {}
     for r in db["SpellReagents"]:
         lst = []
@@ -711,6 +731,8 @@ def build(manifest, db, wh, client=None):
         }
         if sp in casts:
             recipes[sp]["cast"] = casts[sp]
+        if sp in cooldowns:
+            recipes[sp]["cd"], recipes[sp]["cdCat"] = cooldowns[sp]
         if w:
             recipes[sp]["onWh"] = True
         if sp in cl_known:
@@ -869,8 +891,9 @@ def build(manifest, db, wh, client=None):
     no_item_src = sorted(i for i in reagent_ids if not items.get(i, {}).get("how"))
     report.append("reagents without Wowhead source data: %d %s" % (len(no_item_src), no_item_src))
 
+    cd_cats = {r["cdCat"]: cat_name.get(r["cdCat"], "?") for r in recipes.values() if r.get("cdCat")}
     files = {
-        "Data/Recipes.lua": lua_recipes(recipes, prof),
+        "Data/Recipes.lua": lua_recipes(recipes, prof, cd_cats),
         "Data/Items.lua": lua_items(items),
         "Data/Vendor.lua": lua_vendor(vendor, items),
     }
@@ -1157,7 +1180,7 @@ def llist(v):
     return str(v)
 
 
-def lua_recipes(recipes, prof):
+def lua_recipes(recipes, prof, cd_cats):
     out = [HEADER, "ns.DATA_BUILD = %s" % lstr(BUILD), "",
            "-- skillLine = { name, parent, cat } (parent 0 = the profession itself; cat = SkillLine.CategoryID:",
            "--   11 profession, 9 secondary skill)",
@@ -1172,7 +1195,9 @@ def lua_recipes(recipes, prof):
             "--   2 drop, 4 quest, ...; from the profession lists, or from the recipe's own page when",
             "--   src has wh_item), cost = trainer cost (copper), items = recipe item IDs,",
             "--   acquire = SkillLineAbility.AcquireMethod, cast = cast time in ms (SpellMisc.CastingTimeIndex ->",
-            "--   SpellCastTimes.Base; missing = no SpellMisc row, time unknown), learnText = the game's own \"how to learn\" text",
+            "--   SpellCastTimes.Base; missing = no SpellMisc row, time unknown), cd = cooldown in seconds",
+            "--   (SpellCooldowns: the larger of RecoveryTime and CategoryRecoveryTime), cdCat = the shared cooldown",
+            "--   category (SpellCategories.Category, set when CategoryRecoveryTime is), learnText = the game's own \"how to learn\" text",
             "--   (C_TradeSkillUI.GetRecipeSourceText, src client), known = date of the client dump in which a",
             "--   character knew the recipe (src client); src client = the game listed the recipe and its",
             "--   reagents/output come from the game }",
@@ -1184,13 +1209,21 @@ def lua_recipes(recipes, prof):
         ver = max(PAGES_VERIFIED if r.get("page") else DB2_VERIFIED, r.get("client") or "", r.get("known") or "")
         text = ",learnText=%s" % lstr(r["learnText"]) if r.get("learnText") else ""
         text += ",known=%s" % lstr(r["known"]) if r.get("known") else ""
-        text = (",cast=%d" % r["cast"] if "cast" in r else "") + text
+        text = (",cast=%d" % r["cast"] if "cast" in r else "") + (",cd=%d" % r["cd"] if "cd" in r else "") + (
+            ",cdCat=%d" % r["cdCat"] if r.get("cdCat") else "") + text
+        if "cd" in r:
+            ver = max(ver, CD_VERIFIED)
         out.append(
             "  [%s]={name=%s,skill=%d,learn=%d,trivLo=%d,trivHi=%d,out=%s,reagents=%s,how=%s,"
             "cost=%d,items=%s,acquire=%d%s,src=\"%s\",verified=\"%s\"}," % (
                 sp, lstr(r["name"]), r["skill"], r["learn"], r["trivLo"], r["trivHi"],
                 llist(r["out"]), llist(r["reagents"]), llist(r["how"]), r["cost"],
                 llist(r["items"]), r["acquire"], text, "+".join(src), ver))
+    out += ["}", "",
+            "-- Shared cooldown categories of the recipes (cdCat): [SpellCategory.ID] = { name = SpellCategory.Name_lang }",
+            "ns.CooldownCategories = {"]
+    for k in sorted(cd_cats):
+        out.append("  [%d]={name=%s,src=\"db2\",verified=\"%s\"}," % (k, lstr(cd_cats[k]), CD_VERIFIED))
     out.append("}")
     return "\n".join(out) + "\n"
 

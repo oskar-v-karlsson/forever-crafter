@@ -84,6 +84,7 @@ function S.RowLimit(r, kind, floor)
   end
   local cushion = kind == "ah" and S.CUSHION or 0
   lim.W, lim.C, lim.batch, lim.time, lim.gh, lim.fast = p.W, p.C, p.batch, p.time, p.gh, p.fast
+  lim.cd = r.cd
   lim.Wc = math.floor((1 - cushion) * p.W)
   local ahCost = 0
   for _, e in ipairs(PL.ShoppingList(p.tree)) do
@@ -111,7 +112,7 @@ function S.ApplyFloor(lim, floor)
   end
   lim.markup = lim.room / lim.ahCost
   for _, g in pairs(lim.reagents) do g.max = math.floor(g.unit * (1 + lim.markup) + 1e-6) end
-  if lim.time and lim.time > 0 then
+  if lim.time and lim.time > 0 and not lim.cd then
     lim.floorGh = (lim.Wc - lim.C) * pct / 100 / lim.time * 3600
   end
   return lim
@@ -137,19 +138,26 @@ end
 
 S.MAX_TARGET = 9999
 
--- A ticked craft's target: how many crafts to buy reagents for. nil = its cheap batch.
-function S.Target(spell)
-  return ns.char and store().targets[spell] or nil
+-- A recipe with a cooldown makes one craft per cooldown: its target is always its batch of 1.
+local function once(spell)
+  return PL.Cooldown(PL.Recipe(spell)) ~= nil
 end
 
--- n = an integer 1 .. MAX_TARGET, or nil / blank for the batch. → true if accepted
+-- A ticked craft's target: how many crafts to buy reagents for. nil = its cheap batch.
+function S.Target(spell)
+  if not ns.char or once(spell) then return nil end
+  return store().targets[spell]
+end
+
+-- n = an integer 1 .. MAX_TARGET (1 for a cooldown recipe), or nil / blank for the batch. → true if accepted
 function S.SetTarget(spell, n)
   if n == nil or n == "" then
     store().targets[spell] = nil
   else
     n = tonumber(n)
-    if not n or n ~= math.floor(n) or n < 1 or n > S.MAX_TARGET then return false end
-    store().targets[spell] = n
+    local max = once(spell) and 1 or S.MAX_TARGET
+    if not n or n ~= math.floor(n) or n < 1 or n > max then return false end
+    store().targets[spell] = not once(spell) and n or nil
   end
   ns.Fire("SNIPE_CHANGED")
   return true
@@ -818,7 +826,7 @@ function S.CraftCellText(lim, key)
   if key == "craft" then
     local mark = ""
     if lim.noRoom then mark = " |cffff8040no room|r" elseif lim.noAH then mark = " |cff808080no AH reagents|r" end
-    return (lim.name or "?") .. mark
+    return (lim.cd and "|cffffd100[cd]|r " or "") .. (lim.name or "?") .. mark
   end
   if key == "sale" then return lim.kind == "vendor" and "Vendor" or "AH" end
   if key == "batch" then return lim.batch and tostring(lim.batch) or "—" end
@@ -836,6 +844,7 @@ function S.CraftCellText(lim, key)
   end
   if key == "floorgh" then
     if lim.noRoom or lim.noAH then return "—" end
+    if lim.cd then return "|cff808080per cooldown|r" end
     return lim.floorGh and (Util.Money(math.floor(lim.floorGh + 0.5)) .. "/h") or "—"
   end
   return ""

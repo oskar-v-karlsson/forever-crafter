@@ -123,6 +123,10 @@ local DEFAULTS = {
     snipeFloor = 0.9,
     snipeSort = "under",
     snipeSortDesc = true,
+    -- Cooldowns tab: its sort, and the "N cooldowns ready" chat line at login
+    cdSort = "cready",
+    cdSortDesc = false,
+    cdLogin = true,
   },
   realms = {},      -- realm key → { time, items = { [itemID] = { min, qty, n, steps = {unit1, qty1, ...} } } }
   vendorSeen = {},  -- itemID → { unit, stack, limited, time, npc } from MERCHANT_SHOW (authoritative)
@@ -145,6 +149,8 @@ local CHAR_DEFAULTS = {
   -- Sniper: rows = { [spell] = limits of a ticked craft (Modules/Sniper.lua RowLimit) }; bought = { [itemID] =
   -- { n = bought and not yet in the bags (AH purchases go to the mail), bagsAt = bag count when last checked } }
   snipe = { rows = {}, bought = {}, targets = {} },
+  -- Profession cooldowns: spell ID → when it is ready again (time(); 0 = ready when read). Modules/Cooldowns.lua
+  cooldowns = {},
 }
 
 local function fill(dst, src)
@@ -215,6 +221,7 @@ local function help()
   ns.Print("/crafter rep          - reputation planner (Durotar Supply and Logistics / Azeroth Commerce Authority)")
   ns.Print("/crafter rep forget   - clear the reputation and favor amounts learned in game")
   ns.Print("/crafter snipe [start|stop|clear|forget] - reagent sniper: tab, search loop, untick all, forget purchases")
+  ns.Print("/crafter cd [login]   - profession cooldowns of all your characters; login: the chat line at login on/off")
   ns.Print("/crafter status       - professions, snapshot age, AH cut")
   ns.Print("/crafter reset        - forget prices, merchant data and this character's recipe data")
   ns.Print("/crafter dump         - save the open profession's recipes and item data for the addon's data files")

@@ -35,7 +35,9 @@ ns.SkillLines = {
 --   2 drop, 4 quest, ...; from the profession lists, or from the recipe's own page when
 --   src has wh_item), cost = trainer cost (copper), items = recipe item IDs,
 --   acquire = SkillLineAbility.AcquireMethod, cast = cast time in ms (SpellMisc.CastingTimeIndex ->
---   SpellCastTimes.Base; missing = no SpellMisc row, time unknown), learnText = the game's own "how to learn" text
+--   SpellCastTimes.Base; missing = no SpellMisc row, time unknown), cd = cooldown in seconds
+--   (SpellCooldowns: the larger of RecoveryTime and CategoryRecoveryTime), cdCat = the shared cooldown
+--   category (SpellCategories.Category, set when CategoryRecoveryTime is), learnText = the game's own "how to learn" text
 --   (C_TradeSkillUI.GetRecipeSourceText, src client), known = date of the client dump in which a
 --   character knew the recipe (src client); src client = the game listed the recipe and its
 --   reagents/output come from the game }
@@ -573,8 +575,8 @@ ns.Recipes = {
   [11476]={name="Elixir of Shadow Power",skill=171,learn=250,trivLo=265,trivHi=305,out={9264,1,1},reagents={{8845,3},{8925,1}},how={5},cost=0,items={9301},acquire=0,cast=3000,src="db2+wh_list",verified="2026-11-12"},
   [11477]={name="Potion of Demon Slaying",skill=171,learn=250,trivLo=265,trivHi=305,out={9224,1,1},reagents={{8846,1},{8845,1},{8925,1}},how={5},cost=0,items={9300},acquire=0,cast=3000,src="db2+wh_list",verified="2026-11-12"},
   [11478]={name="Draught of Detect Demon",skill=171,learn=250,trivLo=265,trivHi=305,out={9233,1,1},reagents={{8846,2},{8925,1}},how={6},cost=14000,items={},acquire=0,cast=3000,src="db2+wh_list",verified="2026-11-12"},
-  [11479]={name="Transmute: Iron to Gold",skill=171,learn=225,trivLo=240,trivHi=280,out={3577,1,1},reagents={{3575,1}},how={5,6},cost=2500,items={9304},acquire=0,cast=25000,src="db2+wh_list",verified="2026-11-12"},
-  [11480]={name="Transmute: Mithril to Truesilver",skill=171,learn=225,trivLo=240,trivHi=280,out={6037,1,1},reagents={{3860,1}},how={5,6},cost=10000,items={9305},acquire=0,cast=25000,src="db2+wh_list",verified="2026-11-12"},
+  [11479]={name="Transmute: Iron to Gold",skill=171,learn=225,trivLo=240,trivHi=280,out={3577,1,1},reagents={{3575,1}},how={5,6},cost=2500,items={9304},acquire=0,cast=25000,cd=3600,src="db2+wh_list",verified="2026-11-20"},
+  [11480]={name="Transmute: Mithril to Truesilver",skill=171,learn=225,trivLo=240,trivHi=280,out={6037,1,1},reagents={{3860,1}},how={5,6},cost=10000,items={9305},acquire=0,cast=25000,cd=3600,src="db2+wh_list",verified="2026-11-20"},
   [11643]={name="Golden Scale Gauntlets",skill=164,learn=180,trivLo=200,trivHi=220,out={9366,1,1},reagents={{3859,10},{3577,4},{3486,4},{3864,1}},how={4},cost=0,items={9367},acquire=0,cast=45000,src="db2+wh_list+client",verified="2026-11-12"},
   [12044]={name="Simple Linen Pants",skill=197,learn=40,trivLo=40,trivHi=60,out={10045,1,1},reagents={{2996,1},{2320,1}},how={},cost=0,items={},acquire=1,cast=5125,src="db2+wh_list",verified="2026-11-12"},
   [12045]={name="Simple Linen Boots",skill=197,learn=20,trivLo=50,trivHi=85,out={10046,1,1},reagents={{2996,2},{2318,1},{2320,1}},how={6},cost=50,items={},acquire=0,cast=5125,src="db2+wh_list",verified="2026-11-12"},
@@ -756,21 +758,21 @@ ns.Recipes = {
   [16995]={name="Heartseeker",skill=164,learn=300,trivLo=320,trivHi=340,out={12783,1,1},reagents={{12360,10},{12655,10},{12810,2},{7910,6},{12800,6},{12799,6},{12644,4}},how={2},cost=0,items={12839},acquire=0,cast=60000,src="db2+wh_list+client",verified="2026-11-12"},
   [17180]={name="Enchanted Thorium",skill=333,learn=250,trivLo=250,trivHi=260,out={12655,1,1},reagents={{12359,1},{11176,3}},how={6},cost=10000,items={},acquire=0,cast=12500,src="db2+wh_list",verified="2026-11-12"},
   [17181]={name="Enchanted Leather",skill=333,learn=250,trivLo=250,trivHi=260,out={12810,1,1},reagents={{8170,1},{16202,1}},how={6},cost=10000,items={},acquire=0,cast=12500,src="db2+wh_list",verified="2026-11-12"},
-  [17187]={name="Transmute: Arcanite",skill=171,learn=275,trivLo=275,trivHi=290,out={12360,1,1},reagents={{12359,1},{12363,1}},how={5},cost=0,items={12958},acquire=0,cast=25000,src="db2+wh_list",verified="2026-11-12"},
+  [17187]={name="Transmute: Arcanite",skill=171,learn=275,trivLo=275,trivHi=290,out={12360,1,1},reagents={{12359,1},{12363,1}},how={5},cost=0,items={12958},acquire=0,cast=25000,cd=169200,cdCat=310,src="db2+wh_list",verified="2026-11-20"},
   [17551]={name="Stonescale Oil",skill=171,learn=250,trivLo=250,trivHi=260,out={13423,2,2},reagents={{13422,1},{3372,1}},how={6},cost=15000,items={},acquire=0,cast=3000,src="db2+wh_list",verified="2026-11-12"},
   [17552]={name="Mighty Rage Potion",skill=171,learn=255,trivLo=270,trivHi=310,out={13442,1,1},reagents={{8846,3},{8925,1}},how={2},cost=0,items={13476},acquire=0,cast=3000,src="db2+wh_list",verified="2026-11-12"},
   [17553]={name="Superior Mana Potion",skill=171,learn=260,trivLo=275,trivHi=315,out={13443,1,1},reagents={{8838,2},{8839,2},{8925,1}},how={5},cost=0,items={13477},acquire=0,cast=3000,src="db2+wh_list",verified="2026-11-12"},
   [17554]={name="Elixir of Greater Defense",skill=171,learn=265,trivLo=280,trivHi=320,out={13445,1,1},reagents={{13423,2},{8838,1},{8925,1}},how={5},cost=0,items={13478},acquire=0,cast=3000,src="db2+wh_list",verified="2026-11-12"},
   [17555]={name="Elixir of the Sages",skill=171,learn=270,trivLo=285,trivHi=325,out={13447,1,1},reagents={{13463,1},{13466,2},{8925,1}},how={2},cost=0,items={13479},acquire=0,cast=3000,src="db2+wh_list",verified="2026-11-12"},
   [17557]={name="Elixir of Brute Force",skill=171,learn=275,trivLo=290,trivHi=330,out={13453,1,1},reagents={{8846,2},{13466,2},{8925,1}},how={2},cost=0,items={13481},acquire=0,cast=3000,src="db2+wh_list",verified="2026-11-12"},
-  [17559]={name="Transmute: Air to Fire",skill=171,learn=275,trivLo=275,trivHi=290,out={7078,1,1},reagents={{7082,1}},how={5},cost=0,items={13482},acquire=0,cast=25000,src="db2+wh_list",verified="2026-11-12"},
-  [17560]={name="Transmute: Fire to Earth",skill=171,learn=275,trivLo=275,trivHi=290,out={7076,1,1},reagents={{7078,1}},how={5},cost=0,items={13483},acquire=0,cast=25000,src="db2+wh_list",verified="2026-11-12"},
-  [17561]={name="Transmute: Earth to Water",skill=171,learn=275,trivLo=275,trivHi=290,out={7080,1,1},reagents={{7076,1}},how={5},cost=0,items={13484},acquire=0,cast=25000,src="db2+wh_list",verified="2026-11-12"},
-  [17562]={name="Transmute: Water to Air",skill=171,learn=275,trivLo=275,trivHi=290,out={7082,1,1},reagents={{7080,1}},how={5},cost=0,items={13485},acquire=0,cast=25000,src="db2+wh_list",verified="2026-11-12"},
-  [17563]={name="Transmute: Undeath to Water",skill=171,learn=275,trivLo=275,trivHi=290,out={7080,1,1},reagents={{12808,1}},how={2},cost=0,items={13486},acquire=0,cast=25000,src="db2+wh_list",verified="2026-11-12"},
-  [17564]={name="Transmute: Water to Undeath",skill=171,learn=275,trivLo=275,trivHi=290,out={12808,1,1},reagents={{7080,1}},how={2},cost=0,items={13487},acquire=0,cast=25000,src="db2+wh_list",verified="2026-11-12"},
-  [17565]={name="Transmute: Life to Earth",skill=171,learn=275,trivLo=275,trivHi=290,out={7076,1,1},reagents={{12803,1}},how={2},cost=0,items={13488},acquire=0,cast=25000,src="db2+wh_list",verified="2026-11-12"},
-  [17566]={name="Transmute: Earth to Life",skill=171,learn=275,trivLo=275,trivHi=290,out={12803,1,1},reagents={{7076,1}},how={2},cost=0,items={13489},acquire=0,cast=25000,src="db2+wh_list",verified="2026-11-12"},
+  [17559]={name="Transmute: Air to Fire",skill=171,learn=275,trivLo=275,trivHi=290,out={7078,1,1},reagents={{7082,1}},how={5},cost=0,items={13482},acquire=0,cast=25000,cd=82800,cdCat=310,src="db2+wh_list",verified="2026-11-20"},
+  [17560]={name="Transmute: Fire to Earth",skill=171,learn=275,trivLo=275,trivHi=290,out={7076,1,1},reagents={{7078,1}},how={5},cost=0,items={13483},acquire=0,cast=25000,cd=82800,cdCat=310,src="db2+wh_list",verified="2026-11-20"},
+  [17561]={name="Transmute: Earth to Water",skill=171,learn=275,trivLo=275,trivHi=290,out={7080,1,1},reagents={{7076,1}},how={5},cost=0,items={13484},acquire=0,cast=25000,cd=82800,cdCat=310,src="db2+wh_list",verified="2026-11-20"},
+  [17562]={name="Transmute: Water to Air",skill=171,learn=275,trivLo=275,trivHi=290,out={7082,1,1},reagents={{7080,1}},how={5},cost=0,items={13485},acquire=0,cast=25000,cd=82800,cdCat=310,src="db2+wh_list",verified="2026-11-20"},
+  [17563]={name="Transmute: Undeath to Water",skill=171,learn=275,trivLo=275,trivHi=290,out={7080,1,1},reagents={{12808,1}},how={2},cost=0,items={13486},acquire=0,cast=25000,cd=82800,cdCat=310,src="db2+wh_list",verified="2026-11-20"},
+  [17564]={name="Transmute: Water to Undeath",skill=171,learn=275,trivLo=275,trivHi=290,out={12808,1,1},reagents={{7080,1}},how={2},cost=0,items={13487},acquire=0,cast=25000,cd=82800,cdCat=310,src="db2+wh_list",verified="2026-11-20"},
+  [17565]={name="Transmute: Life to Earth",skill=171,learn=275,trivLo=275,trivHi=290,out={7076,1,1},reagents={{12803,1}},how={2},cost=0,items={13488},acquire=0,cast=25000,cd=82800,cdCat=310,src="db2+wh_list",verified="2026-11-20"},
+  [17566]={name="Transmute: Earth to Life",skill=171,learn=275,trivLo=275,trivHi=290,out={12803,1,1},reagents={{7076,1}},how={2},cost=0,items={13489},acquire=0,cast=25000,cd=82800,cdCat=310,src="db2+wh_list",verified="2026-11-20"},
   [17570]={name="Greater Stoneshield Potion",skill=171,learn=280,trivLo=295,trivHi=335,out={13455,1,1},reagents={{13423,3},{10620,1},{8925,1}},how={2},cost=0,items={13490},acquire=0,cast=3000,src="db2+wh_list",verified="2026-11-12"},
   [17571]={name="Elixir of the Mongoose",skill=171,learn=280,trivLo=295,trivHi=335,out={13452,1,1},reagents={{13465,2},{13466,2},{8925,1}},how={2},cost=0,items={13491},acquire=0,cast=3000,src="db2+wh_list",verified="2026-11-12"},
   [17572]={name="Purification Potion",skill=171,learn=285,trivLo=300,trivHi=340,out={13462,1,1},reagents={{13467,2},{13466,2},{8925,1}},how={2},cost=0,items={13492},acquire=3,cast=3000,src="db2+wh_list",verified="2026-11-12"},
@@ -844,7 +846,7 @@ ns.Recipes = {
   [18456]={name="Truefaith Vestments",skill=197,learn=295,trivLo=310,trivHi=340,out={14154,1,1},reagents={{14048,12},{14342,8},{12811,2},{13926,2},{9210,8},{14341,2},{249431,10}},how={2},cost=0,items={14512},acquire=0,cast=60000,src="db2+wh_list",verified="2026-11-12"},
   [18457]={name="Robe of the Archmage",skill=197,learn=295,trivLo=310,trivHi=340,out={14152,1,1},reagents={{14048,12},{7078,8},{7082,8},{7076,8},{7080,8},{14341,2},{249431,10}},how={2},cost=0,items={14513},acquire=0,cast=60000,src="db2+wh_list",verified="2026-11-12"},
   [18458]={name="Robe of the Void",skill=197,learn=295,trivLo=310,trivHi=340,out={14153,1,1},reagents={{14048,12},{12662,20},{14256,40},{7078,8},{12808,8},{14341,2},{249431,10}},how={2},cost=0,items={14514},acquire=0,cast=60000,src="db2+wh_list",verified="2026-11-12"},
-  [18560]={name="Mooncloth",skill=197,learn=230,trivLo=270,trivHi=300,out={14342,1,1},reagents={{14256,2}},how={5},cost=0,items={14526},acquire=0,cast=60000,src="db2+wh_list",verified="2026-11-12"},
+  [18560]={name="Mooncloth",skill=197,learn=230,trivLo=270,trivHi=300,out={14342,1,1},reagents={{14256,2}},how={5},cost=0,items={14526},acquire=0,cast=60000,cd=342000,src="db2+wh_list",verified="2026-11-20"},
   [18629]={name="Runecloth Bandage",skill=129,learn=260,trivLo=260,trivHi=320,out={14529,1,1},reagents={{14047,1}},how={},cost=0,items={},acquire=0,cast=3000,src="db2+wh_list",verified="2026-11-12"},
   [18630]={name="Heavy Runecloth Bandage",skill=129,learn=290,trivLo=290,trivHi=350,out={14530,1,1},reagents={{14047,2}},how={},cost=0,items={},acquire=0,cast=3000,src="db2+wh_list",verified="2026-11-12"},
   [19047]={name="Cured Rugged Hide",skill=165,learn=225,trivLo=225,trivHi=235,out={15407,2,2},reagents={{8171,1},{15409,1}},how={6},cost=5000,items={},acquire=0,cast=12500,src="db2+wh_list",verified="2026-11-12"},
@@ -1071,7 +1073,7 @@ ns.Recipes = {
   [25128]={name="Wizard Oil",skill=333,learn=275,trivLo=285,trivHi=305,out={20750,0,0},reagents={{16204,3},{4625,2},{8925,1}},how={5},cost=0,items={20755},acquire=0,cast=5000,src="db2+wh_list",verified="2026-11-12"},
   [25129]={name="Brilliant Wizard Oil",skill=333,learn=300,trivLo=310,trivHi=330,out={20749,0,0},reagents={{14344,2},{4625,3},{18256,1}},how={5},cost=0,items={20756},acquire=0,cast=5000,src="db2+wh_list",verified="2026-11-12"},
   [25130]={name="Brilliant Mana Oil",skill=333,learn=300,trivLo=310,trivHi=330,out={20748,0,0},reagents={{14344,2},{8831,3},{18256,1}},how={5},cost=0,items={20757},acquire=0,cast=5000,src="db2+wh_list",verified="2026-11-12"},
-  [25146]={name="Transmute: Elemental Fire",skill=171,learn=300,trivLo=301,trivHi=310,out={7068,3,3},reagents={{7077,1}},how={5},cost=0,items={20761},acquire=0,cast=25000,src="db2+wh_list",verified="2026-11-12"},
+  [25146]={name="Transmute: Elemental Fire",skill=171,learn=300,trivLo=301,trivHi=310,out={7068,3,3},reagents={{7077,1}},how={5},cost=0,items={20761},acquire=0,cast=25000,cd=600,cdCat=310,src="db2+wh_list",verified="2026-11-20"},
   [25659]={name="Dirge's Kickin' Chimaerok Chops",skill=185,learn=300,trivLo=325,trivHi=365,out={21023,5,5},reagents={{2692,1},{9061,1},{8150,1},{21024,1}},how={4},cost=0,items={21025},acquire=0,cast=3000,src="db2+wh_list",verified="2026-11-12"},
   [25704]={name="Smoked Sagefish",skill=185,learn=80,trivLo=120,trivHi=160,out={21072,1,1},reagents={{21071,1},{2678,1}},how={5},cost=0,items={21099},acquire=0,cast=3000,src="db2+wh_list",verified="2026-11-12"},
   [25954]={name="Sagefish Delight",skill=185,learn=175,trivLo=215,trivHi=255,out={21217,1,1},reagents={{21153,1},{2692,1}},how={5},cost=0,items={21219},acquire=0,cast=3000,src="db2+wh_list",verified="2026-11-12"},
@@ -2057,7 +2059,7 @@ ns.Recipes = {
   [1308185]={name="Stuckbutton Goggles",skill=202,learn=200,trivLo=205,trivHi=210,out={280312,1,1},reagents={{5507,1},{4389,1},{4234,8}},how={5},cost=0,items={280327},acquire=0,cast=3000,src="db2+wh_list",verified="2026-11-12"},
   [1308186]={name="Dented Goggles",skill=202,learn=200,trivLo=205,trivHi=210,out={280313,1,1},reagents={{5507,1},{4389,1},{3860,2}},how={5},cost=0,items={280328},acquire=0,cast=3000,src="db2+wh_list",verified="2026-11-12"},
   [1317270]={name="Unsanctified Grenade",skill=202,learn=260,trivLo=280,trivHi=300,out={284869,3,3},reagents={{18631,1},{12655,2},{15992,3},{14047,2}},how={},cost=0,items={284870},acquire=0,cast=8000,src="db2+wh_list",verified="2026-11-12"},
-  [1317279]={name="Transmute: Legionite",skill=171,learn=275,trivLo=275,trivHi=290,out={251290,1,1},reagents={{251291,1},{248819,1}},how={},cost=0,items={284871},acquire=0,cast=25000,src="db2+wh_list",verified="2026-11-12"},
+  [1317279]={name="Transmute: Legionite",skill=171,learn=275,trivLo=275,trivHi=290,out={251290,1,1},reagents={{251291,1},{248819,1}},how={},cost=0,items={284871},acquire=0,cast=25000,cd=169200,cdCat=310,src="db2+wh_list",verified="2026-11-20"},
   [1317958]={name="Satchel of Copper Bombs",skill=202,learn=85,trivLo=90,trivHi=95,out={285275,1,1},reagents={{4360,20},{2318,6},{4359,4}},how={5},cost=0,items={285285},acquire=0,cast=3000,src="db2+wh_list",verified="2026-11-12"},
   [1317959]={name="Satchel of Bronze Bombs",skill=202,learn=165,trivLo=170,trivHi=175,out={285276,1,1},reagents={{4380,20},{2319,6},{4375,1}},how={5},cost=0,items={285286},acquire=0,cast=3000,src="db2+wh_list",verified="2026-11-12"},
   [1317960]={name="Satchel of Iron Bombs",skill=202,learn=230,trivLo=235,trivHi=240,out={285277,1,1},reagents={{4394,20},{4304,6},{4389,1}},how={5},cost=0,items={285287},acquire=0,cast=3000,src="db2+wh_list",verified="2026-11-12"},
@@ -2078,4 +2080,9 @@ ns.Recipes = {
   [1319164]={name="Large White Rocket Cluster",skill=202,learn=275,trivLo=275,trivHi=285,out={21719,5,5},reagents={{15992,1},{8170,1}},how={},cost=0,items={286086},acquire=0,cast=5125,src="db2+wh_list",verified="2026-11-12"},
   [1319165]={name="Large Yellow Rocket Cluster",skill=202,learn=275,trivLo=275,trivHi=285,out={21720,5,5},reagents={{15992,1},{8170,1}},how={},cost=0,items={286087},acquire=0,cast=5125,src="db2+wh_list",verified="2026-11-12"},
   [1319313]={name="Plated Armorfish",skill=185,learn=225,trivLo=245,trivHi=255,out={286152,1,1},reagents={{13890,1},{3713,1}},how={2},cost=0,items={286153},acquire=0,cast=3000,src="db2+wh_list",verified="2026-11-12"},
+}
+
+-- Shared cooldown categories of the recipes (cdCat): [SpellCategory.ID] = { name = SpellCategory.Name_lang }
+ns.CooldownCategories = {
+  [310]={name="Transmute - Alchemy",src="db2",verified="2026-11-20"},
 }

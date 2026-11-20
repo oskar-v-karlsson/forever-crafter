@@ -25,7 +25,7 @@ function PL.Recipe(spell)
     trivLo = r and r.trivLo, trivHi = r and r.trivHi, out = s.out,
     reagents = (#s.reagents > 0 or not r) and s.reagents or r.reagents,
     how = r and r.how or {}, cost = r and r.cost or 0, items = r and r.items or {}, acquire = r and r.acquire,
-    known = r and r.known, cast = r and r.cast, runtime = true,
+    known = r and r.known, cast = r and r.cast, cd = r and r.cd, cdCat = r and r.cdCat, runtime = true,
   }
 end
 
@@ -102,6 +102,11 @@ local function avgOut(r)
 end
 PL.AvgOut = avgOut
 
+-- A recipe with a cooldown (Mooncloth, the transmutes): one craft per cooldown. → seconds or nil
+function PL.Cooldown(r)
+  return r and r.cd and r.cd > 0 and r.cd or nil
+end
+
 -- One solver run. Memoises cost(item, qty) unless the subtree hit the cycle guard or the depth limit.
 -- Each node is chosen by its score = copper cost + lambda x crafting seconds of its subtree (buying takes 0 s; a
 -- recipe with no cast time counts as 0 s). lambda nil or 0: the cheapest in copper (the most-gold path). A positive
@@ -137,7 +142,8 @@ local function newSolver(usable, producers, lambda)
       visiting[id] = true
       for _, spell in ipairs(producers[id] or {}) do
         local r = PL.Recipe(spell)
-        if usable(spell, r) then
+        -- A cooldown recipe is never a chain step: a batch (or a few chained crafts) would need several cooldowns.
+        if usable(spell, r) and not PL.Cooldown(r) then
           local lo, hi = PL.OutRange(r)
           local crafts = math.ceil(qty / ((lo + hi) / 2))
           local total, kids, ok, est, h, var, deep = 0, {}, true, PL.CountUnknown(r), 0, hi > lo, nil
@@ -280,10 +286,12 @@ end
 -- is at least BATCH_KEEP of the first craft's. The extra cost of each craft is taken to never fall, so k is found by
 -- doubling and a binary search. at(k) is the cached solveCrafts; nil = k is not available. prefix: every k up to the
 -- batch must be available (the search only checks some k), so the batch ends before the first k that is not.
+-- once: a cooldown recipe, the batch is its one craft per cooldown.
 -- → k, capped (k is a lower bound: the search cap, or the next craft needs more than the snapshot's price steps)
-local function cheapBatch(worth, at, prefix)
+local function cheapBatch(worth, at, prefix, once)
   local first = worth - at(1).cost
   if first <= 0 then return nil end
+  if once then return 1, false end
   local need = PL.BATCH_KEEP * first
   local status = {}
   local function check(k)
@@ -523,7 +531,9 @@ local function evaluate(spell, r, line, cost, kit)
   end
   -- Cheap batch for the best sale, and for a vendor sale (Vendor shuffles); the numbers below are batch averages.
   local vworth = value.vendor and math.floor(value.vendor * n)
-  res.batch, res.batchCapped = cheapBatch(worth, at)
+  local cd = PL.Cooldown(r)
+  if cd then res.cd, res.cdCat = cd, r.cdCat end
+  res.batch, res.batchCapped = cheapBatch(worth, at, nil, cd)
   if res.batch then
     res.cost = batchCost(at, res.batch)
     res.profit = worth - res.cost
@@ -536,7 +546,7 @@ local function evaluate(spell, r, line, cost, kit)
     if vworth == worth then
       res.vendorBatch, res.vendorBatchCapped = res.batch, res.batchCapped
     else
-      res.vendorBatch, res.vendorBatchCapped = cheapBatch(vworth, at)
+      res.vendorBatch, res.vendorBatchCapped = cheapBatch(vworth, at, nil, cd)
     end
     vcost = batchCost(at, res.vendorBatch)
     res.vendorBatchProfit = res.vendorBatch * vworth - math.max(res.vendorBatch * total, at(res.vendorBatch).cost)
@@ -555,8 +565,10 @@ local function evaluate(spell, r, line, cost, kit)
     if hi > lo then res.vendorWorst = math.floor(value.vendor * lo) - vcost end
   end
   if value.ah then res.ahProfit = math.floor(value.ah * n) - res.cost end
-  -- Crafting time (per craft) and the batch-average profit per hour (nil when the time is 0 or partly unknown).
+  -- Crafting time (per craft) and the batch-average profit per hour (nil when the time is 0 or partly unknown, and
+  -- for a cooldown recipe: its profit is per cooldown, not per hour of crafting).
   res.time, res.casts, res.timeUnknown = PL.ChainTime(res.tree)
+  if cd then return res end
   if res.time > 0 and not res.timeUnknown then
     res.ahPerHour = res.ahProfit and res.ahProfit / res.time * 3600
     res.vendorPerHour = res.vendorProfit and res.vendorProfit / res.time * 3600
@@ -853,6 +865,15 @@ function PL.Run(opts)
   end
   table.sort(results, byProfit)
   return results, stats
+end
+
+-- A cooldown recipe's profit for one craft at today's prices, every reagent bought (AH or vendor; no chains, so it
+-- is the same for every character). → result (as PL.Run's, profit may be <= 0) or nil, why
+function PL.CooldownResult(spell)
+  local r = PL.Recipe(spell)
+  if not r or not r.out or not r.skill then return nil, "noRecipe" end
+  local buy = newSolver(function() return false end, {})
+  return evaluate(spell, r, Util.ParentLine(r.skill), buy, nil)
 end
 
 -- The what-if run spread over frames (one profession set per frame) so a large run does not freeze the game.

@@ -70,6 +70,7 @@ local COLUMNS = {
 }
 COLUMNS.rep = ns.Reputation.COLUMNS
 COLUMNS.snipe = ns.Sniper.COLUMNS
+COLUMNS.cd = ns.Cooldowns.COLUMNS
 local MAX_COLUMNS = 14
 local LIST_W = 804
 local FRAME_W = LIST_W + 400
@@ -83,9 +84,13 @@ local function snipeMode()
   return ns.settings.tab == "snipe"
 end
 
--- A tab other than the craft list (Reputation, Sniper).
+local function cdMode()
+  return ns.settings.tab == "cd"
+end
+
+-- A tab other than the craft list (Reputation, Sniper, Cooldowns).
 local function panelMode()
-  return repMode() or snipeMode()
+  return repMode() or snipeMode() or cdMode()
 end
 
 local function whatIf()
@@ -107,6 +112,7 @@ UI.craftOffset = 0
 local function columns()
   if repMode() then return COLUMNS.rep end
   if snipeMode() then return COLUMNS.snipe end
+  if cdMode() then return COLUMNS.cd end
   return COLUMNS[whatIf() and "whatIf" or "char"]
 end
 
@@ -115,6 +121,7 @@ local function sortSetting()
   local s = ns.settings
   if repMode() then return s.repSort or "rper", s.repSortDesc == true end
   if snipeMode() then return s.snipeSort or "under", s.snipeSortDesc ~= false end
+  if cdMode() then return s.cdSort or "cready", s.cdSortDesc == true end
   return s.sort or "profit", s.sortDesc ~= false
 end
 
@@ -123,6 +130,8 @@ local function setSort(key, desc)
     ns.settings.repSort, ns.settings.repSortDesc = key, desc
   elseif snipeMode() then
     ns.settings.snipeSort, ns.settings.snipeSortDesc = key, desc
+  elseif cdMode() then
+    ns.settings.cdSort, ns.settings.cdSortDesc = key, desc
   else
     ns.settings.sort, ns.settings.sortDesc = key, desc
   end
@@ -264,6 +273,15 @@ function UI.PerHourText(v, est)
   return v > 0 and t or ("|cff808080" .. t .. "|r")
 end
 
+-- "Cooldown 47 h (shared: Transmute - Alchemy): one craft per cooldown, so the batch is 1 and there is no g/h ..."
+function UI.CooldownLine(r)
+  if not r.cd then return nil end
+  local cat = r.cdCat and ns.CooldownCategories[r.cdCat]
+  return string.format("|cffffd100Cooldown %s%s:|r one craft per cooldown, so the batch is 1 and there is no g/h; "
+    .. "the profit is per cooldown. See the Cooldowns tab for when it is ready.", UI.TimeText(r.cd),
+    cat and (" (shared: " .. cat.name .. ")") or "")
+end
+
 -- "Crafting time 1 min 15 s (5 casts)  |  AH 12g 30s/h  |  vendor 3g/h"
 function UI.TimeLine(r)
   if not r.time then return nil end
@@ -377,6 +395,7 @@ end
 function UI.ApplyFilter()
   if repMode() then return applyPanel(ns.Reputation) end
   if snipeMode() then return applyPanel(ns.Sniper) end
+  if cdMode() then return applyPanel(ns.Cooldowns) end
   local s = ns.settings
   local view = {}
   local wi = whatIf()
@@ -440,6 +459,17 @@ end
 
 -- What-if runs are spread over frames (Planner.RunAsync); the list keeps the last results until the new ones are in.
 function UI.Recompute()
+  if cdMode() then
+    PL.CancelAsync()
+    UI.calculating = nil
+    local ok, rows = pcall(ns.Cooldowns.List)
+    if not ok then
+      ns.Error("cooldowns: " .. tostring(rows))
+      rows = {}
+    end
+    apply(rows, {})
+    return
+  end
   if snipeMode() then
     PL.CancelAsync()
     UI.calculating = nil
@@ -631,6 +661,7 @@ end
 
 function UI.DetailText(r)
   if snipeMode() then return ns.Sniper.DetailText(r) end
+  if cdMode() then return ns.Cooldowns.DetailText(r) end
   if repMode() then
     return ns.Reputation.DetailText(r, UI.repPlan or { steps = {}, shopping = {}, inPlan = {}, gained = 0, cash = 0 },
       UI.repStanding)
@@ -701,6 +732,8 @@ function UI.DetailText(r)
       r.vendorWorst and string.format(" (worst case (%d) %s)", r.outMin, Util.Money(r.vendorWorst)) or ""))
   end
   for _, l in ipairs(UI.BatchLines(r)) do table.insert(out, l) end
+  local cdl = UI.CooldownLine(r)
+  if cdl then table.insert(out, cdl) end
   local tl = UI.TimeLine(r)
   if tl then
     table.insert(out, tl)
@@ -795,6 +828,7 @@ end
 
 function UI.StatusText()
   if snipeMode() then return ns.Sniper.StatusText(#UI.view) end
+  if cdMode() then return ns.Cooldowns.StatusText(#UI.view) end
   if repMode() then
     return ns.Reputation.StatusText(UI.repPlan or { inPlan = {} }, UI.repStanding, #UI.view)
   end
@@ -893,10 +927,10 @@ local function hint(owner, lines)
   owner:SetScript("OnLeave", UI.HideHint)
 end
 
--- mode: "char" | "whatIf" | "rep" (the Reputation tab) | "snipe" (the Sniper tab); the crafting mode is kept for
--- when you go back
+-- mode: "char" | "whatIf" | "rep" (the Reputation tab) | "snipe" (the Sniper tab) | "cd" (the Cooldowns tab); the
+-- crafting mode is kept for when you go back
 function UI.SetMode(mode)
-  if mode == "rep" or mode == "snipe" then
+  if mode == "rep" or mode == "snipe" or mode == "cd" then
     ns.settings.tab = mode
   else
     ns.settings.tab = "craft"
@@ -1000,7 +1034,11 @@ local function targetBox(row)
     if lim then
       local t = (self:GetText() or ""):gsub("%s", "")
       if not ns.Sniper.SetTarget(lim.spell, t) then
-        ns.Print("Target must be a whole number from 1 to " .. ns.Sniper.MAX_TARGET .. ", or blank for the batch")
+        if lim.cd then
+          ns.Print(lim.name .. " has a cooldown: one craft per cooldown, so its target is 1")
+        else
+          ns.Print("Target must be a whole number from 1 to " .. ns.Sniper.MAX_TARGET .. ", or blank for the batch")
+        end
       end
     end
     self:ClearFocus()
@@ -1145,6 +1183,7 @@ end
 local function cellText(r, key)
   if repMode() then return ns.Reputation.CellText(r, key, UI.repPlan) end
   if snipeMode() then return ns.Sniper.CellText(r, key) end
+  if cdMode() then return ns.Cooldowns.CellText(r, key) end
   if key == "snipe" then return "" end
   if key == "name" then
     local col = COLORS[r.color] or COLORS.unknown
@@ -1156,6 +1195,7 @@ local function cellText(r, key)
       name = "|cffc080ff[rnd]|r " .. name
     end
     if UI.IsShuffle(r) then name = "|cff40ff40[V]|r " .. name end
+    if r.cd then name = "|cffffd100[cd]|r " .. name end
     if ns.Planner.Steps(r.tree) > 1 then name = name .. " |cffaaaaaa+chain|r" end
     local lim = ns.Sniper.IsTicked(r.spell) and ns.Sniper.Limit(r.spell)
     if lim and lim.noRoom then name = "|cffff8040no room|r " .. name end
@@ -1185,6 +1225,8 @@ local function cellText(r, key)
     if not t then return "—" end
     if unknown then return "|cffff8040>" .. UI.TimeText(t, true) .. "|r" end
     return UI.TimeText(t, true) .. (fast and FAST_MARK or "")
+  elseif (key == "ahgh" or key == "vgh") and r.cd then
+    return "|cff808080cd|r"
   elseif key == "ahgh" then
     local v, fast = PL.AHPerHour(r)
     return UI.PerHourText(v) .. (fast and FAST_MARK or "")
@@ -1203,6 +1245,7 @@ UI.CellText = cellText
 UI.SortValue = function(r, key)
   if repMode() then return ns.Reputation.SortValue(r, key) end
   if snipeMode() then return ns.Sniper.SortValue(r, key) end
+  if cdMode() then return ns.Cooldowns.SortValue(r, key) end
   return sortValue(r, key)
 end
 
@@ -1294,6 +1337,12 @@ local function build()
     UI.SetMode(snipeMode() and ns.settings.mode or "snipe")
   end)
   frame.snipeTab:SetPoint("TOPRIGHT", -154, -8)
+  frame.cdTab = button(frame, 84, "Cooldowns", function()
+    UI.SetMode(cdMode() and ns.settings.mode or "cd")
+  end)
+  frame.cdTab:SetPoint("TOPRIGHT", -238, -8)
+  hint(frame.cdTab, { "Cooldowns", "Recipes with a cooldown (Mooncloth, the transmutes) for all your characters: "
+    .. "profit per craft at today's AH and when each is ready, plus what an alt could learn. Also: /crafter cd" })
   hint(frame.snipeTab, { "Sniper", "Watch the AH for the reagents of the crafts you ticked (S column) and buy the "
     .. "listings at or under a max price that keeps most of the craft's g/h. One click per purchase. Also: /crafter snipe" })
   -- Sniper controls (filter row, Sniper tab only).
@@ -1430,6 +1479,8 @@ local function build()
         setSort(key, key == "rtier" or key == "rrep")
       elseif snipeMode() then
         setSort(key, key ~= "name" and key ~= "cheap" and key ~= "davg" and key ~= "max" and key ~= "seen")
+      elseif cdMode() then
+        setSort(key, key == "cprofit" or key == "ccd")
       else
         setSort(key, key ~= "name" and key ~= "profs" and key ~= "conf" and key ~= "time")
       end
@@ -1479,7 +1530,13 @@ local function build()
       if not r then return end
       if panelMode() then
         local lines = {}
-        if repMode() then ns.Reputation.OptionLines(r, lines) else ns.Sniper.OptionLines(r, lines) end
+        if repMode() then
+          ns.Reputation.OptionLines(r, lines)
+        elseif cdMode() then
+          ns.Cooldowns.OptionLines(r, lines)
+        else
+          ns.Sniper.OptionLines(r, lines)
+        end
         UI.ShowHint(self, lines)
         return
       end
@@ -1498,6 +1555,8 @@ local function build()
           vendor and "Vendor batch" or "Cheap batch", capped and "at least " or "", k, k == 1 and "" or "s",
           Util.Money(vendor and r.vendorProfit or r.profit), Util.Money(vendor and r.vendorProfit1 or r.profit1)))
       end
+      local cdl = UI.CooldownLine(r)
+      if cdl then table.insert(lines, cdl) end
       local tl = UI.TimeLine(r)
       if tl then
         table.insert(lines, tl)
@@ -1532,12 +1591,13 @@ end
 
 function UI.Refresh()
   if not frame or not frame:IsShown() then return end
-  local wi, rm, sm = whatIf(), repMode(), snipeMode()
-  local pm = rm or sm
+  local wi, rm, sm, cm = whatIf(), repMode(), snipeMode(), cdMode()
+  local pm = rm or sm or cm
   layoutColumns()
   frame.mode:SetText(wi and "Mode: What-if" or "Mode: My character")
   frame.repTab:SetText(rm and "Back to crafts" or "Reputation")
   frame.snipeTab:SetText(sm and "Crafts" or "Sniper")
+  frame.cdTab:SetText(cm and "Crafts" or "Cooldowns")
   for _, c in ipairs({ frame.mode, frame.shuffles, frame.prof, frame.minProfit, frame.minListings, frame.minSold,
     frame.minBatch }) do
     c:SetShown(not pm)
@@ -1604,14 +1664,14 @@ function UI.Refresh()
   if pm then
     frame.footer:SetText(string.format("%d-%d of %d   (%s)", math.min(UI.offset + 1, n),
       math.min(UI.offset + visibleRows(), n),
-      n, rm and ns.Reputation.FOOTER or ns.Sniper.FOOTER))
+      n, rm and ns.Reputation.FOOTER or cm and ns.Cooldowns.FOOTER or ns.Sniper.FOOTER))
     detail:SetText(UI.DetailText(UI.selected))
     frame.detailChild:SetHeight(math.max(detail:GetStringHeight() + 10, 10))
     return
   end
   frame.footer:SetText(n > 0 and string.format("%d-%d of %d   (scroll with the mouse wheel; [L] = not learned yet; "
     .. "[1-5] = random count; [V] = vendor shuffle; 50+ = batch may be bigger; Batch profit = the whole batch; "
-    .. "* = g/h and time of a faster path; S = snipe)",
+    .. "* = g/h and time of a faster path; [cd] = cooldown: 1 per cooldown, no g/h; S = snipe)",
     UI.offset + 1, math.min(UI.offset + ROWS, n), n)
     or (ns.settings.vendorShuffles and "no vendor shuffles with these filters" or "nothing profitable with these filters"))
   detail:SetText(UI.DetailText(UI.selected))

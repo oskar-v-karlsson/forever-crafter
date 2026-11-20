@@ -147,7 +147,7 @@ def check_data(ns):
     expect(ns.DATA_BUILD in read(os.path.join(ROOT, "SOURCES.md")), "SOURCES.md does not name the pinned DB2 build")
     date = re.compile(r"^\d{4}-\d{2}-\d{2}$")
     counts = {}
-    for table in ("SkillLines", "Recipes", "Items", "Vendor"):
+    for table in ("SkillLines", "Recipes", "Items", "Vendor", "CooldownCategories"):
         t = ns[table]
         n = 0
         for k, e in t.items():
@@ -171,6 +171,15 @@ def check_data(ns):
             zero_count += 1  # DB2 and Wowhead give no count; Planner counts 1 and marks the result "~"
         else:
             expect(r.out[2] >= 1 and r.out[3] >= r.out[2], f"Recipes[{spell}] output count {r.out[2]}-{r.out[3]}")
+    # Cooldowns (DB2 SpellCooldowns / SpellCategories): a shared category is named; Mooncloth and the transmutes wait.
+    for spell, r in ns.Recipes.items():
+        if r.cdCat is not None:
+            expect(r.cd and r.cd > 0 and ns.CooldownCategories[r.cdCat] is not None,
+                   f"Recipes[{spell}] cooldown category {r.cdCat} without a cd or a CooldownCategories entry")
+    expect(ns.Recipes[18560].cd == 342000 and ns.Recipes[18560].cdCat is None
+           and ns.Recipes[17187].cd == 169200 and ns.Recipes[17187].cdCat == 310
+           and ns.Recipes[25146].cdCat == 310 and ns.Recipes[3170].cd is None,
+           "cooldown data (Mooncloth 342000 s alone; Arcanite and Elemental Fire share category 310)")
     # 73 at build 1.60.1.70888 (e.g. Lesser Wizard Oil 25126; its tooltip also says "(0)"). A jump means a parse bug.
     expect(zero_count <= 80, f"{zero_count} recipes have output count 0")
     expect(ns.Recipes[2963].out[2] == 1, "Bolt of Linen Cloth should make 1")
@@ -796,6 +805,132 @@ def check_sniper():
     slash(lua3, "snipe start")
     expect(not ns3.Sniper.running and any("no AH search API" in p for p in prints(stub3, n0))
            and any("SendSearchQuery missing" in e for e in ns3.errors.values()), "missing search API")
+
+
+MOONCLOTH, ARCANITE, ELEM_FIRE, ALCHEMY = 18560, 17187, 25146, 171
+FELCLOTH, MOONCLOTH_ITEM, THORIUM_BAR, ARCANE_CRYSTAL, ARCANITE_BAR = 14256, 14342, 12359, 12363, 12360
+
+
+def check_cooldowns():
+    """Cooldown recipes: one craft per cooldown, never a chain step; the ready times per character, kept across a
+    relog; the Cooldowns tab and the login line."""
+    lua, ns, stub = new_runtime()
+    g = lua.globals()
+    login(lua, stub, skills={TAILORING: 300, ALCHEMY: 300}, known=(MOONCLOTH, ARCANITE, ELEM_FIRE))
+    # A made-up craft that uses Mooncloth: it must buy it, never make it (one per cooldown is not a chain step).
+    X, OX = 991901, 990901
+    synthetic(lua, ns, stub, {X: (OX, [[MOONCLOTH_ITEM, 1]])}, [OX])
+    set_auctions(lua, stub, [(FELCLOTH, 100, 100 * 500), (MOONCLOTH_ITEM, 5, 5 * 40000), (OX, 1, 90000),
+                             (THORIUM_BAR, 100, 100 * 3000), (ARCANE_CRYSTAL, 50, 50 * 60000),
+                             (ARCANITE_BAR, 10, 10 * 200000)])
+    scan(lua, stub)
+    res, _ = results(ns)
+    m, x = res.get(MOONCLOTH), res.get(X)
+    if not expect(m and x, "cooldown test recipes not evaluated"):
+        return
+    expect(m.cd == 342000 and m.batch == 1 and m.ahPerHour is None and m.vendorPerHour is None
+           and m.fastAH is None and m.fastVendor is None and m.profit > 0,
+           f"Mooncloth: batch {m.batch}, g/h {m.ahPerHour}/{m.vendorPerHour}, profit {m.profit}")
+    kid = x.tree.children[1]
+    expect(kid.src == "ah" and kid.id == MOONCLOTH_ITEM, f"Mooncloth used as a chain step ({kid.src})")
+    cell = ns.UI.CellText
+    expect("[cd]" in cell(m, "name") and "cd" in cell(m, "ahgh") and "cd" in cell(m, "vgh"),
+           f"craft list cooldown cells {cell(m, 'name')!r} {cell(m, 'ahgh')!r}")
+    S = ns.Sniper
+    S.Toggle(m)
+    expect(not S.SetTarget(MOONCLOTH, 3) and S.SetTarget(MOONCLOTH, 1) and S.Target(MOONCLOTH) is None,
+           "a cooldown recipe's sniper target must stay 1")
+    expect(S.Limit(MOONCLOTH).cd == 342000 and S.CraftCellText(S.Limit(MOONCLOTH), "floorgh").find("per cooldown"),
+           "sniper floor of a cooldown craft")
+    S.Toggle(m)
+
+    # Read at the profession window: Mooncloth waits an hour; the other window was not opened.
+    t0 = g.time()
+    stub.cooldowns[MOONCLOTH] = t0 + 3600
+    open_ts(lua, stub, TAILORING, 300, {MOONCLOTH: (True, 0, None)})
+    cds = ns.char.cooldowns
+    expect(cds[MOONCLOTH] == t0 + 3600, f"Mooncloth ready time {cds[MOONCLOTH]} (expected {t0 + 3600})")
+    C = ns.Cooldowns
+
+    def rows():
+        return {(o.char, o.recipe): o for o in C.Rows()[0].values()}
+    me = ns.CharKey()
+    r = rows()
+    expect(r[(me, MOONCLOTH)].state == "wait" and r[(me, ARCANITE)].state == "unread"
+           and "open the profession window" in C.CellText(r[(me, ARCANITE)], "cready"),
+           f"states {r[(me, MOONCLOTH)].state} {r[(me, ARCANITE)].state}")
+    stub.now = stub.now + 3700
+    expect(rows()[(me, MOONCLOTH)].state == "ready", "Mooncloth not ready after its cooldown expired")
+    # Ready means the API says nil: a read after it expired stores 0.
+    open_ts(lua, stub, TAILORING, 300, {MOONCLOTH: (True, 0, None)})
+    expect(cds[MOONCLOTH] == 0, f"an expired cooldown reads as {cds[MOONCLOTH]}")
+
+    # A craft starts the cooldown: Elemental Fire makes every transmute (category 310) wait, Mooncloth not.
+    t1 = g.time()
+    stub.fire("UNIT_SPELLCAST_SUCCEEDED", "player", "Cast-1", ELEM_FIRE)
+    expect(cds[ARCANITE] == t1 + 600 and cds[ELEM_FIRE] == t1 + 600 and cds[17559] == t1 + 600 and cds[MOONCLOTH] == 0,
+           f"shared category after Elemental Fire: {cds[ARCANITE]} {cds[MOONCLOTH]} (t {t1})")
+    stub.fire("UNIT_SPELLCAST_SUCCEEDED", "player", "Cast-2", ARCANITE)
+    stub.fire("UNIT_SPELLCAST_SUCCEEDED", "target", "Cast-3", MOONCLOTH)
+    expect(cds[ELEM_FIRE] == t1 + 169200 and cds[MOONCLOTH] == 0, "Arcanite must make the whole category wait")
+    n, _ = C.Ready(C.Rows()[0])
+    expect(n == 1, f"{n} cooldowns ready (Mooncloth only; the transmutes wait)")
+
+    # Alts: one below Mooncloth's skill, one that could learn it now; neither has Alchemy.
+    ns.db.chars["Alt-Test"] = ltable(lua, {"skills": {TAILORING: {"rank": 180, "max": 300}}, "known": {},
+                                           "listed": {}, "cooldowns": {}})
+    ns.db.chars["Ivy-Other"] = ltable(lua, {"skills": {TAILORING: {"rank": 250, "max": 300}}, "known": {},
+                                            "listed": {TAILORING: {"time": 1}}, "cooldowns": {}})
+    r = rows()
+    alt, ivy = r.get(("Alt-Test", MOONCLOTH)), r.get(("Ivy-Other", MOONCLOTH))
+    expect(alt and alt.state == "skill" and alt.charName == "Alt"
+           and "learn at Tailoring 230|r (you 180)" in C.CellText(alt, "cready") and "[L]" in C.CellText(alt, "crecipe")
+           and ("Alt-Test", ARCANITE) not in r, f"alt row {alt and alt.state} {alt and C.CellText(alt, 'cready')!r}")
+    expect(ivy and ivy.state == "learn" and ivy.charName == "Ivy-Other" and "learn now" in C.CellText(ivy, "cready")
+           and "Learn: Tailoring 230" in C.DetailText(ivy), f"learnable alt row {ivy and ivy.state}")
+    order = sorted(r.values(), key=lambda o: C.SortValue(o, "cready"))
+    expect(order[0].state == "ready" and order[-1].state == "skill", "Ready sort: ready first, skill gaps last")
+
+    # The Cooldowns tab.
+    slash(lua, "")
+    frame = g.ForeverCrafterFrame
+    slash(lua, "cd")
+    UI = ns.UI
+    expect(ns.settings.tab == "cd" and len(UI.view) == len(r) and frame.cdTab.GetText(frame.cdTab) == "Crafts"
+           and "Cooldowns: 1 ready" in UI.StatusText(), f"Cooldowns tab: {ns.settings.tab} {len(UI.view)} rows")
+    first = UI.view[1]
+    expect(first.state == "ready" and first.recipe == MOONCLOTH and "Ready" in UI.CellText(first, "cready")
+           and "Reagents (one craft)" in UI.DetailText(first) and "Felcloth" in UI.DetailText(first),
+           f"first Cooldowns row {first.recipe} {first.state}")
+    spans = []
+    for tab in (frame.cdTab, frame.snipeTab, frame.repTab):
+        p = tab.__points
+        expect(p[1] == "TOPRIGHT", "tabs are placed from the top right")
+        spans.append((p[2] - tab.__w, p[2]))
+    spans.sort()
+    expect(all(a[1] <= b[0] for a, b in zip(spans, spans[1:])), f"tab buttons overlap: {spans}")
+    frame.cdTab.Click(frame.cdTab)
+    expect(ns.settings.tab != "cd" and frame.cdTab.GetText(frame.cdTab) == "Cooldowns", "Cooldowns tab back to crafts")
+
+    # Kept across a relog; the login line names the best one ready.
+    saved = stub.savedVariables("ForeverCrafterDB")
+    lua2, ns2, stub2 = new_runtime(saved=saved)
+    stub2.now = stub.now
+    start = len(stub2.prints)
+    login(lua2, stub2, skills={TAILORING: 300, ALCHEMY: 300}, known=(MOONCLOTH, ARCANITE, ELEM_FIRE))
+    expect(ns2.char.cooldowns[ARCANITE] == t1 + 169200, "the ready times did not survive a relog")
+    line = [p for p in prints(stub2, start) if "cooldown" in p]
+    expect(len(line) == 1 and "1 cooldown ready (best: Mooncloth" in line[0] and "on Hana" in line[0]
+           and line[0].endswith("/crafter cd"), f"login line {line}")
+    slash(lua2, "cd login")
+    expect(ns2.settings.cdLogin is False, "/crafter cd login must turn the login line off")
+    lua3, ns3, stub3 = new_runtime(saved=stub2.savedVariables("ForeverCrafterDB"))
+    stub3.now = stub.now
+    login(lua3, stub3, skills={TAILORING: 300})
+    expect(not [p for p in prints(stub3) if "cooldowns ready" in p or "cooldown ready" in p],
+           "login line printed while turned off")
+    errs = list(ns.errors.values()) + list(ns2.errors.values()) + list(ns3.errors.values())
+    expect(not errs, f"errors in the cooldown checks: {errs[:3]}")
 
 
 def check_sniper_target():
@@ -1516,7 +1651,12 @@ def check_batch_depth():
         if kind == "infinite":
             for r in char + wi:
                 ok = (r.profit == r.profit1 and r.cost == r.cost1 and r.vendorProfit == r.vendorProfit1
-                      and (r.profit <= 0 or r.batchCapped and (r.vendorBatch is None or r.vendorBatchCapped)))
+                      and (r.profit <= 0 or r.batchCapped and (r.vendorBatch is None or r.vendorBatchCapped)
+                           or r.cd and r.batch == 1 and r.vendorBatch in (None, 1)
+                           # A bigger batch crafts an intermediate the first craft buys (a step that makes several,
+                           # e.g. Gold Power Core x3 in Steam Tonk Controller): the extra cost per craft steps, so the
+                           # search may end early. The profit still equals the first craft's.
+                           or r.batchTree and ns.Planner.PathSig(r.batchTree) != ns.Planner.PathSig(r.tree)))
                 if not expect(ok, f"infinite depth: {r.spell} profit {r.profit1} -> {r.profit} batch {r.batch} "
                                   f"capped {r.batchCapped}"):
                     break
@@ -1543,7 +1683,11 @@ def time_stats(res):
     → (results with an unknown time, top 10 by AH g/h, top 10 by vendor g/h)"""
     for r in res:
         ok = r.time is not None and r.casts >= 1 and (r.timeUnknown or r.time > 0)
-        if ok and r.time > 0 and not r.timeUnknown:
+        if ok and r.cd:
+            # One craft per cooldown: no g/h, no fast path, a batch of 1.
+            ok = (r.ahPerHour is None and r.vendorPerHour is None and r.fastAH is None and r.fastVendor is None
+                  and r.batch in (None, 1))
+        elif ok and r.time > 0 and not r.timeUnknown:
             ok = ((r.ahProfit is None) == (r.ahPerHour is None)
                   and (r.vendorProfit is None) == (r.vendorPerHour is None)
                   and (r.ahPerHour is None or abs(r.ahPerHour - r.ahProfit / r.time * 3600) < 1e-6)
@@ -2774,6 +2918,7 @@ def main():
         check_merchant()
         check_sniper()
         check_sniper_target()
+        check_cooldowns()
         check_missing_apis()
         check_dump()
         n, evaluated, took, hidden, shuffles, times, batches, fasts = check_full_run()

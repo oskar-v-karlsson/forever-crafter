@@ -185,6 +185,7 @@ function P.Capture()
     all, complete = prev.ids, true
   end
   char.listed[line] = { time = time(), complete = complete, ids = all, learned = learned }
+  if ns.Cooldowns then ns.Cooldowns.Read() end
   ns.Debug(string.format("%s: %d recipes, %d learned, unlearned listed: %s", Util.LineName(line), #ids, learned,
     tostring(sawUnlearned)))
 
