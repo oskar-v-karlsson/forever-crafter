@@ -43,9 +43,10 @@ local QUALITY_COLORS = {
   [0] = "ff9d9d9d", [1] = "ffffffff", [2] = "ff1eff00", [3] = "ff0070dd", [4] = "ffa335ee", [5] = "ffff8000",
 }
 
--- Static item data: the recipe items (Data/Items.lua), else the reputation planner's (Data/Reputation.lua).
+-- Static item data: the recipe items (Data/Items.lua), else the reputation planner's (Data/Reputation.lua), else the
+-- built-in farms' loot (Data/Farms.lua).
 local function itemData(id)
-  return ns.Items[id] or (ns.RepItems and ns.RepItems[id])
+  return ns.Items[id] or (ns.RepItems and ns.RepItems[id]) or (ns.FarmItems and ns.FarmItems[id])
 end
 Util.ItemData = itemData
 

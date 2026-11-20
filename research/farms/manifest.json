@@ -1,0 +1,41 @@
+{
+  "fetched": "2026-11-21",
+  "product": "wowf",
+  "tables": {
+    "ItemSparse": {
+      "build": "1.60.1.70938",
+      "columns": [
+        "ID",
+        "Display_lang",
+        "OverallQualityID",
+        "SellPrice",
+        "Bonding"
+      ],
+      "full_rows": 19325,
+      "full_sha256": "fdc65396e8a1103ea5f552ea59aaebc0e73ba572612a3412c50e636b54c90b41",
+      "snapshot_rows": 424,
+      "snapshot_sha256": "0323aedc86cb6b9f43479aad0604557415ad15d054b7dab5b20f00e954ce9e9e",
+      "url": "https://wago.tools/db2/ItemSparse/csv?build=1.60.1.70938"
+    },
+    "SkillLine": {
+      "build": "1.60.1.70888",
+      "columns": [
+        "ID",
+        "DisplayName_lang",
+        "ParentSkillLineID",
+        "CategoryID"
+      ],
+      "full_rows": 154,
+      "full_sha256": "f3867d43ab42d1f5278e6e5028d0151bc06e4ef8e5cbd790a20df6ee57aa654d",
+      "snapshot_rows": 3,
+      "snapshot_sha256": "0f0bed75a013eeb75dbcdf5331aa3fb445a771d5c9be1278fc6b09da926bf2e5",
+      "url": "https://wago.tools/db2/SkillLine/csv?build=1.60.1.70888"
+    }
+  },
+  "wowhead": {
+    "fetched": "2026-11-20 (lower-level nodes 2026-11-21)",
+    "file": "research/wowhead/farms_2026-11-21.json",
+    "sha256": "967d5341653404a80d5f5ec35718d791f86d7e7b04bd5356d9af1604e770570f",
+    "source": "Wowhead Forever NPC and object pages; listviews drops/skinning/pickpocketing/herbalism/mining. Row = [itemId,name,quality,count,outof,stack 'min-max']. chance = count/outof per kill or per node; avg qty = chance*(min+max)/2."
+  }
+}

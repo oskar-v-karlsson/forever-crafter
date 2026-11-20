@@ -42,6 +42,13 @@ STUB = {
   throttled = false, -- C_AuctionHouse.IsThrottledMessageSystemReady() == false
   money = 1000000000,
   cooldowns = {},   -- spell ID → time() it is ready (C_TradeSkillUI.GetRecipeCooldown, C_Spell.GetSpellCooldown)
+  class = "WARRIOR", -- UnitClass("player") class file
+  target = nil,     -- { guid, dead, tapDenied, secret } (UnitGUID / UnitIsDead / UnitIsTapDenied "target")
+  -- the open loot window: { {link, sources = {guid1, qty1, ...}}, ... } (GetNumLootItems, GetLootSlotLink,
+  -- GetLootSourceInfo); noSourceInfo = true: GetLootSourceInfo is missing
+  loot = {},
+  noSourceInfo = false,
+  areas = {},       -- AreaTable ID → name (C_Map.GetAreaInfo)
 }
 
 -- Frames ------------------------------------------------------------------------------------------
@@ -180,6 +187,30 @@ function GetRealmName() return "Test" end
 function UnitFactionGroup() return STUB.faction end
 function GetRealZoneText() return STUB.zone end
 function UnitIsAFK() return STUB.afk == true end
+function UnitClass(unit)
+  if unit ~= "player" then return nil end
+  return STUB.class:sub(1, 1) .. STUB.class:sub(2):lower(), STUB.class, 1
+end
+-- A GUID the stub marks secret is a table, which only issecretvalue can tell apart.
+function issecretvalue(v) return type(v) == "table" and v.secret == true end
+function UnitGUID(unit)
+  local t = unit == "target" and STUB.target
+  if not t then return nil end
+  if t.secret then return { secret = true } end
+  return t.guid
+end
+function UnitIsDead(unit) return unit == "target" and STUB.target ~= nil and STUB.target.dead == true end
+function UnitIsTapDenied(unit) return unit == "target" and STUB.target ~= nil and STUB.target.tapDenied == true end
+function GetNumLootItems() return #STUB.loot end
+function GetLootSlotLink(slot) return STUB.loot[slot] and STUB.loot[slot].link end
+function GetLootSourceInfo(slot)
+  if STUB.noSourceInfo then error("attempt to call a nil value") end
+  local e = STUB.loot[slot]
+  if not e or not e.sources then return nil end
+  return unpack(e.sources)
+end
+C_Map = {}
+function C_Map.GetAreaInfo(id) return STUB.areas[id] end
 function GetCursorPosition() return 0, 0 end
 function GetBuildInfo() return "1.60.1", "70888", "Nov 4 2026", 16001 end
 function GetCurrentRegionName() return STUB.regionName end
