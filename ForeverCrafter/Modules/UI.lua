@@ -71,6 +71,8 @@ local COLUMNS = {
 COLUMNS.rep = ns.Reputation.COLUMNS
 COLUMNS.snipe = ns.Sniper.COLUMNS
 COLUMNS.cd = ns.Cooldowns.COLUMNS
+COLUMNS.shelves = ns.Shelves.COLUMNS
+COLUMNS.farm, COLUMNS.farmBest = ns.Farm.SESSION_COLUMNS, ns.Farm.BEST_COLUMNS
 local MAX_COLUMNS = 14
 local LIST_W = 804
 local FRAME_W = LIST_W + 400
@@ -88,9 +90,23 @@ local function cdMode()
   return ns.settings.tab == "cd"
 end
 
--- A tab other than the craft list (Reputation, Sniper, Cooldowns).
+local function shelfMode()
+  return ns.settings.tab == "shelves"
+end
+
+local function farmMode()
+  return ns.settings.tab == "farm"
+end
+
+-- The Empty shelves or Farm tab: a module with List, CellText, SortValue, OptionLines, DetailText, StatusText, FOOTER.
+local function listPanel()
+  if shelfMode() then return ns.Shelves end
+  if farmMode() then return ns.Farm end
+end
+
+-- A tab other than the craft list (Reputation, Sniper, Cooldowns, Empty shelves, Farm).
 local function panelMode()
-  return repMode() or snipeMode() or cdMode()
+  return repMode() or snipeMode() or cdMode() or listPanel() ~= nil
 end
 
 local function whatIf()
@@ -113,6 +129,8 @@ local function columns()
   if repMode() then return COLUMNS.rep end
   if snipeMode() then return COLUMNS.snipe end
   if cdMode() then return COLUMNS.cd end
+  if shelfMode() then return COLUMNS.shelves end
+  if farmMode() then return ns.Farm.Columns() end
   return COLUMNS[whatIf() and "whatIf" or "char"]
 end
 
@@ -122,6 +140,11 @@ local function sortSetting()
   if repMode() then return s.repSort or "rper", s.repSortDesc == true end
   if snipeMode() then return s.snipeSort or "under", s.snipeSortDesc ~= false end
   if cdMode() then return s.cdSort or "cready", s.cdSortDesc == true end
+  if shelfMode() then return s.shelfSort or "sscore", s.shelfSortDesc ~= false end
+  if farmMode() then
+    if ns.Farm.BestView() then return s.farmBestSort or "fgph", s.farmBestSortDesc ~= false end
+    return s.farmSort or "fvalue", s.farmSortDesc ~= false
+  end
   return s.sort or "profit", s.sortDesc ~= false
 end
 
@@ -132,6 +155,12 @@ local function setSort(key, desc)
     ns.settings.snipeSort, ns.settings.snipeSortDesc = key, desc
   elseif cdMode() then
     ns.settings.cdSort, ns.settings.cdSortDesc = key, desc
+  elseif shelfMode() then
+    ns.settings.shelfSort, ns.settings.shelfSortDesc = key, desc
+  elseif farmMode() and ns.Farm.BestView() then
+    ns.settings.farmBestSort, ns.settings.farmBestSortDesc = key, desc
+  elseif farmMode() then
+    ns.settings.farmSort, ns.settings.farmSortDesc = key, desc
   else
     ns.settings.sort, ns.settings.sortDesc = key, desc
   end
@@ -396,6 +425,7 @@ function UI.ApplyFilter()
   if repMode() then return applyPanel(ns.Reputation) end
   if snipeMode() then return applyPanel(ns.Sniper) end
   if cdMode() then return applyPanel(ns.Cooldowns) end
+  if listPanel() then return applyPanel(listPanel()) end
   local s = ns.settings
   local view = {}
   local wi = whatIf()
@@ -459,6 +489,18 @@ end
 
 -- What-if runs are spread over frames (Planner.RunAsync); the list keeps the last results until the new ones are in.
 function UI.Recompute()
+  local lp = listPanel()
+  if lp then
+    PL.CancelAsync()
+    UI.calculating = nil
+    local ok, rows = pcall(lp.List)
+    if not ok then
+      ns.Error(ns.settings.tab .. ": " .. tostring(rows))
+      rows = {}
+    end
+    apply(rows, {})
+    return
+  end
   if cdMode() then
     PL.CancelAsync()
     UI.calculating = nil
@@ -662,6 +704,7 @@ end
 function UI.DetailText(r)
   if snipeMode() then return ns.Sniper.DetailText(r) end
   if cdMode() then return ns.Cooldowns.DetailText(r) end
+  if listPanel() then return listPanel().DetailText(r) end
   if repMode() then
     return ns.Reputation.DetailText(r, UI.repPlan or { steps = {}, shopping = {}, inPlan = {}, gained = 0, cash = 0 },
       UI.repStanding)
@@ -829,6 +872,7 @@ end
 function UI.StatusText()
   if snipeMode() then return ns.Sniper.StatusText(#UI.view) end
   if cdMode() then return ns.Cooldowns.StatusText(#UI.view) end
+  if listPanel() then return listPanel().StatusText(#UI.view) end
   if repMode() then
     return ns.Reputation.StatusText(UI.repPlan or { inPlan = {} }, UI.repStanding, #UI.view)
   end
@@ -927,10 +971,11 @@ local function hint(owner, lines)
   owner:SetScript("OnLeave", UI.HideHint)
 end
 
--- mode: "char" | "whatIf" | "rep" (the Reputation tab) | "snipe" (the Sniper tab) | "cd" (the Cooldowns tab); the
--- crafting mode is kept for when you go back
+-- mode: "char" | "whatIf" | "rep" (the Reputation tab) | "snipe" (the Sniper tab) | "cd" (the Cooldowns tab) |
+-- "shelves" (Empty shelves) | "farm" (the Farm tab); the crafting mode is kept for when you go back
+local TABS = { rep = true, snipe = true, cd = true, shelves = true, farm = true }
 function UI.SetMode(mode)
-  if mode == "rep" or mode == "snipe" or mode == "cd" then
+  if TABS[mode] then
     ns.settings.tab = mode
   else
     ns.settings.tab = "craft"
@@ -1143,6 +1188,7 @@ end
 
 local function layoutColumns()
   local mode = panelMode() and ns.settings.tab or ns.settings.mode
+  if farmMode() then mode = mode .. ":" .. (ns.settings.farmView or "session") end
   if frame.layoutMode == mode then return end
   frame.layoutMode = mode
   local sm = snipeMode()
@@ -1184,6 +1230,7 @@ local function cellText(r, key)
   if repMode() then return ns.Reputation.CellText(r, key, UI.repPlan) end
   if snipeMode() then return ns.Sniper.CellText(r, key) end
   if cdMode() then return ns.Cooldowns.CellText(r, key) end
+  if listPanel() then return listPanel().CellText(r, key) end
   if key == "snipe" then return "" end
   if key == "name" then
     local col = COLORS[r.color] or COLORS.unknown
@@ -1246,6 +1293,7 @@ UI.SortValue = function(r, key)
   if repMode() then return ns.Reputation.SortValue(r, key) end
   if snipeMode() then return ns.Sniper.SortValue(r, key) end
   if cdMode() then return ns.Cooldowns.SortValue(r, key) end
+  if listPanel() then return listPanel().SortValue(r, key) end
   return sortValue(r, key)
 end
 
@@ -1449,6 +1497,88 @@ local function build()
   frame.scan:SetText("Scan AH")
   frame.scan:SetScript("OnClick", function() ns.Scanner.Start() end)
 
+  -- Empty shelves and Farm tabs (filter row, right end, left of Scan AH).
+  frame.shelfTab = button(frame, 74, "Shelves", function()
+    UI.SetMode(shelfMode() and ns.settings.mode or "shelves")
+  end)
+  frame.shelfTab:SetPoint("TOPRIGHT", -162, -36)
+  hint(frame.shelfTab, { "Empty shelves", "Items that sell steadily in your region (TradeSkillMaster) but that this "
+    .. "realm has (almost) none of on the AH: list them and set the price, with no one to undercut. Also: "
+    .. "/crafter shelves" })
+  frame.farmTab = button(frame, 60, "Farm", function()
+    UI.SetMode(farmMode() and ns.settings.mode or "farm")
+  end)
+  frame.farmTab:SetPoint("TOPRIGHT", -98, -36)
+  hint(frame.farmTab, { "Farm", "Start a farm session: counts what you loot and the money you loot and measures "
+    .. "your real gold per hour, per zone. Also: /crafter farm start|stop|pause" })
+  -- Empty shelves controls (filter row, Shelves tab only).
+  local sh = {}
+  sh.max = editBox(frame, 32, "Max listed", 14, function()
+    return tostring(ns.settings.shelfMaxListed or 5)
+  end, function(v)
+    local n = tonumber(v)
+    if n and n >= 0 and n <= 999 then
+      ns.settings.shelfMaxListed = math.floor(n)
+      UI.Recompute()
+    end
+  end)
+  hint(sh.max, { "Max listed", "Show items this realm has at most this many of on the AH (last snapshot). 0 = only "
+    .. "empty shelves." })
+  sh.min = editBox(frame, 50, "Min value (g)", 140, function()
+    return tostring((ns.settings.shelfMinValue or 0) / 10000)
+  end, function(v)
+    local c = Util.ParseMoney(v)
+    if c and c >= 0 then
+      ns.settings.shelfMinValue = c
+      UI.Recompute()
+    end
+  end)
+  hint(sh.min, { "Min value", "Hide items worth less than this each (TSM realm market value, else region average)." })
+  sh.gear = checkBox(frame, "BoE gear", 290, "shelfGear", -36, function() UI.Recompute() end)
+  hint(sh.gear, { "BoE gear", "Also show weapons and armour. Off by default: their stats are random, so one value "
+    .. "fits them badly." })
+  sh.realms = editBox(frame, 32, "Realm share 1 /", 390, function()
+    return tostring(ns.settings.shelfRealms or 15)
+  end, function(v)
+    local n = tonumber(v)
+    if n and n >= 1 and n <= 1000 then
+      ns.settings.shelfRealms = math.floor(n)
+      UI.Recompute()
+    end
+  end)
+  hint(sh.realms, { "Realm share", "The share of the region's sales this realm sees: 1 / this number. TSM's region "
+    .. "data has no listing counts to estimate it from, so set it yourself (15 = about one of fifteen equal realms).",
+    "Expected sales a day, Supply and Score use it." })
+  frame.sh = sh
+  -- Farm controls (filter row, Farm tab only).
+  local fm = {}
+  fm.start = button(frame, 70, "Start", function()
+    if ns.Farm.Current() then ns.Farm.Stop() else ns.Farm.Start() end
+    UI.Recompute()
+    UI.Refresh()
+  end)
+  fm.start:SetPoint("TOPLEFT", 14, -38)
+  hint(fm.start, { "Start / Stop", "Start counts your loot, looted money and time; Stop saves the session (the last "
+    .. ns.Farm.KEEP .. " per character) with today's item values." })
+  fm.pause = button(frame, 70, "Pause", function()
+    if not ns.Farm.Pause("you") then ns.Farm.Resume() end
+    UI.Recompute()
+    UI.Refresh()
+  end)
+  fm.pause:SetPoint("TOPLEFT", 90, -38)
+  hint(fm.pause, { "Pause / Resume", "Stops the clock (it also stops by itself while you are AFK or logged out); "
+    .. "loot is not counted while paused." })
+  fm.view = button(frame, 110, "", function()
+    ns.settings.farmView = ns.Farm.BestView() and "session" or "best"
+    UI.selected, UI.offset = nil, 0
+    UI.Recompute()
+    UI.Refresh()
+  end)
+  fm.view:SetPoint("TOPLEFT", 166, -38)
+  hint(fm.view, { "This session / Best farms", "This session: the items of the running (or last) session.",
+    "Best farms: your saved sessions by zone, best gold per hour first." })
+  frame.fm = fm
+
   frame.status = text(frame, "small", 0.8, 0.8, 0.8)
   frame.status:SetPoint("TOPLEFT", 14, -66)
   frame.status:SetWidth(FRAME_W - 30)
@@ -1481,6 +1611,10 @@ local function build()
         setSort(key, key ~= "name" and key ~= "cheap" and key ~= "davg" and key ~= "max" and key ~= "seen")
       elseif cdMode() then
         setSort(key, key == "cprofit" or key == "ccd")
+      elseif shelfMode() then
+        setSort(key, key ~= "sname" and key ~= "slisted" and key ~= "smin" and key ~= "ssupply")
+      elseif farmMode() then
+        setSort(key, key ~= "fitem" and key ~= "fhow" and key ~= "fzone" and key ~= "fchars")
       else
         setSort(key, key ~= "name" and key ~= "profs" and key ~= "conf" and key ~= "time")
       end
@@ -1534,6 +1668,8 @@ local function build()
           ns.Reputation.OptionLines(r, lines)
         elseif cdMode() then
           ns.Cooldowns.OptionLines(r, lines)
+        elseif listPanel() then
+          listPanel().OptionLines(r, lines)
         else
           ns.Sniper.OptionLines(r, lines)
         end
@@ -1592,12 +1728,29 @@ end
 function UI.Refresh()
   if not frame or not frame:IsShown() then return end
   local wi, rm, sm, cm = whatIf(), repMode(), snipeMode(), cdMode()
-  local pm = rm or sm or cm
+  local lp = listPanel()
+  local pm = panelMode()
   layoutColumns()
   frame.mode:SetText(wi and "Mode: What-if" or "Mode: My character")
   frame.repTab:SetText(rm and "Back to crafts" or "Reputation")
   frame.snipeTab:SetText(sm and "Crafts" or "Sniper")
   frame.cdTab:SetText(cm and "Crafts" or "Cooldowns")
+  frame.shelfTab:SetText(shelfMode() and "Crafts" or "Shelves")
+  frame.farmTab:SetText(farmMode() and "Crafts" or "Farm")
+  for _, c in pairs(frame.sh) do
+    c:SetShown(shelfMode())
+    if c.label then c.label:SetShown(shelfMode()) end
+  end
+  frame.sh.gear:SetChecked(ns.settings.shelfGear)
+  for _, c in pairs(frame.fm) do c:SetShown(farmMode()) end
+  if farmMode() then
+    local cur = ns.Farm.Current()
+    frame.fm.start:SetText(cur and "Stop" or "Start")
+    frame.fm.pause:SetText(cur and not cur.since and "Resume" or "Pause")
+    frame.fm.pause:SetEnabled(cur ~= nil)
+    frame.fm.view:SetText(ns.Farm.BestView() and "This session" or "Best farms")
+    if ns.Farm.Running() then ns.Farm.Tick() end
+  end
   for _, c in ipairs({ frame.mode, frame.shuffles, frame.prof, frame.minProfit, frame.minListings, frame.minSold,
     frame.minBatch }) do
     c:SetShown(not pm)
@@ -1664,7 +1817,7 @@ function UI.Refresh()
   if pm then
     frame.footer:SetText(string.format("%d-%d of %d   (%s)", math.min(UI.offset + 1, n),
       math.min(UI.offset + visibleRows(), n),
-      n, rm and ns.Reputation.FOOTER or cm and ns.Cooldowns.FOOTER or ns.Sniper.FOOTER))
+      n, rm and ns.Reputation.FOOTER or cm and ns.Cooldowns.FOOTER or lp and lp.FOOTER or ns.Sniper.FOOTER))
     detail:SetText(UI.DetailText(UI.selected))
     frame.detailChild:SetHeight(math.max(detail:GetStringHeight() + 10, 10))
     return
@@ -1676,6 +1829,11 @@ function UI.Refresh()
     or (ns.settings.vendorShuffles and "no vendor shuffles with these filters" or "nothing profitable with these filters"))
   detail:SetText(UI.DetailText(UI.selected))
   frame.detailChild:SetHeight(math.max(detail:GetStringHeight() + 10, 10))
+end
+
+-- Only the status line (the Farm tab's clock).
+function UI.RefreshStatus()
+  if frame and frame:IsShown() then frame.status:SetText(statusText()) end
 end
 
 function UI.Show()

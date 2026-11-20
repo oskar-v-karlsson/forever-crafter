@@ -2,6 +2,8 @@
 -- For every item the recipes use (and the reputation planner's writs, crates and items) it keeps the lowest unit buyout, the quantity and listing count, and a
 -- price ladder (cheapest steps first) so the planner can price buying N of an item.
 -- The ladder is flat to keep memory and SavedVariables small: steps = { unit1, qty1, unit2, qty2, ... }.
+-- Every other item goes into others[id] = { min unit buyout, qty }, for the Empty shelves tab (Modules/Shelves.lua)
+-- and the farm tracker's prices (Modules/Farm.lua); total = every listing read.
 local _, ns = ...
 local S = {}
 ns.Scanner = S
@@ -24,6 +26,19 @@ end
 function S.Price(id)
   local items = S.Prices()
   return items and items[id] or nil
+end
+
+-- The realm's listings of any item in the last snapshot: → min unit buyout or nil, quantity (0 = none listed),
+-- known (false = no snapshot, or one from before the addon kept every item)
+function S.Listed(id)
+  local r = ns.db and ns.db.realms[ns.RealmKey()]
+  if not r then return nil, 0, false end
+  local p = r.items and r.items[id]
+  if p then return p.min, p.qty, true end
+  if not r.others then return nil, 0, false end
+  local e = r.others[id]
+  if e then return e[1], e[2], true end
+  return nil, 0, true
 end
 
 local function itemIDFromLink(link)
@@ -51,11 +66,12 @@ function S.Summarise(raw)
   return items
 end
 
-local function finish(raw, count)
+local function finish(raw, count, other, all)
   local items = S.Summarise(raw)
   local n = 0
   for _ in pairs(items) do n = n + 1 end
-  ns.db.realms[ns.RealmKey()] = { time = time(), items = items, listings = count }
+  ns.db.realms[ns.RealmKey()] = { time = time(), items = items, listings = count, others = other or {},
+    total = all or count }
   S.state = "idle"
   ns.Print(string.format("snapshot done: %d listings, %d items used by recipes", count, n))
   ns.Fire("SCAN_DONE")
@@ -73,7 +89,7 @@ local function read()
     ns.Fire("DATA_CHANGED")
     return
   end
-  local raw, count, index = {}, 0, 0
+  local raw, count, index, other, all = {}, 0, 0, {}, 0
   local function step()
     if not S.ahOpen then
       S.state = "idle"
@@ -93,17 +109,29 @@ local function read()
         end
         buyout = tonumber(buyout) or 0
         stack = tonumber(stack) or 0
-        if itemID and (ns.Items[itemID] or ns.RepItems[itemID]) and buyout > 0 and stack > 0 then
-          raw[itemID] = raw[itemID] or {}
-          table.insert(raw[itemID], { math.ceil(buyout / stack), stack })
-          count = count + 1
+        if itemID and buyout > 0 and stack > 0 then
+          local unit = math.ceil(buyout / stack)
+          all = all + 1
+          if ns.Items[itemID] or ns.RepItems[itemID] then
+            raw[itemID] = raw[itemID] or {}
+            table.insert(raw[itemID], { unit, stack })
+            count = count + 1
+          else
+            local e = other[itemID]
+            if e then
+              if unit < e[1] then e[1] = unit end
+              e[2] = e[2] + stack
+            else
+              other[itemID] = { unit, stack }
+            end
+          end
         end
       end
       index = index + 1
     end
     ns.Fire("SCAN_PROGRESS", index, total)
     if index > total then
-      finish(raw, count)
+      finish(raw, count, other, all)
     else
       C_Timer.After(0, step)
     end

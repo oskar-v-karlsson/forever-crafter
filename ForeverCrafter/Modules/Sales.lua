@@ -149,6 +149,13 @@ function S.Get(id)
   return out
 end
 
+-- A TSM money price source for an item, e.g. "DBMarket" (the realm's market value) or "DBRegionSaleAvg", in copper
+-- (TSM price sources are copper; see the README's Verify list). Live TSM only, no snapshot. → copper or nil
+function S.Money(key, id)
+  local v = id and raw(key, id)
+  if v and v > 0 then return v end
+end
+
 -- "12", "3.4", "0.25" or "—" (no data)
 function S.Format(perDay)
   if not perDay then return "—" end

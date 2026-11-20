@@ -19,7 +19,9 @@ STUB = {
   deposits = {},    -- itemID → deposit
   merchant = nil,   -- { npc, items = { {id, price, stack, available, extendedCost, currencyID}, ... } }
   invoices = {},    -- { {kind, bid, consignment}, ... }
-  items = {},       -- itemID → { name, quality, sell } (C_Item.GetItemInfo; nil = not cached)
+  items = {},       -- itemID → { name, quality, sell, class, bind } (C_Item.GetItemInfo; nil = not cached)
+  zone = "Durotar", -- GetRealZoneText
+  afk = false,      -- UnitIsAFK("player")
   badEvents = {},   -- event → true: RegisterEvent throws, like the client does for unknown events
   faction = "Alliance",
   regionName = "EU", -- GetCurrentRegionName()
@@ -176,6 +178,8 @@ function UnitName(unit)
 end
 function GetRealmName() return "Test" end
 function UnitFactionGroup() return STUB.faction end
+function GetRealZoneText() return STUB.zone end
+function UnitIsAFK() return STUB.afk == true end
 function GetCursorPosition() return 0, 0 end
 function GetBuildInfo() return "1.60.1", "70888", "Nov 4 2026", 16001 end
 function GetCurrentRegionName() return STUB.regionName end
@@ -351,7 +355,8 @@ C_Item = {}
 function C_Item.GetItemInfo(id)
   local d = STUB.items[id]
   if not d then return nil end
-  return d.name, "|Hitem:" .. id .. "|h", d.quality or 1, 1, 1, "Trade Goods", "", 20, "", 134400, d.sell or 0, 7, 5, 0
+  return d.name, "|Hitem:" .. id .. "|h", d.quality or 1, 1, 1, "Trade Goods", "", 20, "", 134400, d.sell or 0,
+    d.class or 7, 5, d.bind or 0
 end
 function C_Item.RequestLoadItemDataByID() end
 function C_Item.GetItemCount(id) return STUB.bags[id] or 0 end

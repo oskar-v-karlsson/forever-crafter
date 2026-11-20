@@ -127,8 +127,24 @@ local DEFAULTS = {
     cdSort = "cready",
     cdSortDesc = false,
     cdLogin = true,
+    -- Empty shelves tab: items listed at most shelfMaxListed times on the realm, worth at least shelfMinValue
+    -- (copper); shelfGear = also show BoE weapons and armour; the realm sells 1 / shelfRealms of the region's sales
+    shelfMaxListed = 5,
+    shelfMinValue = 1500,
+    shelfGear = false,
+    shelfRealms = 15,
+    shelfSort = "sscore",
+    shelfSortDesc = true,
+    -- Farm tab: farmView = "session" (this session's loot) or "best" (Best farms); the sorts of both
+    farmView = "session",
+    farmSort = "fvalue",
+    farmSortDesc = true,
+    farmBestSort = "fgph",
+    farmBestSortDesc = true,
   },
-  realms = {},      -- realm key → { time, items = { [itemID] = { min, qty, n, steps = {unit1, qty1, ...} } } }
+  -- realm key → { time, items = { [itemID] = { min, qty, n, steps = {unit1, qty1, ...} } } (recipe items),
+  --   others = { [itemID] = { min, qty } } (every other item listed), listings, total }
+  realms = {},
   vendorSeen = {},  -- itemID → { unit, stack, limited, time, npc } from MERCHANT_SHOW (authoritative)
   deposit = {},     -- itemID → deposit for one item, 12 h (C_AuctionHouse.CalculateCommodityDeposit)
   -- cutSeen = { pct, n, time } from sale invoices (GetInboxInvoiceInfo)
@@ -151,6 +167,8 @@ local CHAR_DEFAULTS = {
   snipe = { rows = {}, bought = {}, targets = {} },
   -- Profession cooldowns: spell ID → when it is ready again (time(); 0 = ready when read). Modules/Cooldowns.lua
   cooldowns = {},
+  -- Farm sessions (Modules/Farm.lua): current = the running or paused one; sessions = the last 20 finished
+  farm = { sessions = {} },
 }
 
 local function fill(dst, src)
@@ -222,6 +240,8 @@ local function help()
   ns.Print("/crafter rep forget   - clear the reputation and favor amounts learned in game")
   ns.Print("/crafter snipe [start|stop|clear|forget] - reagent sniper: tab, search loop, untick all, forget purchases")
   ns.Print("/crafter cd [login]   - profession cooldowns of all your characters; login: the chat line at login on/off")
+  ns.Print("/crafter shelves      - empty shelves: items that sell in the region but are (almost) not listed here")
+  ns.Print("/crafter farm [start|stop|pause] - farm session: measures what you loot and your real gold per hour")
   ns.Print("/crafter status       - professions, snapshot age, AH cut")
   ns.Print("/crafter reset        - forget prices, merchant data and this character's recipe data")
   ns.Print("/crafter dump         - save the open profession's recipes and item data for the addon's data files")

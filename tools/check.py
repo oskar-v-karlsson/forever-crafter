@@ -229,6 +229,7 @@ def check_data(ns):
     got = sorted((rg[1], rg[2]) for rg in r.reagents.values()) if r else None
     expect(got == [(2447, 1), (2449, 2), (3371, 1)], f"Recipes[3170] reagents {got} differ from Wowhead Forever")
     counts.update(check_sales_data(ns, keys, date))
+    counts.update(check_shelves_data(ns, keys, date))
     counts.update(check_rep_data(ns, keys, date))
     return counts
 
@@ -931,6 +932,309 @@ def check_cooldowns():
            "login line printed while turned off")
     errs = list(ns.errors.values()) + list(ns2.errors.values()) + list(ns3.errors.values())
     expect(not errs, f"errors in the cooldown checks: {errs[:3]}")
+
+
+TSM_MONEY_STUB = """
+  TSM_STUB = { live = {}, money = {} }
+  TSM_API = { GetCustomPriceValue = function(key, s)
+    local id = tonumber(s:match("^i:(%d+)$"))
+    local m = TSM_STUB.money[id]
+    if m and m[key] then return m[key] end
+    local e = TSM_STUB.live[id]
+    if not e then return nil end
+    if key == "DBRegionSoldPerDay" then return e[1] end
+    if key == "DBRegionSaleRate" then return e[2] end
+  end }
+"""
+
+
+def tsm_money(lua, ns, items):
+    """A TSM_API stub: the region snapshot's sold/day and sale rate unscaled (so the scale is 1), plus items =
+    {id: {key: value}} for any price source (DBMarket, DBRegionSaleAvg, DBRegionSoldPerDay, DBRegionSaleRate)."""
+    lua.execute(TSM_MONEY_STUB)
+    tsm = lua.globals().TSM_STUB
+    for i, v in ns.SalesData.regions.eu["items"].items():
+        tsm.live[i] = lua.table_from([v[1], v[2]])
+    for i, m in items.items():
+        tsm.money[i] = lua.table_from(m)
+    ns.Sales.Reset()
+    return tsm
+
+
+def check_shelves_data(ns, keys, date):
+    """Data/Shelves.lua (gen_data.py tsm): the empty-shelf candidate IDs from the same TSM download as Data/Sales.lua."""
+    d = ns.ShelfCandidates
+    if not expect(d is not None, "Data/Shelves.lua does not set ns.ShelfCandidates"):
+        return {}
+    expect(d.src in keys and d.src == "tsm", f"ShelfCandidates src {d.src!r}")
+    expect(isinstance(d.verified, str) and date.match(d.verified), "ShelfCandidates has no verified date")
+    expect(d.minSold > 0 and 0 < d.minRate < 1 and d.minAvg > 0, "ShelfCandidates thresholds")
+    sources = read(os.path.join(ROOT, "SOURCES.md"))
+    counts = {}
+    for reg in ("us", "eu"):
+        e, sales = d.regions[reg], ns.SalesData.regions[reg]
+        if not expect(e is not None and sales is not None, f"ShelfCandidates has no {reg} region"):
+            continue
+        expect(e.sha256 == sales.sha256 and e.updated == sales.updated,
+               f"ShelfCandidates {reg} is not from the same TSM download as SalesData")
+        ids = list(e["items"].values())
+        expect(ids == sorted(set(ids)) and all(isinstance(i, int) and i > 0 for i in ids),
+               f"ShelfCandidates {reg} IDs must be sorted, unique item IDs")
+        expect(100 < len(ids) <= sales.rows, f"ShelfCandidates {reg} keeps {len(ids)} of {sales.rows} rows")
+        row = re.search(r"^\| " + reg.upper() + r" \|.*\| (\d+) \|$", sources, re.M)
+        expect(row and int(row.group(1)) == len(ids), f"SOURCES.md shelf candidates for {reg} != {len(ids)}")
+        counts[f"shelf {reg} candidates"] = len(ids)
+    return counts
+
+
+def check_shelves():
+    """Empty shelves: candidates, the score and supply math, the filters, the price suggestion and the tab."""
+    lua, ns, stub = new_runtime()
+    g = lua.globals()
+    login(lua, stub)
+    S, UI = ns.Shelves, ns.UI
+    E0, E1, BOP, QUEST, GEAR, MANY, CHEAP, VEND, LOAD, NOVAL = range(995001, 995011)
+    items = {E0: {}, E1: {}, BOP: {"bind": 1}, QUEST: {"class": 12}, GEAR: {"class": 4, "bind": 2}, MANY: {},
+             CHEAP: {}, VEND: {"sell": 5000}, NOVAL: {}}
+    for i, d in items.items():
+        stub["items"][i] = lua.table_from({"name": f"Shelf {i}", "sell": d.get("sell", 10), "class": d.get("class", 7),
+                                           "bind": d.get("bind", 0)})
+    ns.ShelfCandidates = ltable(lua, {"src": "tsm", "verified": "2026-11-20",
+                                      "regions": {"eu": {"items": [E0, BOP, QUEST, GEAR, CHEAP, VEND, LOAD, NOVAL]}}})
+    # No TSM, no snapshot: the status says what is missing.
+    slash(lua, "shelves")
+    expect(ns.settings.tab == "shelves" and len(UI.view) == 0 and "needs TradeSkillMaster" in UI.StatusText(),
+           f"no TSM: {UI.StatusText()!r}")
+    sales = {"DBRegionSoldPerDay": 60, "DBRegionSaleRate": 0.5}
+    tsm_money(lua, ns, {E0: dict(sales, DBMarket=30000, DBRegionSaleAvg=28000),
+                        E1: {"DBRegionSaleAvg": 25000, "DBRegionSoldPerDay": 30, "DBRegionSaleRate": 0.6},
+                        BOP: dict(sales, DBMarket=40000), QUEST: dict(sales, DBMarket=40000),
+                        GEAR: dict(sales, DBMarket=90000), MANY: dict(sales, DBMarket=40000),
+                        CHEAP: dict(sales, DBMarket=1000), VEND: dict(sales, DBMarket=2000),
+                        LOAD: dict(sales, DBMarket=20000), NOVAL: {"DBMarket": 50000}})
+    UI.Recompute()
+    expect("Scan" in UI.StatusText() and len(UI.view) == 0, f"no snapshot: {UI.StatusText()!r}")
+    # E1 is listed 3 (a candidate from the snapshot only), MANY 8 (over Max listed 5).
+    set_auctions(lua, stub, [(E1, 3, 3 * 20000), (MANY, 8, 8 * 1000), (LINEN, 20, 20 * 50)])
+    scan(lua, stub)
+    snap = ns.db.realms[ns.RealmKey()]
+    expect(snap.others[E1][1] == 20000 and snap.others[E1][2] == 3 and snap.total == 3,
+           f"snapshot others/total: {snap.others[E1] and list(snap.others[E1].values())} {snap.total}")
+    expect(ns.Scanner.Listed(E0) == (None, 0, True) and ns.Scanner.Listed(E1)[:2] == (20000, 3),
+           f"Scanner.Listed {ns.Scanner.Listed(E0)} {ns.Scanner.Listed(E1)}")
+    ns.settings.shelfMinValue = 1500
+    rows, info = S.Rows()
+    by = {r.id: r for r in rows.values()}
+    expect(set(by) == {E0, E1, VEND, LOAD}, f"shelf rows {sorted(by)} (want E0, E1, VEND, LOAD)")
+    expect(info.bound == 2 and info.gear == 1 and info.noValue == 1 and info.loading == 1,
+           f"hidden: bound {info.bound} gear {info.gear} noValue {info.noValue} loading {info.loading}")
+    a, b = by.get(E0), by.get(E1)
+    if a and b:
+        # 1/15 of 60/day = 4 a day, nothing listed: score = 30000 x 4 x 0.5 / 1.
+        expect(abs(a.expected - 4) < 1e-9 and a.supply == 0 and abs(a.score - 60000) < 1e-6 and a.valueSrc == "realm"
+               and a.price == 30000 and a.stack == 8, f"E0 {a.expected} {a.supply} {a.score} {a.price} {a.stack}")
+        # No realm value: the region average. 2 a day, 3 listed = 1.5 days: 25000 x 2 x 0.6 / 2.5.
+        expect(abs(b.expected - 2) < 1e-9 and abs(b.supply - 1.5) < 1e-9 and abs(b.score - 12000) < 1e-6
+               and b.valueSrc == "region" and b.min == 20000 and b.stack == 4,
+               f"E1 {b.expected} {b.supply} {b.score} {b.valueSrc}")
+    v = by.get(VEND)
+    expect(v and v.price == 5000 and "vendor sell price" in S.DetailText(v), "the suggestion is never below vendor")
+    expect(by.get(LOAD) and by[LOAD].loading and "loading" in S.CellText(by[LOAD], "sname"), "loading row")
+    expect(S.Suggest(100, 0, 0.2) == (100, 1) and S.Suggest(None, 300, 3.5) == (300, 7), "Suggest stack/floor")
+    e, sup, sc = S.Score(10000, ltable(lua, {"perDay": 0, "rate": 0.5}), 2, 1 / 15)
+    expect(e == 0 and sup == float("inf") and sc == 0, "no sales: infinite supply, score 0")
+    # The toggles: gear on, more realms, max listed 8.
+    ns.settings.shelfGear, ns.settings.shelfRealms, ns.settings.shelfMaxListed = True, 30, 8
+    by = {r.id: r for r in S.Rows()[0].values()}
+    expect(GEAR in by and "[G]" in S.CellText(by[GEAR], "sname") and MANY in by and abs(by[E0].expected - 2) < 1e-9,
+           f"gear/realms/max listed toggles: {sorted(by)}")
+    ns.settings.shelfGear, ns.settings.shelfRealms, ns.settings.shelfMaxListed = False, 15, 5
+    # The tab.
+    UI.Recompute()
+    UI.Refresh()
+    first = UI.view[1]
+    expect(first and first.id == E0 and UI.CellText(first, "slisted").find("0") >= 0
+           and "/d" in UI.CellText(first, "sscore") and "Suggested: list 8" in UI.DetailText(first)
+           and "overstate" in UI.DetailText(first) and "Empty shelves: 4 items" in UI.StatusText(),
+           f"Shelves tab: first {first and first.id}, status {UI.StatusText()!r}")
+    widths = sum(c.width for c in S.COLUMNS.values())
+    expect(widths <= 796, f"Empty shelves columns are {widths} px wide (796 max)")
+    frame = g.ForeverCrafterFrame
+    expect(frame.shelfTab.GetText(frame.shelfTab) == "Crafts" and frame.sh.max.IsShown(frame.sh.max)
+           and not frame.minProfit.IsShown(frame.minProfit), "Shelves tab controls")
+    frame.sh.max.SetText(frame.sh.max, "0")
+    frame.sh.max.__scripts.OnEnterPressed(frame.sh.max)
+    expect(ns.settings.shelfMaxListed == 0 and {r.id for r in UI.view.values()} == {E0, VEND, LOAD},
+           f"Max listed 0: {[r.id for r in UI.view.values()]}")
+    ns.settings.shelfMaxListed = 5
+    frame.shelfTab.Click(frame.shelfTab)
+    expect(ns.settings.tab == "craft" and frame.shelfTab.GetText(frame.shelfTab) == "Shelves", "Shelves tab back")
+    expect(not list(ns.errors.values()), f"errors in the shelves checks: {list(ns.errors.values())[:3]}")
+
+
+def check_farm():
+    """Farm sessions: loot and money lines, pause / AFK / logout, item values, g/h, saved sessions, Best farms."""
+    lua, ns, stub = new_runtime()
+    g = lua.globals()
+    login(lua, stub)
+    F, UI = ns.Farm, ns.UI
+    SHELF, VEND, NOPRICE = 995101, 995102, 995103
+    for i, sell in ((SHELF, 10), (VEND, 700), (NOPRICE, 0)):
+        stub["items"][i] = lua.table_from({"name": f"Loot {i}", "sell": sell})
+    tsm_money(lua, ns, {SHELF: {"DBMarket": 50000}})
+    set_auctions(lua, stub, [(LINEN, 20, 20 * 300)])
+    scan(lua, stub)
+    cut = ns.Pricing.Cut()[0]
+
+    def link(i):
+        return f"|cffffffff|Hitem:{i}::::::::60:::::|h[Loot {i}]|h|r"
+    # Parsing.
+    expect(F.ParseLoot(f"You receive loot: {link(LINEN)}.") == (LINEN, 1)
+           and F.ParseLoot(f"You receive loot: {link(LINEN)}x12.") == (LINEN, 12)
+           and F.ParseLoot(f"Bob receives loot: {link(LINEN)}.") is None
+           and F.ParseLoot(f"You receive item: {link(LINEN)}.") is None, "loot line parsing")
+    expect(F.ParseMoney("You loot 1 Gold, 2 Silver, 3 Copper") == 10203 and F.ParseMoney("You loot 45 Copper") == 45
+           and F.ParseMoney("Your share of the loot is 5 Silver.") == 500
+           and F.ParseMoney("Your share of the loot is 1 Silver, 20 Copper. (6 Copper deposited to guild bank)") == 120
+           and F.ParseMoney("Du plünderst 5 Silber") is None, "money line parsing")
+    expect(F.Pattern("a.b%sc(%d)") == "^a%.b(.-)c%((%d+)%)$", f"Pattern {F.Pattern('a.b%sc(%d)')}")
+
+    # A session.
+    stub.zone = "Durotar"
+    expect(F.Start() and not F.Start() and F.Running(), "Start")
+    t0 = g.time()
+
+    def loot(i, n=1):
+        stub.fire("CHAT_MSG_LOOT", f"You receive loot: {link(i)}x{n}." if n > 1 else f"You receive loot: {link(i)}.",
+                  "Hana")
+
+    def money_line(text):
+        stub.fire("CHAT_MSG_MONEY", text)
+
+    def gain(c):
+        stub.money = stub.money + c
+        stub.fire("PLAYER_MONEY")
+    loot(LINEN, 5)
+    loot(LINEN)
+    loot(SHELF)
+    loot(VEND, 2)
+    loot(NOPRICE)
+    stub.fire("CHAT_MSG_LOOT", f"Bob receives loot: {link(LINEN)}x9.", "Bob")
+    money_line("You loot 1 Gold, 2 Silver, 3 Copper")
+    gain(10203)                           # its PLAYER_MONEY: counted once
+    gain(5000)                            # a vendor sale: not loot
+    stub.clock = stub.clock + 5
+    gain(777)
+    money_line("Du plünderst 7 Silber")   # unread line right after a rise: the rise counts
+    stub.clock = stub.clock + 5
+    money_line("Tu ramasses 3 Argent")    # unread line, then its rise
+    gain(300)
+    stub.clock = stub.clock + 5
+    cur = F.Current()
+    expect(cur["items"][LINEN] == 6 and cur["items"][SHELF] == 1 and cur["items"][VEND] == 2,
+           f"looted items {dict(cur['items'])}")
+    expect(cur.money == 10203 + 777 + 300, f"looted money {cur.money} (want {10203 + 777 + 300})")
+    # Pause: no loot, no time.
+    stub.now = stub.now + 600
+    expect(F.Pause("you") and not F.Running(), "Pause")
+    stub.now = stub.now + 1000
+    loot(LINEN, 50)
+    expect(cur["items"][LINEN] == 6, "loot counted while paused")
+    expect(F.Resume(), "Resume")
+    # AFK pauses and resumes on its own; another zone.
+    stub.zone = "The Barrens"
+    stub.fire("ZONE_CHANGED_NEW_AREA")
+    stub.now = stub.now + 1200
+    stub.afk = True
+    stub.fire("PLAYER_FLAGS_CHANGED", "player")
+    expect(cur.paused == "afk", "AFK must pause the session")
+    stub.now = stub.now + 5000
+    stub.afk = False
+    stub.fire("PLAYER_FLAGS_CHANGED", "player")
+    expect(F.Running(), "back from AFK must resume")
+    stub.now = stub.now + 600
+    el = F.Elapsed(cur)
+    expect(abs(el - 2400) <= 20, f"elapsed {el}: paused and AFK time must not count")
+    # Values: the shelf suggestion less the cut, the AH min less the cut, the vendor price; the best of them.
+    vals = {r.id: r for r in F.ItemRows(cur)[0].values()}
+    expect(vals[SHELF].how == "shelf" and vals[SHELF].each == int(50000 * (1 - cut)), f"shelf value {vals[SHELF].each}")
+    expect(vals[LINEN].how == "AH" and vals[LINEN].each == int(300 * (1 - cut)), f"AH value {vals[LINEN].each}")
+    expect(vals[VEND].how == "vendor" and vals[VEND].each == 700 and vals[NOPRICE].how is None
+           and vals[NOPRICE].each == 0, "vendor / no price")
+    t = F.Totals(cur)
+    want = cur.money + 6 * int(300 * (1 - cut)) + int(50000 * (1 - cut)) + 1400
+    expect(t.total == want and abs(t.gph - want * 3600 / t.elapsed) < 1e-6 and t.zone in ("Durotar", "The Barrens"),
+           f"totals {t.total} (want {want}) {t.gph} {t.zone}")
+    # The tab while running.
+    slash(lua, "farm")
+    frame = g.ForeverCrafterFrame
+    expect(ns.settings.tab == "farm" and len(UI.view) == 4 and frame.fm.start.GetText(frame.fm.start) == "Stop"
+           and "running" in UI.StatusText() and frame.farmTab.GetText(frame.farmTab) == "Crafts",
+           f"Farm tab: {len(UI.view)} rows, status {UI.StatusText()!r}")
+    expect(UI.view[1].id == SHELF and UI.CellText(UI.view[1], "fhow") == "shelf", "Farm rows by value")
+    stub.runTimers(5)
+    expect(not list(ns.errors.values()), f"errors in the farm tick: {list(ns.errors.values())[:3]}")
+    # Stop freezes the values.
+    s = F.Stop()
+    expect(s and s.saved and F.Current() is None and ns.char.farm.sessions[1].stop == s.stop and s.total == want
+           and s.zoneName == "The Barrens", f"Stop: {s and s.total} (want {want}) {s and s.zoneName}")
+    g.TSM_STUB.money[SHELF] = lua.table_from({"DBMarket": 1})
+    expect(F.Totals(s).total == want, "a saved session's item values must be frozen at Stop")
+    # Logout pauses, login resumes.
+    F.Start()
+    stub.fire("PLAYER_LOGOUT")
+    expect(F.Current().paused == "logout", "logout must pause the session")
+    lua2, ns2, stub2 = new_runtime(saved=stub.savedVariables("ForeverCrafterDB"))
+    stub2.now = stub.now + 3600
+    n0 = len(stub2.prints)
+    login(lua2, stub2)
+    expect(ns2.Farm.Running() and any("farm session resumed" in p for p in prints(stub2, n0)),
+           "login must resume a session paused by logout")
+    expect(ns2.Farm.Elapsed(ns2.Farm.Current()) < 60, "the logged-out hour must not count")
+    # Keep the last 20.
+    stub.zone = "Durotar"
+    for i in range(25):
+        F.Start()
+        stub.now = stub.now + 60
+        F.Stop()
+    expect(len(ns.char.farm.sessions) == 20, f"{len(ns.char.farm.sessions)} sessions kept (20)")
+    # Best farms: by zone over every character.
+    ns.db.chars["Alt-Test"] = ltable(lua, {"farm": {"sessions": [
+        {"zoneName": "Durotar", "elapsed": 3600, "total": 3600000, "money": 100, "saved": True},
+        {"zoneName": "Felwood", "elapsed": 1800, "total": 900000, "money": 0, "saved": True}]}})
+    best = {o.zone: o for o in F.BestRows().values()}
+    d = best.get("Durotar")
+    expect(d and d.nChars == 2 and d.sessions == 21 and d.best == 3600000 and best["Felwood"].gph == 1800000
+           and abs(d.gph - d.gold * 3600 / d.time) < 1e-6, f"Best farms {d and (d.nChars, d.sessions, d.best)}")
+    frame.fm.view.Click(frame.fm.view)
+    expect(ns.settings.farmView == "best" and UI.view[1].zone == "Durotar" and "Hana" in UI.CellText(UI.view[1], "fchars")
+           and frame.fm.view.GetText(frame.fm.view) == "This session", "Best farms view")
+    for cols in (F.SESSION_COLUMNS, F.BEST_COLUMNS):
+        w = sum(c.width for c in cols.values())
+        expect(w <= 796, f"Farm columns are {w} px wide (796 max)")
+    expect(not list(ns.errors.values()) and not list(ns2.errors.values()),
+           f"errors in the farm checks: {list(ns.errors.values())[:3]}")
+
+
+def check_filter_row():
+    """The filter row: the Shelves and Farm tabs and Scan AH sit right of every crafting filter and panel control."""
+    lua, ns, stub = new_runtime()
+    login(lua, stub)
+    slash(lua, "")
+    frame = lua.globals().ForeverCrafterFrame
+    spans = []
+    for b in (frame.shelfTab, frame.farmTab, frame.scan):
+        p = b.__points
+        expect(p[1] == "TOPRIGHT", "filter-row tabs are placed from the top right")
+        spans.append((1204 + p[2] - b.__w, 1204 + p[2]))
+    spans.sort()
+    expect(all(a[1] <= b[0] for a, b in zip(spans, spans[1:])), f"filter-row buttons overlap: {spans}")
+
+    def right(e, chars):   # an edit box: its label (about 6 px a character), 8 px, the box
+        return e.label.__points[2] + 6 * chars + 8 + e.__w
+    ends = [right(frame.minBatch, len("Min batch")), right(frame.sh.realms, len("Realm share 1 /")),
+            frame.fm.view.__points[2] + frame.fm.view.__w]
+    expect(max(ends) < spans[0][0], f"filter controls end at {max(ends)}, the tabs start at {spans[0][0]}")
 
 
 def check_sniper_target():
@@ -2919,6 +3223,9 @@ def main():
         check_sniper()
         check_sniper_target()
         check_cooldowns()
+        check_shelves()
+        check_farm()
+        check_filter_row()
         check_missing_apis()
         check_dump()
         n, evaluated, took, hidden, shuffles, times, batches, fasts = check_full_run()
