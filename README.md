@@ -162,6 +162,34 @@ The **Cooldowns** button in the title row (or `/crafter cd`) lists them for ever
 
 At login, chat says e.g. `3 cooldowns ready (best: Mooncloth 36g on Hana) - /crafter cd` (a shared cooldown counts once per character). `/crafter cd login` turns that line off and on.
 
+### Empty shelves
+
+The **Shelves** button in the filter row (or `/crafter shelves`) lists items that sell steadily in your region but that your realm has (almost) none of on the AH. If you list one, there is no one to undercut you, so you set the price. It needs the TradeSkillMaster addon with its Desktop App data, and a scan.
+
+- **Candidates:** every item of your last scan listed at most **Max listed** times (default 5), plus every item in TSM's region data that sells 3 or more a day at a sale rate of 40% or more and an average of 15s or more (`Data/Shelves.lua`, made by `make tsm`). TSM's addon API can only price an item you name. It cannot list items, so the region list is bundled.
+- **Columns:**
+  - **Listed**, **Realm min:** from your last scan.
+  - **Value:** TSM's realm market value (`DBMarket`), or the grey region average when the realm has none.
+  - **Region avg** (`DBRegionSaleAvg`), **Sold/d** (`DBRegionSoldPerDay`), **Sale %** (`DBRegionSaleRate`): the whole region.
+  - **Supply:** the days your realm's listings last, which is listed ÷ (region sold/day × realm share).
+  - **Score:** the copper a day you can expect, which is value × expected realm sales a day × sale rate ÷ (1 + supply days).
+- **Realm share:** TSM's region data has no listing counts to estimate it from, so it is a setting, **Realm share 1 /** (default 15).
+- **Hidden:** soulbound and quest items, items worth less than **Min value** (default 15s) and items TSM has no value or sales for. BoE weapons and armour are also hidden, because their random stats make one value a poor guide; the **BoE gear** box shows them, marked `[G]`.
+- **Details:** the suggested price (the value, never below the vendor sell price) and stack (about 2 days of expected realm sales), and where the addon's data says the item comes from (recipes and vendors; drops and gathering are not in it). Region numbers overstate one realm's demand, so list a few and see what sells.
+
+### Farm sessions
+
+The **Farm** button (or `/crafter farm`) measures what a farm really earns. **Start** (`/crafter farm start`), farm, then **Stop** (`/crafter farm stop`).
+
+- **What it counts:** your own loot lines ("You receive loot: ...", with stacks such as `x5`) and the money you loot, including a party's or guild's share. It does not count purchases, crafts or quest rewards. If a money line does not parse (another client language), the money rise right next to it counts instead.
+- **The clock:** it counts the time in each zone and stops while you are paused (**Pause**, `/crafter farm pause`), AFK or logged out. A session paused by logging out resumes at the next login.
+- **Item values:** each item is worth the best of three prices, and the **Priced by** column says which one was used:
+  - the Empty shelves value of a rarely listed item, less the AH cut (`shelf`);
+  - your realm's AH min, less the cut (`AH`);
+  - the vendor sell price (`vendor`).
+- **Saved sessions:** Stop saves the session with the values of that moment, and the last 20 are kept per character.
+- **Best farms:** this view compares your zones over every character's saved sessions. It shows the time, what was earned, g/h and the best single session.
+
 ### Commands
 
 | Command | What it does |
@@ -175,6 +203,8 @@ At login, chat says e.g. `3 cooldowns ready (best: Mooncloth 36g on Hana) - /cra
 | `/crafter dump` | Save the open profession window's full recipe list (learned and unlearned), reagents, outputs, the game's "how to learn" text (empty in Forever so far) and item info, for the data in this addon (see below); `/crafter dump clear` removes it |
 | `/crafter cd [login]` | The Cooldowns tab (see "Cooldowns" above); `login` turns the "N cooldowns ready" chat line at login off or on |
 | `/crafter rep` | The reputation planner (see "Reputation planner" above); `/crafter rep forget` clears the learned reputation and favor amounts |
+| `/crafter shelves` | The Empty shelves tab (see "Empty shelves" above) |
+| `/crafter farm [start\|stop\|pause]` | Farm sessions (see "Farm sessions" above): open the tab, start, stop and save, or pause / resume |
 | `/crafter snipe [start\|stop\|clear\|forget]` | The sniper (see "Sniper" above): open its tab, start or stop searching, untick all crafts, or forget the purchases still counted as in the mail |
 | `/crafter reset` | Forget prices, merchant data and this character's recipe data (not the learned reputation amounts) |
 | `/crafter debug` | Toggle debug output (also prints any API the client lacks) |
@@ -222,6 +252,12 @@ These cannot be tested outside the game. Please go through them once and report 
 35. [ ] **Cooldowns tab and API:** the **Cooldowns** button fits in the title row left of **Sniper** and its 6 columns fit the list. with the Tailoring window open on a character that made Mooncloth, the Cooldowns tab shows "in ..." with about the time the game shows on the recipe. The addon reads `C_TradeSkillUI.GetRecipeCooldown(recipe)` (assumed: nil when ready) and falls back to `C_Spell.GetSpellCooldown`. If it says "open the profession window" after you did, `/crafter errors` has the reason.
 36. [ ] **Shared transmute cooldown:** after Transmute: Arcanite, do the other transmutes (e.g. Air to Fire) show the same wait in the game and in the tab? Do Iron to Gold and Mithril to Truesilver keep their own 1 h cooldown (no shared category in the data)? Does Elemental Fire (category 310 but a 10 min cooldown) really block the others?
 37. [ ] **Ready time after a relog:** craft Mooncloth, log out and in (and log in an alt): the tab still shows when it is ready, and the login line counts it once it is.
+
+38. [ ] **Shelves and Farm tabs:** the **Shelves** and **Farm** buttons fit in the filter row left of **Scan AH**, without overlapping it or the crafting filters (**Min batch**). On the Shelves tab the 9 columns and the controls (**Max listed**, **Min value (g)**, **BoE gear**, **Realm share 1 /**) fit without cut-off text, and so do the Farm tab's 5 columns (7 in Best farms) and its **Start**, **Pause** and **Best farms** buttons.
+39. [ ] **TSM price sources:** with TSM loaded, the **Value** of an item matches TSM's own tooltip for its realm market value (`DBMarket`), and **Region avg** matches the region sale average. The addon assumes both come back in copper (e.g. 12345 = 1g 23s 45c). If they are 100 times off, please report it. Item names that show `loading item:...` should fill in within a second.
+40. [ ] **Loot lines on the Forever client:** start a farm session and loot a mob or a node. Are single items and stacks (`x5`) counted, and is the looted money right (alone, in a party "Your share of the loot is ...", and with a guild share)? Are purchases, crafts and quest rewards left out? If your client is not in English, does money still count?
+41. [ ] **AFK and logout:** go AFK during a session. Does the status line say "paused (AFK)" and does the clock stop, then run again when you are back? Log out with a session running: does the next login print "farm session resumed"?
+42. [ ] **SavedVariables size:** a scan now keeps the min price and count of every item on the AH (Empty shelves and the farm values use them). Is `ForeverCrafter.lua` in SavedVariables still a reasonable size, and does login stay quick?
 
 ## Development
 

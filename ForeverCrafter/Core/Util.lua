@@ -49,16 +49,16 @@ local function itemData(id)
 end
 Util.ItemData = itemData
 
--- Client item info (name, quality, sell price), cached once loaded.
+-- Client item info (name, quality, sell price, stack size, item class, bind type), cached once loaded.
 local info = {}
 local function clientInfo(id)
   local c = info[id]
   if c then return c end
   local get = ns.API("C_Item.GetItemInfo") or ns.API("GetItemInfo")
   if get then
-    local ok, name, _, quality, _, _, _, _, stack, _, _, sell = pcall(get, id)
+    local ok, name, _, quality, _, _, _, _, stack, _, _, sell, class, _, bind = pcall(get, id)
     if ok and name then
-      c = { name = name, q = quality, sell = sell, stack = stack }
+      c = { name = name, q = quality, sell = sell, stack = stack, class = class, bind = bind }
       info[id] = c
       return c
     end

@@ -16,6 +16,7 @@ Data\Recipes.lua
 Data\Items.lua
 Data\Vendor.lua
 Data\Sales.lua
+Data\Shelves.lua
 Data\Reputation.lua
 Modules\Professions.lua
 Modules\Dump.lua
@@ -26,5 +27,7 @@ Modules\Planner.lua
 Modules\Reputation.lua
 Modules\Sniper.lua
 Modules\Cooldowns.lua
+Modules\Shelves.lua
+Modules\Farm.lua
 Modules\UI.lua
 Modules\Minimap.lua
