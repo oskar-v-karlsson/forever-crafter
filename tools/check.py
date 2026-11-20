@@ -1230,7 +1230,10 @@ def check_farms_data(ns, keys, date):
         nfarms += 1
         expect(d.src and all(p in keys for p in d.src.split("+")) and date.match(d.verified or ""),
                f"FarmDefs {d.key} needs src + verified")
-        expect(d.kind in ("kill", "node") and isinstance(d.zone, int) and d.zoneName, f"FarmDefs {d.key} kind/zone")
+        # A farm with no zone is a generic herb or ore node, counted in any zone.
+        expect(d.kind in ("kill", "node") and ((isinstance(d.zone, int) and d.zoneName)
+                                              or (d.zone is None and d.zoneName is None and d.kind == "node")),
+               f"FarmDefs {d.key} kind/zone")
         expect(d.rate.n > 0 and d.rate.src in keys and (d.rate.src != "assumed" or d.rate.verified is False),
                f"FarmDefs {d.key} rate {d.rate.n} {d.rate.src}: assumed rates must say verified=false")
         for _, pk in d.pages.items():
@@ -1257,9 +1260,12 @@ def check_farms_data(ns, keys, date):
     for i, e in ns.FarmItems.items():
         expect(e.src in keys and date.match(e.verified or "") and e.name, f"FarmItems[{i}] needs src + verified")
         expect(ns.Items[i] is None and ns.RepItems[i] is None, f"FarmItems[{i}] duplicates Items or RepItems")
-    expect(nfarms == 21 and npages == 43, f"{nfarms} farms, {npages} pages (21, 43)")
+    expect(nfarms == 53 and npages == 75, f"{nfarms} farms, {npages} pages (53, 75)")
     # Wowhead Forever npc=5982 Black Slayer (2026-11-20): Vulture Gizzard 8396.
     expect(any(r[1] == 8396 for r in pages.npc5982.drops.values()), "Black Slayer must drop Vulture Gizzard")
+    # Wowhead Forever object=142145 Gromsblood (2026-11-21): Gromsblood 8846 in 316 of 328 nodes, 1-3.
+    expect(list(pages.object142145.herbalism[1].values()) == [8846, 316, 328, 1, 3]
+           and ns.FarmDefs[53].zone is None, "Gromsblood node: Gromsblood 316/328 x1-3, any zone")
     return {"farms": nfarms, "farm pages": npages, "farm loot rows": nrows}
 
 
@@ -1270,6 +1276,8 @@ FARM_FIXTURE = """
      rate={n=120,src="assumed",verified=false},src="wh_npc+wh_item",verified="2026-11-20"},
     {key="nfarm",name="Testlands: herbs",zone=9001,zoneName="Testlands (wh)",kind="node",pages={"object8001"},
      rate={n=60,src="assumed",verified=false},src="wh_object+wh_item",verified="2026-11-20"},
+    {key="gfarm",name="Herb: Generic",kind="node",pages={"object8002"},
+     rate={n=60,src="assumed",verified=false},src="wh_object",verified="2026-11-21"},
   }
   ns.FarmPages = {
     npc7001={kind="npc",id=7001,name="Mob A",url="https://www.wowhead.com/forever/npc=7001/mob-a",
@@ -1279,6 +1287,8 @@ FARM_FIXTURE = """
       drops={{996001,1,1,1,1}},src="wh_npc",verified="2026-11-20"},
     object8001={kind="object",id=8001,name="Herb",url="https://www.wowhead.com/forever/object=8001/herb",
       herbalism={{996005,1,1,2,2}},src="wh_object",verified="2026-11-20"},
+    object8002={kind="object",id=8002,name="Generic herb",url="https://www.wowhead.com/forever/object=8002/generic-herb",
+      herbalism={{996005,1,1,1,1},{996001,1,10,1,1}},src="wh_object",verified="2026-11-21"},
   }
   ns.FarmGuide.Reset()
 """
@@ -1430,12 +1440,38 @@ def check_farm_guide():
     expect(counted() == {"kfarm": 1}, f"a new session counts again: {counted()}")
     F.Stop()
 
+    # A generic (zone-less) node farm counts in any zone; in its own zone a zone farm's herb comes first.
+    gnode = lambda n: f"GameObject-0-1-2-3-8002-0000CC{n:04d}"
+    F.Start()
+    target(None)
+    stub.zone = "Elsewhere"
+    stub.fire("ZONE_CHANGED_NEW_AREA")
+    loot((H, [gnode(1), 1]))                            # the node, anywhere
+    loot((H, None), source_info=False)                  # no source info: its main herb
+    loot((A, None), source_info=False)                  # only a side drop: not a node
+    expect(counted() == {"gfarm": 2}, f"generic node farm in another zone: {counted()}")
+    stub.now = stub.now + 600
+    stub.zone = "Testlands"
+    stub.fire("ZONE_CHANGED_NEW_AREA")
+    loot((H, [gnode(2), 1]))                            # the generic node in Testlands
+    loot((H, None), source_info=False)                  # the herb in Testlands: Testlands' own herb farm
+    expect(counted() == {"gfarm": 3, "nfarm": 1}, f"zone farm first in its zone: {counted()}")
+    stub.now = stub.now + 300
+    gL0 = ns.char.farmGuide.farms.gfarm
+    F.Stop()
+    gL = ns.char.farmGuide.farms.gfarm
+    expect(gL0 is None and gL.n == 3 and near(gL.secs, 600 + 300 / 2),
+           f"generic farm time by zone: {gL.n} nodes in {gL.secs} s (want 3 in 750)")
+    gr = rows()["gfarm"]
+    expect(gr.zone == "Any zone" and strip(G.CellText(gr, "gzone")) == "Any zone"
+           and near(gr.ev, vH + 0.1 * vA), f"generic farm row: {gr.zone} EV {gr.ev}")
+
     # The Farms view.
     slash(lua, "farm")
     frame = g.ForeverCrafterFrame
     frame.fm.guide.Click(frame.fm.guide)
     view = {o.spell: o for o in UI.view.values()}
-    expect(ns.settings.farmView == "farms" and len(UI.view) == 2 and UI.view[1].gph >= UI.view[2].gph
+    expect(ns.settings.farmView == "farms" and len(UI.view) == 3 and UI.view[1].gph >= UI.view[2].gph
            and frame.fm.guide.GetText(frame.fm.guide) == "This session" and frame.fmRate.IsShown(frame.fmRate),
            f"Farms view: {ns.settings.farmView} {len(UI.view)} rows")
     UI.selected = view["nfarm"]

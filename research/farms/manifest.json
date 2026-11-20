@@ -1,5 +1,5 @@
 {
-  "fetched": "2026-11-20",
+  "fetched": "2026-11-21",
   "product": "wowf",
   "tables": {
     "ItemSparse": {
@@ -13,8 +13,8 @@
       ],
       "full_rows": 19325,
       "full_sha256": "fdc65396e8a1103ea5f552ea59aaebc0e73ba572612a3412c50e636b54c90b41",
-      "snapshot_rows": 380,
-      "snapshot_sha256": "7c466ca15be28f5d86fe04cfb1119e93213ad4b50cebce085b58e959f7983621",
+      "snapshot_rows": 424,
+      "snapshot_sha256": "0323aedc86cb6b9f43479aad0604557415ad15d054b7dab5b20f00e954ce9e9e",
       "url": "https://wago.tools/db2/ItemSparse/csv?build=1.60.1.70938"
     },
     "SkillLine": {
@@ -33,9 +33,9 @@
     }
   },
   "wowhead": {
-    "fetched": "2026-11-20",
-    "file": "research/wowhead/farms_2026-11-20.json",
-    "sha256": "9aa2e9934674cc188b2d75f0bbfce3abd6bc99eebf379096d9dca4c55e607f72",
+    "fetched": "2026-11-20 (lower-level nodes 2026-11-21)",
+    "file": "research/wowhead/farms_2026-11-21.json",
+    "sha256": "967d5341653404a80d5f5ec35718d791f86d7e7b04bd5356d9af1604e770570f",
     "source": "Wowhead Forever NPC and object pages; listviews drops/skinning/pickpocketing/herbalism/mining. Row = [itemId,name,quality,count,outof,stack 'min-max']. chance = count/outof per kill or per node; avg qty = chance*(min+max)/2."
   }
 }

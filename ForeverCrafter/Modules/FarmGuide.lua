@@ -6,7 +6,8 @@
 -- farm's zone; until then the rate is assumed and coin is 0 (Wowhead has no coin data).
 -- Counting: the combat log is not readable by addons on Forever (C_CombatLog.GetCurrentEventInfo is SecureOnly), so a
 -- kill is UNIT_DIED for your (not tap-denied) target, or a corpse you loot (GetLootSourceInfo); a node is a loot
--- window from a farm's object (GetLootSourceInfo), else one holding that node's herbs or ore. Each GUID counts once.
+-- window from a farm's object (GetLootSourceInfo), else one holding that node's main herb or ore. Each GUID counts once.
+-- Farms with no zone are generic herb and ore nodes, counted in any zone; in its own zone a zone farm comes first.
 local _, ns = ...
 local G = {}
 ns.FarmGuide = G
@@ -34,8 +35,10 @@ end
 G.Def = function(key) return defs()[key] end
 
 -- The client's zone name for a farm (C_Map.GetAreaInfo of its AreaTable ID), else the Wowhead Forever name.
+G.ANY_ZONE = "Any zone"
 local zoneNames = {}
 function G.ZoneName(def)
+  if not def.zone then return G.ANY_ZONE end
   local z = zoneNames[def.zone]
   if z then return z end
   local ok, name = ns.Call("C_Map.GetAreaInfo", def.zone)
@@ -231,25 +234,32 @@ local seen, seenFor = {}, nil
 local moneyFarm, moneyAt
 local index, indexZone
 
--- The farms of the zone you are in: { npc = { [id] = {def, page} }, object = {...}, items = { [itemID] = {def, page} } }
+-- The farms you can count where you are: this zone's farms first, then the generic (zone-less) node farms.
+-- { npc = { [id] = {def, page} }, object = {...}, items = { [itemID] = {def, page} } }; items holds each node's main
+-- herb or ore (its most likely loot), for loot windows with no source info.
 local function zoneIndex()
   local ok, z = ns.Call("GetRealZoneText")
-  z = ok and z or nil
+  z = ok and type(z) == "string" and z ~= "" and z or nil
   if index and indexZone == z then return index, z end
   index, indexZone = { npc = {}, object = {}, items = {} }, z
-  for _, def in ipairs(ns.FarmDefs or {}) do
-    if z and G.ZoneName(def) == z then
-      for _, pkey in ipairs(def.pages) do
-        local page = ns.FarmPages[pkey]
-        if page then
-          local hit = { def = def, page = pkey }
-          index[page.kind][page.id] = index[page.kind][page.id] or hit
-          for _, lname in ipairs({ "herbalism", "mining" }) do
-            for _, r in ipairs(page[lname] or {}) do index.items[r[1]] = index.items[r[1]] or hit end
-          end
+  local function add(def)
+    for _, pkey in ipairs(def.pages) do
+      local page = ns.FarmPages[pkey]
+      if page then
+        local hit = { def = def, page = pkey }
+        index[page.kind][page.id] = index[page.kind][page.id] or hit
+        for _, lname in ipairs({ "herbalism", "mining" }) do
+          local main = page[lname] and page[lname][1]
+          if main then index.items[main[1]] = index.items[main[1]] or hit end
         end
       end
     end
+  end
+  for _, def in ipairs(ns.FarmDefs or {}) do
+    if def.zone and z and G.ZoneName(def) == z then add(def) end
+  end
+  for _, def in ipairs(ns.FarmDefs or {}) do
+    if not def.zone then add(def) end
   end
   return index, z
 end
@@ -273,10 +283,11 @@ local function count(cur, hit, guid, zone)
   end
   local t = cur.guide[hit.def.key]
   if not t then
-    t = { n = 0, money = 0, mix = {}, zone = zone }
+    t = { n = 0, money = 0, mix = {}, zones = {} }
     cur.guide[hit.def.key] = t
   end
   t.n = t.n + 1
+  if zone then t.zones[zone] = (t.zones[zone] or 0) + 1 end
   t.mix[hit.page] = (t.mix[hit.page] or 0) + 1
   ns.Fire("DATA_CHANGED")
   return true
@@ -368,12 +379,12 @@ function G.OnMoney(copper)
   if t then t.money = t.money + copper end
 end
 
--- At Stop: each zone's time goes to that zone's farms by their share of the session's kills and nodes.
+-- At Stop: each zone's time goes to the farms counted in that zone, by their share of its kills and nodes.
 function G.OnStop(cur)
   if not cur.guide or not ns.char then return end
   local byZone = {}
   for _, t in pairs(cur.guide) do
-    if t.n > 0 and t.zone then byZone[t.zone] = (byZone[t.zone] or 0) + t.n end
+    for z, n in pairs(t.zones or {}) do byZone[z] = (byZone[z] or 0) + n end
   end
   local st = learnStore()
   for key, t in pairs(cur.guide) do
@@ -381,7 +392,7 @@ function G.OnStop(cur)
       local L = st[key] or { n = 0, secs = 0, money = 0, mix = {} }
       st[key] = L
       L.n = L.n + t.n
-      L.secs = L.secs + (cur.zones[t.zone] or 0) * t.n / byZone[t.zone]
+      for z, n in pairs(t.zones or {}) do L.secs = L.secs + (cur.zones[z] or 0) * n / byZone[z] end
       L.money = L.money + t.money
       L.mix = L.mix or {}
       for p, n in pairs(t.mix) do L.mix[p] = (L.mix[p] or 0) + n end

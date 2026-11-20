@@ -1,19 +1,50 @@
 ID,Display_lang,OverallQualityID,SellPrice,Bonding
+765,Silverleaf,1,10,0
+774,Malachite,2,15,0
+785,Mageroyal,1,20,0
 810,Hammer of the Northern Wind,4,45267,2
+818,Tigerseye,2,100,0
 864,Knightly Longsword,2,9716,2
+1206,Moss Agate,2,400,0
+1210,Shadowgem,2,250,0
 1464,Buzzard Talon,0,71,0
 1529,Jade,2,700,0
 1685,Troll-hide Bag,1,6250,0
+1705,Lesser Moonstone,2,600,0
 1725,Large Knapsack,1,5000,0
 2295,Large Boar Tusk,0,70,0
+2447,Peacebloom,1,10,0
+2449,Earthroot,1,20,0
+2450,Briarthorn,1,25,0
+2452,Swiftthistle,1,15,0
+2453,Bruiseweed,1,25,0
+2770,Copper Ore,1,5,0
+2771,Tin Ore,1,25,0
+2772,Iron Ore,1,150,0
+2775,Silver Ore,2,75,0
+2776,Gold Ore,2,500,0
+2835,Rough Stone,1,2,0
+2836,Coarse Stone,1,15,0
+2838,Heavy Stone,1,60,0
+3340,Incendicite Ore,1,31,0
+3355,Wild Steelbloom,1,50,0
+3356,Kingsblood,1,30,0
+3357,Liferoot,1,75,0
+3358,Khadgar's Whisker,1,175,0
+3369,Grave Moss,1,25,0
 3395,Recipe: Limited Invulnerability Potion,2,250,0
 3403,Ivory Boar Tusk,0,321,0
 3404,Buzzard Wing,1,181,0
 3730,Big Bear Meat,1,45,0
+3818,Fadeleaf,1,125,0
+3819,Wintersbite,1,100,0
+3820,Stranglekelp,1,100,0
+3821,Goldthorn,1,150,0
 3830,Recipe: Elixir of Lesser Fortitude,1,500,0
 3831,Recipe: Troll's Blood Elixir,1,550,0
 3832,Recipe: Elixir of Detect Lesser Invisibility,2,550,0
 3857,Coal,1,125,0
+3858,Mithril Ore,1,250,0
 3864,Citrine,2,800,0
 3867,Plans: Golden Iron Destroyer,2,950,0
 3868,Plans: Frost Tiger Blade,2,1250,0
@@ -54,6 +85,7 @@ ID,Display_lang,OverallQualityID,SellPrice,Bonding
 4093,Large Basilisk Tail,0,713,0
 4234,Heavy Leather,1,150,0
 4235,Heavy Hide,1,200,0
+4278,Lesser Bloodstone Ore,1,25,0
 4299,Pattern: Guardian Armor,2,500,0
 4300,Pattern: Guardian Leather Bracers,2,700,0
 4304,Thick Leather,1,300,0
@@ -78,6 +110,7 @@ ID,Display_lang,OverallQualityID,SellPrice,Bonding
 4589,Long Elegant Feather,1,530,0
 4590,Curved Yellow Bill,0,655,0
 4591,Eagle Eye,0,413,0
+4625,Firebloom,1,250,0
 4636,Strong Iron Lockbox,2,110,0
 4637,Steel Lockbox,2,150,0
 4638,Reinforced Steel Lockbox,2,200,0
@@ -90,6 +123,7 @@ ID,Display_lang,OverallQualityID,SellPrice,Bonding
 5759,Thorium Lockbox,2,375,0
 5774,Pattern: Green Silk Pack,2,275,0
 5829,Razor-sharp Beak,0,804,0
+5833,Indurium Ore,1,0,0
 5974,Pattern: Guardian Cloak,2,350,0
 6045,Plans: Iron Counterweight,2,650,0
 6991,Smoldering Coal,1,0,4
@@ -129,6 +163,7 @@ ID,Display_lang,OverallQualityID,SellPrice,Bonding
 8086,Light Plate Shoulderpads,0,3730,0
 8146,Wicked Claw,1,500,0
 8150,Deeprock Salt,1,250,0
+8153,Wildvine,1,5,0
 8154,Scorpid Scale,1,250,0
 8168,Jet Black Feather,1,100,0
 8169,Thick Hide,1,500,0
@@ -151,8 +186,11 @@ ID,Display_lang,OverallQualityID,SellPrice,Bonding
 8754,Twill Cover,0,3937,0
 8755,Light Plate Helmet,0,3728,0
 8766,Morning Glory Dew,1,200,0
+8831,Purple Lotus,1,300,0
 8836,Arthas' Tears,1,95,0
 8838,Sungrass,1,60,0
+8839,Blindweed,1,375,0
+8845,Ghost Mushroom,1,375,0
 8846,Gromsblood,1,250,0
 8952,Roasted Quail,1,200,0
 8953,Deep Fried Plantains,1,200,0
@@ -363,7 +401,10 @@ ID,Display_lang,OverallQualityID,SellPrice,Bonding
 248821,Demonsage,1,225,0
 248822,Death Lotus,2,1500,0
 249274,Stranglevine,2,250,0
+249391,Pyrite,2,100,0
+249399,Frilled Lichen,2,30,0
 249424,Rosecap,2,95,0
+249425,Bauxite,2,250,0
 249426,Pitchblende,2,375,0
 249428,Pristine Hide,2,250,0
 249429,Pristine Scale,2,375,0
@@ -373,6 +414,9 @@ ID,Display_lang,OverallQualityID,SellPrice,Bonding
 255645,Swollen Venom Sac,1,370,0
 262889,Sealed Expert's Writ,3,0,0
 262890,Sealed Artisan's Writ,3,0,0
+268415,Commonplace Herb Seeds,2,10,0
+268416,Uncommon Herb Seeds,2,25,0
+268417,Unusual Herb Seeds,2,90,0
 268418,Scarce Herb Seeds,2,115,0
 280181,Redstone Basilisk Scale,1,0,4
 281015,Scroll: DOST OREM,1,15,0

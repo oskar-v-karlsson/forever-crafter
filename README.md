@@ -192,7 +192,10 @@ The **Farm** button (or `/crafter farm`) measures what a farm really earns. **St
 
 ### Built-in farms
 
-The **Farms** button on the Farm tab lists 21 known farms (Blasted Lands, Felwood, Winterspring, Un'Goro, devilsaurs, herb and ore routes, and more), each with an estimated gold per hour at today's prices.
+The **Farms** button on the Farm tab lists 53 known farms, each with an estimated gold per hour at today's prices:
+
+- 21 zone farms: Blasted Lands, Felwood, Winterspring, Un'Goro, devilsaurs, herb and ore routes, and more.
+- 32 single herb and ore nodes, from Copper, Silverleaf and Peacebloom up to Small Thorium and Gromsblood (`Ore: ...`, `Herb: ...`). Their **Zone** is **Any zone**: a node counts wherever you gather it.
 
 - **EV per kill or node:** for each item on the mob's or node's Wowhead Forever loot table, the drop chance × the average stack × what the item is worth, summed. Items are valued the same way as in farm sessions (shelf value or AH min less the cut, or the vendor price). Grey and soulbound items use the vendor price, and items with no price count as 0. A farm with several mobs or nodes averages them, equally at first and then in the mix you actually kill.
 - **Skinning and pickpocketing** count only if this character has Skinning, or is a Rogue. The details show what was left out. Herb and ore routes are greyed out without Herbalism or Mining.
@@ -200,7 +203,7 @@ The **Farms** button on the Farm tab lists 21 known farms (Blasted Lands, Felwoo
 - **g/h** = (EV + coin per kill) × rate. Wowhead has no coin data, so coin is 0 until your sessions learn it.
 - **Realm demand:** an orange `!` means one hour's drops of a top item exceed what your realm buys in a day (TSM region sold/day × the realm share). The g/h will not hold for long there.
 - **Details:** the EV split (loot, skinning, pickpocketing, gathering), how the rate was found, the top 18 drops with chance, average stack, value and price source, and a Wowhead Forever link for each mob or node.
-- **How kills are counted:** on Forever, addons cannot read the combat log. A kill is your target dying (not tapped by someone else), or a corpse you loot. A node is a herb or ore you loot from that node. Each mob or node counts once.
+- **How kills are counted:** on Forever, addons cannot read the combat log. A kill is your target dying (not tapped by someone else), or a corpse you loot. A node is a herb or ore you loot from that node. Each mob or node counts once. A zone farm's own nodes count for it in its zone; any other herb or ore node counts for its **Any zone** farm.
 
 ### Commands
 
@@ -275,6 +278,7 @@ These cannot be tested outside the game. Please go through them once and report 
 45. [ ] **Node detection:** gather a few herbs or ore in a farm's zone. Does each node count once, also when you loot it in two goes? Does pickpocketing (Rogue) not count as a kill?
 46. [ ] **Zone names:** do the built-in farms' zones (`C_Map.GetAreaInfo` of the Wowhead / AreaTable zone IDs 4, 361, 45, 618, 490, 47, 46, 616) match `GetRealZoneText()` there, so kills are counted in that zone? The **Zone** column shows the client's name.
 47. [ ] **Assumed rates:** after 10 kills or nodes, does the **Rate** turn into your learned rate, and does the details pane show the coin per kill?
+48. [ ] **Any-zone nodes:** start a session and gather a node with an **Any zone** farm (for example Peacebloom or a Copper Vein) in a zone with no farm of its own. Does that farm's **Rate** show `assumed (1)`? In Felwood, does a Small Thorium Vein count for **Felwood: Small Thorium**, not for **Ore: Small Thorium Vein**?
 
 ## Development
 
