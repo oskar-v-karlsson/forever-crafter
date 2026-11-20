@@ -20,6 +20,7 @@ import os
 import re
 import subprocess
 import sys
+import json
 import math
 import time
 
@@ -1167,6 +1168,69 @@ def shuffle_stats(res):
 
 def shuffle_text(st):
     return f"{st[0]} ({st[1]} best sold on the AH, {st[2]} on an estimated vendor price)"
+
+
+def check_vendor_costs():
+    """Data/Vendor.lua against the pinned Wowhead Forever sold-by rows (cost = [[copper, currencies, items]]), and
+    entries that cost items, a currency or serve one faction are never a gold source."""
+    lua, ns, stub = new_runtime()
+    pages = json.load(open(os.path.join(ROOT, "research", "wowhead", "pages_items.json"), encoding="utf-8"))
+    pi = {p["id"]: p for p in pages["pages"]}
+    n = 0
+    for i, v in ns.Vendor.items():
+        sb = (pi.get(i) or {}).get("lists", {}).get("sold-by")
+        if v.limited or not sb or "wh_item" not in v.src.split("+"):
+            continue
+        n += 1
+        gold, alt, cur = set(), [], []
+        for r in sb["rows"]:
+            c = r["cost"][0]
+            if len(c) > 1 and (c[1] or c[2]):
+                alt += [list(x) for x in c[2]]
+                cur += [list(x) for x in c[1]]
+            else:
+                gold.add(round(c[0] * v.vstack / (r.get("stack") or 1)))
+        got_alt = [list(x.values()) for x in v.alt.values()] if v.alt else []
+        got_cur = [list(x.values()) for x in v.currency.values()] if v.currency else []
+        if gold:
+            expect(v.price in gold and not got_alt and not got_cur,
+                   f"Vendor[{i}] price {v.price} is not a Wowhead sold-by cost {sorted(gold)}")
+            buy = ns.Items[i].buy
+            expect(buy not in gold or v.price == buy, f"Vendor[{i}] price {v.price}: DB2 BuyPrice {buy} is listed")
+        else:
+            expect(v.price == 0 and got_alt == alt[:len(got_alt)] and got_cur == cur[:len(got_cur)]
+                   and (got_alt or got_cur), f"Vendor[{i}] costs {alt or cur} on Wowhead, has alt/currency "
+                   f"{got_alt} {got_cur}")
+    expect(n >= 90, f"only {n} unlimited vendor entries checked against Wowhead pages")
+    # The reported bug: Lokhtos wants 30x Firelands Ember, Mister Graphed charges 52g 63s 15c for Black Lotus.
+    expect(ns.Vendor[7078].alt[1][1] == 227801 and ns.Vendor[7078].alt[1][2] == 30 and ns.Vendor[7078].price == 0,
+           "Essence of Fire must cost 30x item 227801")
+    expect(ns.Vendor[13468].price == 526315 and ns.Vendor[13468].src == "wh_item", "Black Lotus vendor price")
+    expect(ns.Vendor[17010].currency[1][1] == 3469, "Fiery Core costs currency 3469")
+
+    login(lua, stub, skills={TAILORING: 300})
+    P = ns.Pricing
+    expect(P.VendorUnit(7078) is None and P.VendorUnit(17010) is None, "an item or currency cost used as gold")
+    expect(P.VendorUnit(13468) == (526315, "estimate", False), "Black Lotus vendor unit")
+    # Rhapsody Malt: every NPC that sells it is Alliance (Wowhead react).
+    expect(ns.Vendor[2894].side == "Alliance" and P.VendorUnit(2894) == (50, "estimate", False), "Alliance vendor")
+    stub.faction = "Horde"
+    expect(P.VendorUnit(2894) is None and P.VendorBlock(ns.Vendor[2894]) == "Alliance vendor",
+           "a Horde character must not buy from an Alliance-only vendor")
+    stub.faction = "Alliance"
+    # A craft from Essence of Fire: no AH listing = no source (the old 16s vendor price is gone); listed = AH.
+    OUT, FIRE, THREAD = 990501, 7078, 2320
+    synthetic(lua, ns, stub, {995001: (OUT, [[FIRE, 1]]), 995002: (OUT + 1, [[THREAD, 1]])}, [OUT, OUT + 1])
+    set_auctions(lua, stub, [(OUT, 1, 100000), (OUT + 1, 1, 100000)])
+    scan(lua, stub)
+    res, _ = results(ns)
+    expect(995001 not in res or res[995001].cost is None, "Essence of Fire priced from a gold vendor")
+    expect(995002 in res and res[995002].cost == ns.Vendor[THREAD].price, "a gold vendor reagent must still count")
+    set_auctions(lua, stub, [(OUT, 1, 100000), (OUT + 1, 1, 100000), (FIRE, 1, 5000)])
+    scan(lua, stub)
+    res, _ = results(ns)
+    expect(995001 in res and res[995001].cost == 5000, "Essence of Fire from the AH")
+    return n
 
 
 def check_vendor_shuffles():
@@ -2701,6 +2765,7 @@ def main():
         check_core_flow()
         check_solver_shapes()
         check_random_output()
+        summary.append(f"vendor prices: {check_vendor_costs()} unlimited entries match the Wowhead sold-by cost")
         check_vendor_shuffles()
         check_crafting_time()
         check_fast_path()

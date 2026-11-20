@@ -206,6 +206,8 @@ function PL.Acquire(r, spell)
     if seen then
       table.insert(options, "vendor " .. Util.Money(seen.unit) .. (seen.npc and (" (" .. seen.npc .. ")") or ""))
       if not cost or seen.unit < cost then cost = seen.unit end
+    elseif v and ns.Pricing.VendorBlock(v) then
+      table.insert(options, "vendor (" .. ns.Pricing.VendorBlock(v) .. ")" .. Util.VendorNPC(item))
     elseif v then
       table.insert(options, "vendor ~" .. Util.Money(v.price) .. (v.limited and " (limited)" or "")
         .. Util.VendorNPC(item))
@@ -588,7 +590,7 @@ function PL.Confidence(spell, r)
   end
   for _, item in ipairs(r.items or {}) do
     local v = ns.Vendor[item]
-    if (v and v.recipe) or (ns.db and ns.db.vendorSeen[item]) then return 2 end
+    if (v and v.recipe and not ns.Pricing.VendorBlock(v)) or (ns.db and ns.db.vendorSeen[item]) then return 2 end
     local d = ns.Items[item]
     if d then
       for _, c in ipairs(d.how or {}) do

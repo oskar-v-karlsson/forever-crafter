@@ -953,14 +953,52 @@ def sm_role(s, source):
 
 
 def npc_side(react):
+    """Wowhead react {Alliance, Horde}: 1 friendly, 0 neutral (yellow; still trades), -1 or missing = hostile."""
     a, h = (list(react or []) + [None, None])[:2]
-    if a == 1 and h == 1:
+    a, h = a in (0, 1), h in (0, 1)
+    if a and h:
         return "both"
-    if a == 1:
+    if a:
         return "Alliance"
-    if h == 1:
+    if h:
         return "Horde"
     return "hostile"
+
+
+def sold_by_cost(rows, vstack, buy):
+    """Price for vstack items from Wowhead sold-by rows. cost = [[copper, [[currency, n]...], [[item, n]...]]].
+    → price, alt, currency, from_wh. Rows quote either the DB2 BuyPrice or a reputation-adjusted one (about
+    BuyPrice / 0.95); the DB2 price is kept when any NPC charges it, else the cheapest Wowhead gold price.
+    alt / currency: the item costs other items or a currency instead of gold (no gold price)."""
+    gold, other = set(), []
+    for r in rows:
+        c = (r.get("cost") or [[0]])[0]
+        money, cur, its = c[0], (c[1] if len(c) > 1 else []), (c[2] if len(c) > 2 else [])
+        if cur or its:
+            other.append((cur, its))
+        elif money > 0:
+            gold.add(int(round(money * vstack / max(1, r.get("stack") or 1))))
+    if gold:
+        if buy in gold:
+            return buy, None, None, False
+        return min(gold), None, None, True
+    if other:
+        cur, its = other[0]
+        return 0, [list(x) for x in its] or None, [list(x) for x in cur] or None, True
+    return buy, None, None, False
+
+
+def vendor_side(rows, unlimited):
+    """"Alliance" / "Horde" when every NPC selling the item (unlimited-stock ones if any) serves one faction only;
+    None when both can buy or the stored list is cut short (trim_page keeps the first NPCs only)."""
+    use = [r for r in rows if r.get("stock") == -1] or rows
+    if len(use) < (unlimited or len(rows)):
+        return None
+    sides = {npc_side(r.get("react")) for r in use}
+    if "both" in sides or {"Alliance", "Horde"} <= sides:
+        return None
+    one = sides - {"hostile"}
+    return one.pop() if len(one) == 1 else None
 
 
 def apply_pages(wh, recipes, items, vendor, excluded, reagent_ids, recipe_item_ids, report):
@@ -1026,7 +1064,7 @@ def apply_pages(wh, recipes, items, vendor, excluded, reagent_ids, recipe_item_i
                          for s in r["sourcemore"]][:NPC_SHOWN]
 
     # Vendors: who sells each reagent / recipe item, and whether any of them has unlimited stock.
-    stack_diff = []
+    stack_diff, cost_diff = [], []
     for i in sorted(reagent_ids | recipe_item_ids):
         p, e = pi.get(i), items.get(i)
         if not p or p.get("notFound") or not e:
@@ -1038,23 +1076,29 @@ def apply_pages(wh, recipes, items, vendor, excluded, reagent_ids, recipe_item_i
                 del vendor[i]
             continue
         rows = sb["rows"]
-        unit = min(r["cost"][0][0] / max(1, r.get("stack") or 1) for r in rows if r.get("cost"))
-        if not e.get("missing") and e["buy"] > 0:
-            price, vstack = e["buy"], e["vstack"]
+        has_buy = not e.get("missing") and e["buy"] > 0
+        if has_buy:
+            buy, vstack = e["buy"], e["vstack"]
             stacks = {r.get("stack") or 1 for r in rows}
             if stacks != {vstack}:
                 stack_diff.append(i)
         else:
-            price, vstack = int(round(unit * (rows[0].get("stack") or 1))), rows[0].get("stack") or 1
+            buy, vstack = None, rows[0].get("stack") or 1
+        price, alt, currency, from_wh = sold_by_cost(rows, vstack, buy)
+        if from_wh and has_buy:
+            cost_diff.append(i)
         shown = [r for r in rows if r.get("stock") == -1][:NPC_SHOWN] or rows[:NPC_SHOWN]
         vendor[i] = {
             "price": price, "vstack": vstack, "limited": sb["unlimited"] == 0, "recipe": i in recipe_item_ids,
             "npcs": [[r["name"], zones.get((r.get("location") or [0])[0], ""), npc_side(r.get("react"))]
                      for r in shown],
-            "nNpc": sb["total"], "page": True,
+            "nNpc": sb["total"], "page": True, "alt": alt, "currency": currency,
+            "side": vendor_side(rows, sb["unlimited"]), "db2": buy if from_wh else None, "fromWh": from_wh,
         }
     if stack_diff:
         report.append("Wowhead sold-by stack differs from DB2 VendorStackCount: %s" % stack_diff)
+    if cost_diff:
+        report.append("Wowhead sold-by cost replaces DB2 BuyPrice: %d %s" % (len(cost_diff), cost_diff))
 
     # Recipes without a source in the profession lists.
     for sp, r in recipes.items():
@@ -1226,19 +1270,35 @@ def lua_vendor(vendor, items):
            "-- nNpc = how many NPCs sell it. src wh_list (no page read): Wowhead lists the source",
            "-- \"Vendor\" and limited = it also lists other sources or quality > Common. The planner",
            "-- only uses limited vendors after an in-game merchant capture. recipe = recipe item.",
+           "-- With a page, price = the gold cost on the sold-by list: the DB2 BuyPrice when an NPC charges it, else",
+           "-- the cheapest Wowhead price (src wh_item; the comment names both). alt = {{itemID, n}, ...} or",
+           "-- currency = {{currencyID, n}, ...}: the NPC wants items or a currency, not gold (price 0; the planner",
+           "-- never buys it). side = every listed NPC serves this faction only (Wowhead react; neutral NPCs trade",
+           "-- with both); the planner skips it for the other faction.",
            "ns.Vendor = {"]
     for i in sorted(vendor):
         v = vendor[i]
-        extra = ""
+        extra, note = "", ""
         if v.get("page"):
-            extra = ",npcs={%s},nNpc=%d" % (",".join("{%s,%s,%s}" % tuple(map(lstr, n)) for n in v["npcs"]),
-                                           v["nNpc"])
-            src, ver = "db2+wh_item", PAGES_VERIFIED
+            for k in ("alt", "currency"):
+                if v.get(k):
+                    extra += ",%s={%s}" % (k, ",".join("{%d,%d}" % tuple(x) for x in v[k]))
+            if v.get("side"):
+                extra += ",side=%s" % lstr(v["side"])
+            extra += ",npcs={%s},nNpc=%d" % (",".join("{%s,%s,%s}" % tuple(map(lstr, n)) for n in v["npcs"]),
+                                            v["nNpc"])
+            src, ver = ("wh_item" if v.get("fromWh") else "db2+wh_item"), PAGES_VERIFIED
+            if v.get("alt") or v.get("currency"):
+                note = "; costs %s, not gold (DB2 BuyPrice %s)" % (", ".join(
+                    ["%dx item %d" % (n, x) for x, n in v.get("alt") or []]
+                    + ["%dx currency %d" % (n, x) for x, n in v.get("currency") or []]), v.get("db2"))
+            elif v.get("fromWh") and v.get("db2"):
+                note = "; Wowhead %d, DB2 BuyPrice %d" % (v["price"], v["db2"])
         else:
             src, ver = "db2+wh_list", DB2_VERIFIED
-        out.append("  [%d]={price=%d,vstack=%d,limited=%s,recipe=%s%s,src=\"%s\",verified=\"%s\"}, -- %s" % (
+        out.append("  [%d]={price=%d,vstack=%d,limited=%s,recipe=%s%s,src=\"%s\",verified=\"%s\"}, -- %s%s" % (
             i, v["price"], v["vstack"], llist(v["limited"]), llist(v["recipe"]), extra, src, ver,
-            items[i]["name"]))
+            items[i]["name"], note))
     out.append("}")
     return "\n".join(out) + "\n"
 

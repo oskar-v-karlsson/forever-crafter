@@ -208,6 +208,7 @@ These cannot be tested outside the game. Please go through them once and report 
 31. [ ] **Item auction purchase:** for an item that is not a commodity, does **Buy** buy the whole lot at the listed buyout (is the shown price the lot's total)?
 32. [ ] **Mail:** after a purchase, **Have** includes it at once and **Need** drops; when you take it from the mailbox, it moves from the mail to the bags and is not counted twice.
 33. [ ] **Ticked crafts and Target:** on the Sniper tab, the ticked-crafts list (5 rows, scroll with the mouse wheel when more are ticked, 7 columns) and its Total line fit above the reagent list (now 11 rows) without overlapping the status line or each other, and the window is still 1204 px wide. The **Target** box fits in its column; typing a number and pressing Enter raises **Need** at once, a blank resets it to the batch, and a refresh while you type does not overwrite the box.
+34. [ ] **Vendor costs:** at Mister Graphed (Riverglades) Black Lotus should cost 52g 63s 15c, not 40s, and at Lokhtos Darkbargainer (Blackrock Depths) the elemental essences cost 30 Firelands Ember each, not gold; a Horde character should not be told to buy Rhapsody Malt or Thunder Ale (Alliance innkeepers only). Can both factions trade with Mister Graphed (Wowhead shows him neutral to both)?
 
 ## Development
 
