@@ -94,6 +94,7 @@ How long the whole chain takes to cast: every craft of the result and of each cr
 
 - **Time** column: the chain's casting time (`57s`, `1m15s`). Click it to sort, shortest first. When the g/h comes from a faster path (see "How paths are chosen"), the Time column shows and sorts by that path's time, also marked `*`: the vendor sale's path with **Vendor shuffles** on or on a vendor shuffle row, else the AH sale's path.
 - **AH g/h** and **Vend g/h** columns: profit per hour of crafting when you sell on the AH, and when you sell to a vendor. Both are shown for every craft, whichever pays more, and each can be sorted. `—` means no AH price (none listed, or fewer than **Min AH listings**) or a vendor will not buy the item; `~` means the vendor price is an estimate; grey means a loss. The **Vendor shuffles** checkbox still sorts by **Vend. profit**; click **Vend g/h** to sort shuffles by profit per hour. These two columns use the best-g/h path, which may differ from the path behind **Profit** (marked `*`, see "How paths are chosen").
+- **Cooldown recipes** (`[cd]` before the name: Mooncloth, the Alchemy transmutes, Iron to Gold, ...) make one craft per cooldown, so they have no g/h (`cd` in the g/h columns), a batch of 1 and a sniper target of 1; the details say how long the cooldown is and whether it is shared. They are never used as a step of another craft's chain (you would buy the Mooncloth or Arcanite Bar instead). See "Cooldowns" below.
 - The details say e.g. "Crafting time 1 min 15 s (5 casts) | AH 12g 30s/h | vendor 3g/h", and each step of the chain shows its own time (crafts x cast time).
 - Only the casting counts: buying the reagents, travelling and the time between casts are not included, so real profit per hour is lower.
 - Cast times come from the game data; once you open a profession window the game's own cast times are used. If a craft of the chain has no known cast time, the time shows as "at least" (`>` in orange in the list) and there is no per-hour figure. Random-count steps count their average number of crafts, as the cost does.
@@ -153,6 +154,14 @@ Example: a vendor shuffle sells for 3s and needs 1 of reagent A (batch price 10c
 
 The Sniper tab's columns: Reagent, Need, Have (bags plus mail), Max price, Cheapest (the last search, without your own listings), Deal qty, Deal avg, Under max, Searched (seconds ago) and For (the ticked crafts). The ticked crafts, their targets, the Keep g/h % box and the purchases still in the mail are saved per character.
 
+### Cooldowns
+
+Some recipes can only be made once per cooldown: Mooncloth (3 days 23 h), Transmute: Arcanite (1 day 23 h), the elemental transmutes (23 h), Iron to Gold and Mithril to Truesilver (1 h). All the Alchemy transmutes except the last two share one cooldown: after any of them, all of them wait (DB2 cooldown category 310, "Transmute - Alchemy"). The lengths come from the Forever game data.
+
+The **Cooldowns** button in the title row (or `/crafter cd`) lists them for every character you have logged in with: Character, Recipe (`[L]` = not learned yet), **Profit** of one craft at today's AH prices with every reagent bought, where to sell, the Cooldown (`sh` = shared) and **Ready**: `Ready`, `in 5h12m`, "open the profession window" (that character's ready time was never read), "learn now" or "learn at Tailoring 230 (you 180)". The ready times are read when a character opens the profession window and after each craft, and kept across logins, so you can see when an alt's cooldown is up. Rows of recipes a character could level into show what that alt would earn per cooldown.
+
+At login, chat says e.g. `3 cooldowns ready (best: Mooncloth 36g on Hana) - /crafter cd` (a shared cooldown counts once per character). `/crafter cd login` turns that line off and on.
+
 ### Commands
 
 | Command | What it does |
@@ -164,6 +173,7 @@ The Sniper tab's columns: Reagent, Need, Have (bags plus mail), Max price, Cheap
 | `/crafter cap [<profession>] <n\|clear>` | What-if skill cap: `/crafter cap 150` for all professions, `/crafter cap mining 200` for one (name or short name, e.g. `bs`, `first aid`), `/crafter cap mining clear` to drop the override; `/crafter cap` prints them |
 | `/crafter minimap` | Show or hide the minimap button |
 | `/crafter dump` | Save the open profession window's full recipe list (learned and unlearned), reagents, outputs, the game's "how to learn" text (empty in Forever so far) and item info, for the data in this addon (see below); `/crafter dump clear` removes it |
+| `/crafter cd [login]` | The Cooldowns tab (see "Cooldowns" above); `login` turns the "N cooldowns ready" chat line at login off or on |
 | `/crafter rep` | The reputation planner (see "Reputation planner" above); `/crafter rep forget` clears the learned reputation and favor amounts |
 | `/crafter snipe [start\|stop\|clear\|forget]` | The sniper (see "Sniper" above): open its tab, start or stop searching, untick all crafts, or forget the purchases still counted as in the mail |
 | `/crafter reset` | Forget prices, merchant data and this character's recipe data (not the learned reputation amounts) |
@@ -208,6 +218,10 @@ These cannot be tested outside the game. Please go through them once and report 
 31. [ ] **Item auction purchase:** for an item that is not a commodity, does **Buy** buy the whole lot at the listed buyout (is the shown price the lot's total)?
 32. [ ] **Mail:** after a purchase, **Have** includes it at once and **Need** drops; when you take it from the mailbox, it moves from the mail to the bags and is not counted twice.
 33. [ ] **Ticked crafts and Target:** on the Sniper tab, the ticked-crafts list (5 rows, scroll with the mouse wheel when more are ticked, 7 columns) and its Total line fit above the reagent list (now 11 rows) without overlapping the status line or each other, and the window is still 1204 px wide. The **Target** box fits in its column; typing a number and pressing Enter raises **Need** at once, a blank resets it to the batch, and a refresh while you type does not overwrite the box.
+34. [ ] **Vendor costs:** at Mister Graphed (Riverglades) Black Lotus should cost 52g 63s 15c, not 40s, and at Lokhtos Darkbargainer (Blackrock Depths) the elemental essences cost 30 Firelands Ember each, not gold; a Horde character should not be told to buy Rhapsody Malt or Thunder Ale (Alliance innkeepers only). Can both factions trade with Mister Graphed (Wowhead shows him neutral to both)?
+35. [ ] **Cooldowns tab and API:** the **Cooldowns** button fits in the title row left of **Sniper** and its 6 columns fit the list. with the Tailoring window open on a character that made Mooncloth, the Cooldowns tab shows "in ..." with about the time the game shows on the recipe. The addon reads `C_TradeSkillUI.GetRecipeCooldown(recipe)` (assumed: nil when ready) and falls back to `C_Spell.GetSpellCooldown`. If it says "open the profession window" after you did, `/crafter errors` has the reason.
+36. [ ] **Shared transmute cooldown:** after Transmute: Arcanite, do the other transmutes (e.g. Air to Fire) show the same wait in the game and in the tab? Do Iron to Gold and Mithril to Truesilver keep their own 1 h cooldown (no shared category in the data)? Does Elemental Fire (category 310 but a 10 min cooldown) really block the others?
+37. [ ] **Ready time after a relog:** craft Mooncloth, log out and in (and log in an alt): the tab still shows when it is ready, and the login line counts it once it is.
 
 ## Development
 

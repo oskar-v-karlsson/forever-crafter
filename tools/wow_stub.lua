@@ -39,6 +39,7 @@ STUB = {
   purchases = {},   -- { {call, ...args}, ... } Start/Confirm/CancelCommoditiesPurchase, PlaceBid
   throttled = false, -- C_AuctionHouse.IsThrottledMessageSystemReady() == false
   money = 1000000000,
+  cooldowns = {},   -- spell ID → time() it is ready (C_TradeSkillUI.GetRecipeCooldown, C_Spell.GetSpellCooldown)
 }
 
 -- Frames ------------------------------------------------------------------------------------------
@@ -230,6 +231,19 @@ function C_Spell.GetSpellInfo(id)
   if not r or not r.cast then return nil end
   return { spellID = id, name = "spell " .. id, castTime = r.cast, minRange = 0, maxRange = 0, iconID = 0,
     originalIconID = 0 }
+end
+-- → seconds left or nil (ready), isDayCooldown, charges, maxCharges (Blizzard_Professions.lua uses it)
+function C_TradeSkillUI.GetRecipeCooldown(id)
+  local left = (STUB.cooldowns[id] or 0) - time()
+  if left <= 0 then return nil, false, 0, 0 end
+  return left, left > 3600, 0, 0
+end
+function C_Spell.GetSpellCooldown(id)
+  local left = (STUB.cooldowns[id] or 0) - time()
+  if left <= 0 then
+    return { startTime = 0, duration = 0, isEnabled = true, isActive = false, modRate = 1, isOnGCD = false }
+  end
+  return { startTime = GetTime(), duration = left, isEnabled = true, isActive = true, modRate = 1, isOnGCD = false }
 end
 function C_TradeSkillUI.GetRecipeSourceText(id)
   local r = STUB.ts and STUB.ts.recipes[id]

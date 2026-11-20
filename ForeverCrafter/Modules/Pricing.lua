@@ -20,12 +20,23 @@ function P.Cut()
   return P.ASSUMED_CUT, "assumed"
 end
 
+-- Why a static vendor entry (Data/Vendor.lua) can't be bought with gold by this character. → text or nil
+function P.VendorBlock(v)
+  if not v then return nil end
+  if v.alt or v.currency then return "costs items or a currency" end
+  if v.side then
+    local side = UnitFactionGroup and UnitFactionGroup("player")
+    if side and side ~= v.side then return v.side .. " vendor" end
+  end
+  return nil
+end
+
 -- Vendor price for one item. → unit, label ("merchant" | "estimate"), limited  or nil
 function P.VendorUnit(id)
   local seen = ns.db and ns.db.vendorSeen[id]
   if seen and seen.unit then return seen.unit, "merchant", seen.limited end
   local v = ns.Vendor[id]
-  if v and not v.limited and not v.recipe and v.price > 0 then
+  if v and not v.limited and not v.recipe and v.price > 0 and not P.VendorBlock(v) then
     return v.price / math.max(v.vstack or 1, 1), "estimate", false
   end
   return nil

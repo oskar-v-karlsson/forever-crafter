@@ -9,6 +9,7 @@
         "ClassID",
         "SubclassID"
       ],
+      "fetched": "2026-11-12",
       "full_rows": 32008,
       "full_sha256": "037ac6248ce1fceaad391fb0ec717cdb7ae1e8999e8c976c11b086a05deb5c57",
       "snapshot_rows": 4723,
@@ -21,6 +22,7 @@
         "SpellID",
         "TriggerType"
       ],
+      "fetched": "2026-11-12",
       "full_rows": 12693,
       "full_sha256": "d7b8b53248beb9e1bdbacdcf3106ff5edacadb36548a48ff4777074caba67ff3",
       "snapshot_rows": 4080,
@@ -40,6 +42,7 @@
         "RequiredSkillRank",
         "Bonding"
       ],
+      "fetched": "2026-11-12",
       "full_rows": 19325,
       "full_sha256": "ced52fc6e5ca345805cfe3c015c05426c138aebd23ff1ad8a26cff5f1fe08be9",
       "snapshot_rows": 4180,
@@ -52,6 +55,7 @@
         "ItemEffectID",
         "ItemID"
       ],
+      "fetched": "2026-11-12",
       "full_rows": 12679,
       "full_sha256": "15dc36eec90ca5768e00469cb8065aedf82efcf205ca03281daf6aac69ca1885",
       "snapshot_rows": 4080,
@@ -65,6 +69,7 @@
         "ParentSkillLineID",
         "CategoryID"
       ],
+      "fetched": "2026-11-12",
       "full_rows": 154,
       "full_sha256": "f3867d43ab42d1f5278e6e5028d0151bc06e4ef8e5cbd790a20df6ee57aa654d",
       "snapshot_rows": 18,
@@ -82,6 +87,7 @@
         "TrivialSkillLineRankHigh",
         "NumSkillUps"
       ],
+      "fetched": "2026-11-12",
       "full_rows": 7853,
       "full_sha256": "13ef58a08253125e3e9dca642a39bc480187987e90cfbe5c8be30e1ab3c8be0a",
       "snapshot_rows": 2623,
@@ -94,11 +100,56 @@
         "Base",
         "Minimum"
       ],
+      "fetched": "2026-11-12",
       "full_rows": 72,
       "full_sha256": "f94e1e3a3495d11af875fd7b007124fdd660a19ba626bc1de00a609da81f25d8",
       "snapshot_rows": 14,
       "snapshot_sha256": "42f60ec3d8d2a557f1ac06c8e5e2de9eef066dfd2a3887f377301a6c450ef7dc",
       "url": "https://wago.tools/db2/SpellCastTimes/csv?build=1.60.1.70888"
+    },
+    "SpellCategories": {
+      "columns": [
+        "ID",
+        "SpellID",
+        "DifficultyID",
+        "Category"
+      ],
+      "fetched": "2026-11-20",
+      "full_rows": 10819,
+      "full_sha256": "86a4b4624b3335277e832a16813705231ad8840aadc1ede2844213522dfe7620",
+      "snapshot_rows": 16,
+      "snapshot_sha256": "069b855034208c9e32a1c160658c80c82683ab315ef3537e78c5669617fb05f2",
+      "url": "https://wago.tools/db2/SpellCategories/csv?build=1.60.1.70888"
+    },
+    "SpellCategory": {
+      "columns": [
+        "ID",
+        "Name_lang",
+        "Flags",
+        "MaxCharges",
+        "ChargeRecoveryTime"
+      ],
+      "fetched": "2026-11-20",
+      "full_rows": 267,
+      "full_sha256": "4b8e1b6e32f341cd4f437f4ddb93f5edf6d001c8a2285e2cf749ca09718a69bd",
+      "snapshot_rows": 3,
+      "snapshot_sha256": "5db45ddb6d09ac305d6dff3187f7bee0aef963c937244e3917565158a090374c",
+      "url": "https://wago.tools/db2/SpellCategory/csv?build=1.60.1.70888"
+    },
+    "SpellCooldowns": {
+      "columns": [
+        "ID",
+        "SpellID",
+        "DifficultyID",
+        "RecoveryTime",
+        "CategoryRecoveryTime"
+      ],
+      "fetched": "2026-11-20",
+      "full_rows": 4543,
+      "full_sha256": "f5b361c78849f57e8905ad168b7d770f44ab71f81cf19cc206130a4155afdf24",
+      "snapshot_rows": 21,
+      "snapshot_sha256": "e13fc4a0fdca3c2760f1c68eb0094b6616cca79fe6b3b122d29e4c8c3a4ca75d",
+      "url": "https://wago.tools/db2/SpellCooldowns/csv?build=1.60.1.70888"
     },
     "SpellEffect": {
       "columns": [
@@ -111,6 +162,7 @@
         "EffectBasePointsF",
         "Variance"
       ],
+      "fetched": "2026-11-12",
       "full_rows": 43508,
       "full_sha256": "da2fb074eedb51bd1246ef53666044c0b757bdb67340c3969b712caa8481ac2b",
       "snapshot_rows": 2300,
@@ -124,6 +176,7 @@
         "DifficultyID",
         "CastingTimeIndex"
       ],
+      "fetched": "2026-11-12",
       "full_rows": 32461,
       "full_sha256": "4b3d573dae575c2051e71d524dc73ac3590c56aa102b69770675c0eb10508f85",
       "snapshot_rows": 2580,
@@ -135,6 +188,7 @@
         "ID",
         "Name_lang"
       ],
+      "fetched": "2026-11-12",
       "full_rows": 32482,
       "full_sha256": "4358b3d1a2a859284b2f46cf614e6a1f85320be342acc1c4b68b625f30cf47a5",
       "snapshot_rows": 2580,
@@ -162,6 +216,7 @@
         "ReagentCount_6",
         "ReagentCount_7"
       ],
+      "fetched": "2026-11-12",
       "full_rows": 3319,
       "full_sha256": "f37423f667c09a6aaada6f05bed12e6d307fe15b3596944e132492f7f1dc9cc8",
       "snapshot_rows": 2484,
