@@ -16,7 +16,7 @@ All game facts come from World of Warcraft: Forever sources only (the Forever cl
 
 ## Releases
 
-Download the newest zip from [Releases](https://github.com/oskar-v-karlsson/forever-crafter/releases/latest) (the asset `ForeverCrafter-v<version>.zip`, e.g. `ForeverCrafter-v0.1.4.zip`). It holds the `ForeverCrafter/` folder at its top level. Every push to `main` makes a release automatically (`.github/workflows/release.yml`). The workflow runs `make check`, builds the zip and publishes it, marked **Latest**. If the checks fail, no release is made.
+Download the newest zip from [Releases](https://github.com/oskar-v-karlsson/forever-crafter/releases/latest) (the asset `ForeverCrafter-v<version>.zip`, e.g. `ForeverCrafter-v0.2.0.zip`). It holds the `ForeverCrafter/` folder at its top level. Every push to `main` makes a release automatically (`.github/workflows/release.yml`). The workflow runs `make check`, builds the zip and publishes it, marked **Latest**. If the checks fail, no release is made.
 
 - **Version numbers:** each release bumps the patch number: `v0.1.1`, `v0.1.2`, ... (`tools/release_version.py` takes the newest `vX.Y.Z` tag and adds one). Older releases are tagged `v0.1.0-<commit>` and are ignored.
 - **The zip carries the real version.** Nothing is committed back to `main`, so the `## Version` in the repo's `.toc` stays at the base version; the zipped `.toc` gets the release's version, and the game's AddOns list shows it.

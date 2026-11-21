@@ -2,7 +2,7 @@
 ## Title: ForeverCrafter
 ## Notes: Finds profitable crafts and craft chains for World of Warcraft: Forever from one auction house snapshot.
 ## Author: oskar-v-karlsson
-## Version: 0.1.0
+## Version: 0.2.0
 ## SavedVariables: ForeverCrafterDB
 ## IconTexture: Interface\Icons\INV_Misc_Coin_01
 ## AddonCompartmentFunc: ForeverCrafter_OnCompartmentClick
