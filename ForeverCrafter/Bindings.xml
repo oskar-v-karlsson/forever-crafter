@@ -1,0 +1,7 @@
+<Bindings>
+	<!-- Options > Keybindings > AddOns > ForeverCrafter. Bind "Sniper: buy" to the mouse wheel to buy by scrolling.
+	     Names: BINDING_HEADER_FOREVERCRAFTER / BINDING_NAME_FOREVERCRAFTER_SNIPER_BUY (Modules/Sniper.lua). -->
+	<Binding name="FOREVERCRAFTER_SNIPER_BUY" header="FOREVERCRAFTER" category="ADDONS">
+		ForeverCrafter_SniperBuy()
+	</Binding>
+</Bindings>
