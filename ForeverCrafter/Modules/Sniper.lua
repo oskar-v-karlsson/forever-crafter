@@ -26,9 +26,14 @@ local function now()
   return time()
 end
 
+-- ns.char.snipe: rows (ticked crafts' limits), targets, bought (still in the mail), done (itemID → how many the
+-- reagent's need was met for: it is not searched again until the ticked crafts need more), spent (itemID → copper
+-- the sniper paid).
 local function store()
   local st = ns.char.snipe
   st.targets = st.targets or {}
+  st.done = st.done or {}
+  st.spent = st.spent or {}
   return st
 end
 
@@ -181,6 +186,14 @@ end
 function S.Toggle(r)
   local rows = store().rows
   if rows[r.spell] then
+    -- A met reagent stays met for the crafts still ticked: take this craft's share off.
+    local done, lim = store().done, rows[r.spell]
+    for id, g in pairs(lim.reagents or {}) do
+      if done[id] then
+        done[id] = done[id] - S.TargetQty(r.spell, lim, g)
+        if done[id] <= 0 then done[id] = nil end
+      end
+    end
     rows[r.spell] = nil
     store().targets[r.spell] = nil
     ns.Print("no longer sniping for " .. r.name)
@@ -206,13 +219,15 @@ function S.Toggle(r)
 end
 
 function S.Clear()
-  store().rows = {}
-  store().targets = {}
+  local st = store()
+  st.rows, st.targets, st.done, st.spent = {}, {}, {}, {}
   ns.Fire("SNIPE_CHANGED")
 end
 
+-- Also forgets which reagents were met, so the sniper counts only your bags again.
 function S.ForgetBought()
-  store().bought = {}
+  local st = store()
+  st.bought, st.done = {}, {}
   ns.Fire("SNIPE_CHANGED")
 end
 
@@ -258,15 +273,17 @@ function S.Owned(id)
   return cur + mail, cur, mail
 end
 
-local function addBought(id, n)
-  local bought = store().bought
-  local b = bought[id]
+local function addBought(id, n, paid)
+  local st = store()
+  local b = st.bought[id]
   local cur = bagCount(id)
   if b then
     b.n, b.bagsAt = b.n + n, cur
   else
-    bought[id] = { n = n, bagsAt = cur }
+    st.bought[id] = { n = n, bagsAt = cur }
   end
+  if st.done[id] then st.done[id] = st.done[id] + n end
+  st.spent[id] = (st.spent[id] or 0) + (paid or 0)
 end
 
 -- Watch list ------------------------------------------------------------------------------------------------------
@@ -274,7 +291,10 @@ end
 S.seen = {}    -- itemID → { time, commodity, listings = { { unit, qty, total, auctionID }, ... } cheapest first }
 
 -- One entry per reagent of the ticked rows: { id, rows = { { spell, name, kind, max, qty } } (highest max first), max
--- (the highest), need, owned, bags, mail }.
+-- (the highest), total (the rows' qty), need, owned, bags, mail, met }.
+-- Once a reagent's need is met it stays met (store().done = the total it was met for), even when crafting or the bank
+-- takes it out of your bags: it is searched again only when the rows need more than that (a higher Target or batch),
+-- and then only for the difference.
 function S.Watch()
   local byID, list = {}, {}
   if not ns.char then return list end
@@ -299,11 +319,90 @@ function S.Watch()
     end)
     w.max = w.rows[1].max
     w.owned, w.bags, w.mail = S.Owned(w.id)
+    w.total = 0
+    for _, row in ipairs(w.rows) do w.total = w.total + row.qty end
+    local st = store()
+    local done = st.done[w.id]
+    if done then w.owned = math.max(w.owned, done) end
     w.need = S.NeedAt(w, 0)
+    if w.need <= 0 then
+      st.done[w.id] = math.max(done or 0, w.total)
+      w.met = true
+    end
     w.deal = S.Deal(w)
+  end
+  local st = store()
+  local ticked = {}
+  for _, lim in pairs(st.rows) do
+    for id in pairs(lim.reagents or {}) do ticked[id] = true end
+  end
+  for _, t in ipairs({ st.done, st.spent }) do
+    for id in pairs(t) do
+      if not ticked[id] then t[id] = nil end
+    end
   end
   table.sort(list, function(a, b) return a.id < b.id end)
   return list
+end
+
+-- Listings to estimate with: the last search, else the scan's price steps. → { { unit, qty }, ... }, "search" | "scan"
+local function listingsFor(id)
+  local seen = S.seen[id]
+  if seen and not seen.timedOut then return seen.listings, "search" end
+  local p = ns.Scanner.Price(id)
+  if not p then return {}, nil end
+  local out = {}
+  if p.steps then
+    for i = 1, #p.steps, 2 do table.insert(out, { unit = p.steps[i], qty = p.steps[i + 1] }) end
+  else
+    for _, s in ipairs(p.ladder or {}) do table.insert(out, { unit = s[1], qty = s[2] }) end
+  end
+  return out, "scan"
+end
+
+-- The estimated gold to buy what is still needed: the cheapest listings each row's max accepts (the last search, else
+-- the scan), the rest at the row's max (the most the sniper pays; it waits for cheaper listings). → { total, listed
+-- (units priced at a listing), atMax (units priced at the max), from = "search" | "scan" | nil }
+function S.Estimate(w)
+  local est = { total = 0, listed = 0, atMax = 0 }
+  if w.need <= 0 then return est end
+  local left, owned = {}, w.owned or 0
+  for i = #w.rows, 1, -1 do                      -- lowest max first, as in S.Deal
+    local row = w.rows[i]
+    local fill = math.min(owned, row.qty)
+    owned = owned - fill
+    if row.qty > fill then table.insert(left, { max = row.max, n = row.qty - fill }) end
+  end
+  local listings
+  listings, est.from = listingsFor(w.id)
+  for _, l in ipairs(listings) do
+    if l.unit > w.max then break end
+    local q = l.qty
+    for _, row in ipairs(left) do
+      if q <= 0 then break end
+      if row.max >= l.unit and row.n > 0 then
+        local n = math.min(q, row.n)
+        row.n, q = row.n - n, q - n
+        est.total, est.listed = est.total + n * l.unit, est.listed + n
+      end
+    end
+  end
+  for _, row in ipairs(left) do
+    est.total, est.atMax = est.total + row.n * row.max, est.atMax + row.n
+  end
+  return est
+end
+
+-- Over a watch list: { total (estimated, still to buy), spent (by the sniper, on the watched reagents) }
+function S.Spend(list)
+  local out = { total = 0, spent = 0 }
+  if not ns.char then return out end
+  local spent = store().spent
+  for _, w in ipairs(list) do
+    out.total = out.total + S.Estimate(w).total
+    out.spent = out.spent + (spent[w.id] or 0)
+  end
+  return out
 end
 
 -- How many more to buy at unit price p: the rows whose max is at least p, less what you own (owned items go to the
@@ -636,10 +735,93 @@ function S.Buy(w)
   ns.Fire("SNIPE_CHANGED")
 end
 
+-- What was bought is gone from the last search: take it off, so a quick next buy does not aim at it.
+local function consume(p)
+  local seen = S.seen[p.id]
+  if not seen then return end
+  seen.time = -math.huge                         -- search it again soon
+  if p.auctionID then
+    for i, l in ipairs(seen.listings) do
+      if l.auctionID == p.auctionID then
+        table.remove(seen.listings, i)
+        return
+      end
+    end
+    return
+  end
+  local left = p.qty
+  while left > 0 and seen.listings[1] do
+    local l = seen.listings[1]
+    local n = math.min(left, l.qty)
+    l.qty, l.total, left = l.qty - n, (l.qty - n) * l.unit, left - n
+    if l.qty <= 0 then table.remove(seen.listings, 1) end
+  end
+end
+
 local function bought(p, total)
-  addBought(p.id, p.qty)
-  if S.seen[p.id] then S.seen[p.id].time = -math.huge end
+  addBought(p.id, p.qty, total)
+  consume(p)
   finish(string.format("bought %d x %s for %s (sent to your mailbox)", p.qty, Util.ItemName(p.id), Util.Money(total)))
+end
+
+-- A failed purchase: what the last search showed may be gone. Search again before the next buy of it.
+local function stale(id)
+  if id and S.seen[id] then S.seen[id] = { time = -math.huge, commodity = S.seen[id].commodity, listings = {} } end
+end
+
+-- Mouse-wheel / key-binding buys ------------------------------------------------------------------------------------
+
+S.QUICK_GAP = 0.3       -- seconds between two quick buys (a wheel turn sends many events)
+S.QUICK_SAY = 5         -- seconds between two "why not" messages
+S.lastQuick, S.lastSay = -math.huge, -math.huge
+
+local function say(msg)
+  local t = now()
+  if t - S.lastSay < S.QUICK_SAY then return end
+  S.lastSay = t
+  ns.Print(msg)
+end
+
+-- A wheel turn over the Scroll-to-buy pad, or the "Sniper: buy" key binding: the same as a Buy click, but only when a
+-- buy is ready (a deal, or a quote waiting for its Confirm click), one per event, never while a purchase is in flight,
+-- and at most one per S.QUICK_GAP. Must run in the hardware event. → true if it bought (or confirmed)
+function S.QuickBuy(selected)
+  local p = S.pending
+  if p and p.stage ~= "click" then return false end
+  if not ns.Scanner.ahOpen then return false end
+  local t = now()
+  if t - S.lastQuick < S.QUICK_GAP then return false end
+  local w
+  if not p then
+    local _
+    _, w = S.BuyTarget(selected)
+    if not w then return false end
+    local m = money()
+    if m and m < w.deal.total then
+      say("not enough money for " .. Util.Money(w.deal.total))
+      return false
+    end
+  end
+  S.lastQuick = t
+  S.Buy(w)
+  return true
+end
+
+-- Bindings.xml: "Sniper: buy" (bind it to the mouse wheel in Options > Keybindings > AddOns).
+BINDING_HEADER_FOREVERCRAFTER = "ForeverCrafter"
+BINDING_NAME_FOREVERCRAFTER_SNIPER_BUY = "Sniper: buy"
+function ForeverCrafter_SniperBuy()
+  local sel = ns.UI and ns.UI.SnipeSelected and ns.UI.SnipeSelected() or nil
+  S.QuickBuy(sel)
+end
+
+-- The Scroll-to-buy button's text. ready = a deal is ready (S.BuyTarget found one).
+function S.WheelLabel(ready)
+  local p = S.pending
+  if p and p.stage == "click" then return "|cff40ff40Scroll to confirm|r" end
+  if p then return "Scroll to buy (buying...)" end
+  if ready and ns.Scanner.ahOpen then return "|cff40ff40Scroll to buy|r" end
+  return "Scroll to buy (no deal)"
 end
 
 -- The quote, or a new one after a confirm (the price changed): over the budget cancels. A new quote after a confirm
@@ -680,7 +862,10 @@ end)
 
 ns.On("COMMODITY_PURCHASE_FAILED", function()
   S.late = nil
-  if S.pending then finish("the purchase failed (someone may have bought it first)") end
+  if S.pending then
+    stale(S.pending.id)
+    finish("the purchase failed (someone may have bought it first)")
+  end
 end)
 
 ns.On("AUCTION_HOUSE_PURCHASE_COMPLETED", function(auctionID)
@@ -690,7 +875,10 @@ end)
 
 ns.On("AUCTION_HOUSE_SHOW_ERROR", function(err)
   local p = S.pending
-  if p and p.stage == "bid" then finish("the purchase failed (AH error " .. tostring(err) .. ")") end
+  if p and p.stage == "bid" then
+    stale(p.id)
+    finish("the purchase failed (AH error " .. tostring(err) .. ")")
+  end
 end)
 
 -- A restricted call was blocked: ConfirmCommoditiesPurchase from an event handler needs a second click instead.
@@ -727,9 +915,10 @@ end)
 -- Sniper tab ------------------------------------------------------------------------------------------------------
 
 S.COLUMNS = {
-  { key = "name", label = "Reagent", width = 170 },
-  { key = "need", label = "Need", width = 46, hint = "How many more to buy: the ticked crafts' batches less what is in "
-    .. "your bags and what you bought that is still in the mail." },
+  { key = "name", label = "Reagent", width = 140 },
+  { key = "need", label = "Need", width = 46, hint = "How many more to buy: the ticked crafts' Targets (else batches) "
+    .. "less what is in your bags and what you bought that is still in the mail. done = met: not searched again until "
+    .. "a Target or batch rises, even after you craft with it." },
   { key = "have", label = "Have", width = 50, hint = "In your bags plus bought and still in the mail." },
   { key = "max", label = "Max price", width = 80, hint = "The most to pay per item: keeps each ticked craft at Keep g/h "
     .. "of its g/h (AH sales: of the g/h after a 10% price drop)." },
@@ -737,13 +926,16 @@ S.COLUMNS = {
   { key = "dqty", label = "Deal qty", width = 56, hint = "How many the Buy button buys: listings at or under the max, up "
     .. "to the need." },
   { key = "davg", label = "Deal avg", width = 80, hint = "Average price per item of that deal." },
-  { key = "under", label = "Under max", width = 64, hint = "How far the deal is under the max price." },
-  { key = "seen", label = "Searched", width = 56, hint = "Time since the last search for it." },
-  { key = "rows", label = "For", width = 100 },
+  { key = "under", label = "Under max", width = 58, hint = "How far the deal is under the max price." },
+  { key = "seen", label = "Searched", width = 52, hint = "Time since the last search for it." },
+  { key = "est", label = "Est. cost", width = 74, hint = "Estimated gold to buy the rest of the need: the cheapest "
+    .. "listings at or under the max (the last search, else the scan), the rest at the max price (the most the sniper "
+    .. "pays). ~ = an estimate; listings change." },
+  { key = "rows", label = "For", width = 80 },
 }
 
-S.FOOTER = "Buy = one purchase per click; Need 0 = done (raise a craft's Target to buy more); searches run only "
-  .. "while the AH is open"
+S.FOOTER = "Buy = one purchase per click or per wheel turn on Scroll to buy; Need done = met, not searched again "
+  .. "(raise a craft's Target to buy more); searches run only while the AH is open"
 
 -- The ticked crafts above the reagent list.
 S.CRAFT_COLUMNS = {
@@ -879,7 +1071,14 @@ function S.SortValue(w, key)
     return s and s.time or -math.huge
   end
   if key == "rows" then return #w.rows end
+  if key == "est" then return S.Estimate(w).total end
   return w.deal and (w.max - w.deal.avg) / w.max or -math.huge
+end
+
+-- "~1g 20s"; "—" when nothing is needed.
+function S.EstText(w)
+  if w.need <= 0 then return "—" end
+  return "~" .. Util.Money(math.floor(S.Estimate(w).total + 0.5))
 end
 
 function S.CellText(w, key)
@@ -902,8 +1101,10 @@ function S.CellText(w, key)
   end
   if key == "seen" then
     if S.current and S.current.id == w.id then return "|cffffd100now|r" end
+    if w.met then return "|cff808080met|r" end
     return s and ago(s.time) or "never"
   end
+  if key == "est" then return S.EstText(w) end
   if key == "rows" then
     local first = w.rows[1].name or "?"
     return #w.rows > 1 and string.format("%s +%d", first, #w.rows - 1) or first
@@ -958,7 +1159,9 @@ function S.DetailText(w)
     table.insert(out, "")
     table.insert(out, "Tick the Snipe box of a craft in the craft list: its AH reagents are watched here with its cheap "
       .. "batch quantities (raise a craft's Target above to buy for more crafts). Open the AH and press Start: the sniper searches the watched reagents one at a time and "
-      .. "lists listings at or under the max price. Press Buy for each purchase (the game needs a click per buy).")
+      .. "lists listings at or under the max price. Press Buy for each purchase (the game needs a click per buy), or turn "
+      .. "the mouse wheel over Scroll to buy (one purchase per wheel step, only when a deal is ready). You can also bind "
+      .. "Sniper: buy in Options > Keybindings > AddOns.")
     table.insert(out, "")
     table.insert(out, "Max price: a deal must keep the craft at Keep g/h of the g/h it would earn if its AH sale price "
       .. "fell 10% (a vendor sale has no cushion). The room left is shared as one markup over all of the craft's AH "
@@ -968,6 +1171,22 @@ function S.DetailText(w)
   table.insert(out, Util.ItemText(w.id))
   table.insert(out, string.format("Need %d more  |  bags %d, in the mail %d  |  max %s", w.need, w.bags, w.mail,
     Util.Money(w.max)))
+  if w.met then
+    table.insert(out, string.format("|cff40c040Met|r for %d: not searched again until the ticked crafts need more "
+      .. "(a higher Target or batch), even after you craft with it. Forget bought resets it.", store().done[w.id] or w.total))
+  else
+    local est = S.Estimate(w)
+    local parts = {}
+    if est.listed > 0 then
+      table.insert(parts, string.format("%d at the %s listings", est.listed,
+        est.from == "search" and "last search's" or "scan's"))
+    end
+    if est.atMax > 0 then table.insert(parts, string.format("%d at the max price", est.atMax)) end
+    table.insert(out, string.format("Est. cost of the need: ~%s (%s; an estimate)", Util.Money(math.floor(est.total + 0.5)),
+      table.concat(parts, ", ")))
+  end
+  local spent = store().spent[w.id]
+  if spent and spent > 0 then table.insert(out, "Spent by the sniper: " .. Util.Money(spent)) end
   if w.deal then
     table.insert(out, string.format("|cff40ff40Deal:|r %d at %s each (%s); cancelled if the quote is over %s", w.deal.qty,
       Util.Money(math.floor(w.deal.avg + 0.5)), Util.Money(w.deal.total),
@@ -1010,7 +1229,8 @@ function S.OptionLines(w, out)
   end
 end
 
-function S.StatusText(n)
+-- n = the number of watched reagents; list = the watch list (for the estimated cost), optional.
+function S.StatusText(n, list)
   local parts = {}
   if S.running then
     table.insert(parts, "|cff40ff40Sniping|r" .. (S.current and (": " .. Util.ItemName(S.current.id)) or ""))
@@ -1025,6 +1245,11 @@ function S.StatusText(n)
   table.insert(parts, string.format("%d reagent%s for %d craft%s", n, n == 1 and "" or "s", crafts,
     crafts == 1 and "" or "s"))
   if noRoom > 0 then table.insert(parts, string.format("|cffff8040%d with no room|r", noRoom)) end
+  if list then
+    local sp = S.Spend(list)
+    table.insert(parts, string.format("est. ~%s to buy, spent %s", Util.Money(math.floor(sp.total + 0.5)),
+      Util.Money(sp.spent)))
+  end
   table.insert(parts, string.format("keep %d%% g/h", math.floor(S.Floor() * 100 + 0.5)))
   if S.pending then table.insert(parts, "|cffffd100buying " .. Util.ItemName(S.pending.id) .. "|r") end
   if not ns.Scanner.ahOpen then table.insert(parts, "|cffff8040open the AH|r") end

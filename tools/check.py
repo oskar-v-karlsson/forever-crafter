@@ -734,7 +734,9 @@ def check_sniper():
     expect(stub.purchases[k + 1][1] == "Confirm", "the Confirm click does not confirm")
     stub.fire("COMMODITY_PURCHASE_SUCCEEDED")
     expect(S.pending is None and ns.char.snipe.bought[R2].n == 10, "purchase after the click")
+    expect(not S.seen[R2].listings[1], "a purchase must take the bought listings off the last search")
     # A new quote after the confirm (the price changed) is not confirmed by itself; unconfirmed, it is cancelled.
+    stub.fire("COMMODITY_SEARCH_RESULTS_UPDATED", R2)
     r2 = {e.id: e for e in S.Watch().values()}[R2]
     S.Buy(r2)
     stub.fire("COMMODITY_PRICE_UPDATED", 20, 200)
@@ -744,6 +746,7 @@ def check_sniper():
     stub.runTimers(S.CLICK_WAIT + 1)
     expect(S.pending is None and stub.purchases[len(stub.purchases)][1] == "Cancel", "an unconfirmed quote stays open")
     # A confirm the AH does not answer in time is not cancelled, and a late success still counts.
+    stub.fire("COMMODITY_SEARCH_RESULTS_UPDATED", R2)
     S.Buy({e.id: e for e in S.Watch().values()}[R2])
     stub.fire("COMMODITY_PRICE_UPDATED", 20, 200)
     k = len(stub.purchases)
@@ -1676,6 +1679,172 @@ def check_sniper_target():
     expect("keep 90% g/h, target 150 crafts (batch 50)" in UI.DetailText(v), "craft detail has no target")
     errs = list(ns.errors.values())
     expect(not errs, f"errors in the sniper target checks: {errs[:3]}")
+
+
+def check_sniper_quick():
+    """Scroll to buy (one purchase per wheel step, never while one is in flight), the estimated cost, and met
+    reagents that are not searched again until a Target rises."""
+    lua, ns, stub = new_runtime()
+    g = lua.globals()
+    login(lua, stub, skills={TAILORING: 300})
+    R1, R2, R3, OV, OA = 990601, 990602, 990603, 990611, 990612
+    V, A = 991601, 991602
+    synthetic(lua, ns, stub, {V: (OV, [[R1, 1], [R2, 2]]), A: (OA, [[R1, 1], [R3, 1]])}, [R1, R2, R3, OV, OA])
+    ns.Recipes[V].cast = 5000
+    ns.Items[OV].sell = 300
+    stub["items"][OV] = lua.table_from({"name": f"Test {OV}", "sell": 300})
+    set_auctions(lua, stub, [(OA, 1, 1000), (R1, 50, 500), (R1, 100, 100000), (R2, 100, 2000), (R2, 100, 200000),
+                             (R3, 50, 1500), (R3, 100, 150000)])
+    scan(lua, stub)
+    res, _ = results(ns)
+    S, UI = ns.Sniper, ns.UI
+    v, a = res.get(V), res.get(A)
+    if not expect(v and a, "quick-buy test recipes not evaluated"):
+        return
+    S.Toggle(v)
+    S.Toggle(a)
+    done = ns.char.snipe.done
+
+    def watch():
+        return {e.id: e for e in S.Watch().values()}
+
+    # The estimate: the scan's price steps when there is no search (R1: 50 at 10c, then 100 at 10g; max 15c+).
+    w = watch()
+    est = S.Estimate(w[R1])
+    expect((est["from"], est.listed, est.atMax) == ("scan", 50, 50)
+           and est.total == 50 * 10 + sum(r.qty * r.max for r in w[R1].rows.values() if r.spell == A),
+           f"estimate from the scan {(est['from'], est.listed, est.atMax, est.total)}")
+    # From the last search: owned fill the lowest max first, listings go cheapest first to rows whose max takes
+    # them, units not listed under the max count at the max.
+    d = lua.execute("""
+      local S = ...
+      local w = { id = 990699, max = 30, owned = 10, need = 50,
+        rows = { { spell = 1, max = 30, qty = 40 }, { spell = 2, max = 22, qty = 30 } } }
+      S.seen[990699] = { time = 0, commodity = true, listings = { { unit = 20, qty = 30 }, { unit = 25, qty = 50 } } }
+      local a = S.Estimate(w)
+      S.seen[990699] = { time = 0, commodity = true, listings = { { unit = 20, qty = 5 }, { unit = 31, qty = 99 } } }
+      local b = S.Estimate(w)
+      S.seen[990699] = nil
+      return { a.total, a.listed, a.atMax, a.from, b.total, b.listed, b.atMax }
+    """, S)
+    expect(list(d.values()) == [20 * 20 + 10 * 20 + 30 * 25, 60, 0, "search", 5 * 20 + 15 * 22 + 40 * 30, 5, 55],
+           f"estimate from a search {list(d.values())}")
+    slash(lua, "snipe")
+    frame = g.ForeverCrafterFrame
+    expect("est. ~" in frame.status.__text and "spent " in frame.status.__text, f"status {frame.status.__text!r}")
+    r1row = [e for e in UI.view.values() if e.id == R1][0]
+    expect(S.CellText(r1row, "est") == "~" + ns.Util.Money(est.total)
+           and "Est. cost of the need: ~" in UI.DetailText(r1row), "Est. cost cell / detail")
+
+    # Scroll to buy: shown on the Sniper tab only; a wheel step buys the deal, one at a time.
+    pad = frame.sn.wheel
+    expect(pad.__shown and "no deal" in pad.__text, f"pad {pad.__text!r}")
+    stub.fire("AUCTION_HOUSE_SHOW")
+    stub.commodity[R2] = ltable(lua, [[20, 30], [40, 500]])
+    stub.fire("COMMODITY_SEARCH_RESULTS_UPDATED", R2)
+    UI.Refresh()
+    expect("Scroll to buy|r" in pad.__text, f"pad when a deal is ready {pad.__text!r}")
+    stub.purchases = lua.table()
+    wheel = lambda: pad.__scripts.OnMouseWheel(pad, -1)
+    wheel()
+    expect(len(stub.purchases) == 1 and stub.purchases[1][1] == "Start" and stub.purchases[1][2] == R2
+           and stub.purchases[1][3] == 30, f"a wheel step does not buy {len(stub.purchases)}")
+    stub.runTimers(1)
+    wheel()
+    wheel()
+    expect(len(stub.purchases) == 1 and "buying" in S.WheelLabel(True), "a wheel step bought while a quote was open")
+    stub.fire("COMMODITY_PRICE_UPDATED", 20, 600)
+    expect(stub.purchases[2][1] == "Confirm", "an OK quote was not confirmed")
+    stub.runTimers(1)
+    wheel()
+    expect(len(stub.purchases) == 2, "a wheel step during the confirm")
+    stub.fire("COMMODITY_PURCHASE_SUCCEEDED")
+    expect(ns.char.snipe.spent[R2] == 600 and S.Spend(S.Watch()).spent == 600, "spent not counted")
+    # The bought listings are gone: the next wheel step has no deal (the 40c ones are over the max).
+    stub.runTimers(1)
+    wheel()
+    expect(len(stub.purchases) == 2 and watch()[R2].deal is None, "a wheel step bought a listing already bought")
+    # A quote waiting for a click (the confirm was blocked): the wheel confirms it, but not twice within the gap.
+    stub.commodity[R2] = ltable(lua, [[21, 10]])
+    stub.fire("COMMODITY_SEARCH_RESULTS_UPDATED", R2)
+    wheel()
+    stub.fire("COMMODITY_PRICE_UPDATED", 21, 210)
+    stub.fire("ADDON_ACTION_BLOCKED", "ForeverCrafter", "C_AuctionHouse.ConfirmCommoditiesPurchase()")
+    expect(S.pending and S.pending.stage == "click" and "confirm" in S.WheelLabel(False), "blocked confirm")
+    k = len(stub.purchases)
+    wheel()
+    expect(len(stub.purchases) == k, "the wheel confirmed within the gap")
+    stub.runTimers(S.QUICK_GAP + 0.01)
+    wheel()
+    expect(len(stub.purchases) == k + 1 and stub.purchases[k + 1][1] == "Confirm", "the wheel does not confirm")
+    stub.fire("COMMODITY_PURCHASE_SUCCEEDED")
+    # The key binding does the same; nothing when there is no deal or the AH is closed.
+    stub.commodity[R2] = ltable(lua, [[22, 5]])
+    stub.fire("COMMODITY_SEARCH_RESULTS_UPDATED", R2)
+    stub.runTimers(1)
+    k = len(stub.purchases)
+    g.ForeverCrafter_SniperBuy()
+    expect(len(stub.purchases) == k + 1 and stub.purchases[k + 1][1] == "Start" and stub.purchases[k + 1][3] == 5,
+           "the key binding does not buy")
+    stub.fire("COMMODITY_PRICE_UPDATED", 22, 110)
+    stub.fire("COMMODITY_PURCHASE_SUCCEEDED")
+    stub.runTimers(1)
+    k = len(stub.purchases)
+    expect(not S.QuickBuy(None) and len(stub.purchases) == k, "a quick buy without a deal")
+    stub.commodity[R2] = ltable(lua, [[22, 5]])
+    stub.fire("COMMODITY_SEARCH_RESULTS_UPDATED", R2)
+    stub.fire("AUCTION_HOUSE_CLOSED")
+    stub.runTimers(1)
+    expect(not S.QuickBuy(None) and len(stub.purchases) == k, "a quick buy with the AH closed")
+    expect(g.BINDING_NAME_FOREVERCRAFTER_SNIPER_BUY == "Sniper: buy" and g.BINDING_HEADER_FOREVERCRAFTER, "binding names")
+    xml = read(os.path.join(ADDON, "Bindings.xml"))
+    expect(re.search(r'<Binding name="FOREVERCRAFTER_SNIPER_BUY" header="FOREVERCRAFTER" category="ADDONS">\s*'
+                     r'ForeverCrafter_SniperBuy\(\)\s*</Binding>', xml), "Bindings.xml")
+    frame.snipeTab.Click(frame.snipeTab)
+    expect(not pad.__shown, "Scroll to buy shown on the craft list")
+    slash(lua, "snipe")
+
+    # Met: R2 (V: 100 at its batch) is met by bags; it stays met when crafting takes them, and is not searched.
+    ns.char.snipe.bought = lua.table()
+    ns.char.snipe.spent = lua.table()
+    stub.bags[R2] = 100
+    expect(watch()[R2].met and done[R2] == 100, f"met latch {done[R2]}")
+    stub.bags[R2] = 0
+    w = watch()
+    expect(w[R2].met and w[R2].need == 0 and S.Estimate(w[R2]).total == 0 and S.CellText(w[R2], "need").find("done") > 0
+           and "Met|r for 100" in UI.DetailText(w[R2]), "met reagent searched again after crafting")
+    stub.fire("AUCTION_HOUSE_SHOW")
+    n0 = len(stub.searches)
+    S.Start()
+    stub.runTimers(30)
+    ids = {stub.searches[i].key.itemID for i in range(n0 + 1, len(stub.searches) + 1)}
+    expect(R2 not in ids and R1 in ids, f"searched {ids}")
+    # A higher Target resumes it, for the difference only; buying that latches it again.
+    S.SetTarget(V, 75)
+    w = watch()
+    expect(not w[R2].met and w[R2].need == 50 and done[R2] == 100, f"after a raise: need {w[R2].need}")
+    n0 = len(stub.searches)
+    stub.runTimers(30)
+    ids = {stub.searches[i].key.itemID for i in range(n0 + 1, len(stub.searches) + 1)}
+    expect(R2 in ids, f"a raised Target is not searched {ids}")
+    S.Stop()
+    stub.commodity[R2] = ltable(lua, [[20, 50]])
+    stub.fire("COMMODITY_SEARCH_RESULTS_UPDATED", R2)
+    stub.runTimers(1)
+    S.Buy(watch()[R2])
+    stub.fire("COMMODITY_PRICE_UPDATED", 20, 1000)
+    stub.fire("COMMODITY_PURCHASE_SUCCEEDED")
+    expect(done[R2] == 150 and watch()[R2].met, f"bought the difference: done {done[R2]}")
+    # Untick takes the craft's share off a shared reagent: R1 met at 125 (V 75 + A 50), A unticked → 75 for V.
+    stub.bags[R1] = 125
+    watch()
+    stub.bags[R1] = 0
+    S.Toggle(a)
+    expect(done[R1] == 75 and watch()[R1].met, f"untick share {done[R1]}")
+    S.ForgetBought()
+    expect(not any(True for _ in ns.char.snipe.done) and not watch()[R1].met, "Forget keeps the met reagents")
+    errs = list(ns.errors.values())
+    expect(not [e for e in errs if "blocked" not in e], f"errors in the quick-buy checks: {errs[:3]}")
 
 
 def check_merchant():
@@ -3525,6 +3694,7 @@ def main():
         check_merchant()
         check_sniper()
         check_sniper_target()
+        check_sniper_quick()
         check_cooldowns()
         check_shelves()
         check_farm()

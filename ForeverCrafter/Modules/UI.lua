@@ -875,7 +875,7 @@ local function maxPrimariesText(n)
 end
 
 function UI.StatusText()
-  if snipeMode() then return ns.Sniper.StatusText(#UI.view) end
+  if snipeMode() then return ns.Sniper.StatusText(#UI.view, UI.view) end
   if cdMode() then return ns.Cooldowns.StatusText(#UI.view) end
   if listPanel() then return listPanel().StatusText(#UI.view) end
   if repMode() then
@@ -1069,6 +1069,11 @@ function UI.RelistSnipe()
   if not frame or not snipeMode() then return end
   UI.results = ns.Sniper.List()
   UI.ApplyFilter()
+end
+
+-- The reagent selected on the Sniper tab (what Buy, Scroll to buy and the key binding buy first), or nil.
+function UI.SnipeSelected()
+  return frame ~= nil and frame:IsShown() and snipeMode() and UI.selected or nil
 end
 
 local function targetBox(row)
@@ -1439,7 +1444,19 @@ local function build()
   end)
   sn.forget:SetPoint("TOPLEFT", 550, -38)
   hint(sn.forget, { "Forget bought", "What you bought counts as owned until it arrives in your bags from the mail. "
-    .. "Forget it, e.g. if you sold or used it." })
+    .. "Forget it, e.g. if you sold or used it. Also forgets which reagents were met, so they are searched again." })
+  -- Scroll to buy: each mouse-wheel step over it is one Buy (a hardware event), only when a buy is ready.
+  sn.wheel = button(frame, 200, "Scroll to buy", function()
+    ns.Sniper.QuickBuy(UI.SnipeSelected())
+  end)
+  sn.wheel:SetPoint("TOPLEFT", 666, -38)
+  sn.wheel:EnableMouseWheel(true)
+  sn.wheel:SetScript("OnMouseWheel", function()
+    ns.Sniper.QuickBuy(UI.SnipeSelected())
+  end)
+  hint(sn.wheel, { "Scroll to buy", "Turn the mouse wheel over this button: each wheel step does what the Buy button "
+    .. "does, but only when a deal (or a Confirm) is ready, one purchase at a time. Nothing happens while a purchase "
+    .. "is in flight.", "Or bind Sniper: buy in Options > Keybindings > AddOns (e.g. to the mouse wheel)." })
   frame.sn = sn
   frame.repTab:SetPoint("TOPRIGHT", -40, -8)
   hint(frame.repTab, { "Reputation", "The cheapest ways to gain reputation with " .. select(2, ns.Reputation.Faction())
@@ -1795,6 +1812,7 @@ function UI.Refresh()
     frame.sn.buy:SetText(label)
     frame.sn.buy:SetEnabled(ns.Scanner.ahOpen and (target ~= nil or (ns.Sniper.pending ~= nil
       and ns.Sniper.pending.stage == "click")))
+    frame.sn.wheel:SetText(ns.Sniper.WheelLabel(target ~= nil))
     refreshCrafts()
   end
   for _, c in pairs(frame.wi) do c:SetShown(wi) end
